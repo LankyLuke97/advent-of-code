@@ -10,9 +10,6 @@ int Day1::calculatePuzzle1(std::vector<std::string> input) {
 		std::string::iterator firstNum = line.begin();
 		std::string::iterator lastNum = line.end() - 1;
 
-		int iterFrontCount = 0;
-		int iterBackCount = line.size();
-
 		while(firstNum < line.end()) {
 			if(*firstNum <= '9' && *firstNum >= '0') break;
 			firstNum++;
@@ -36,28 +33,62 @@ int Day1::calculatePuzzle2(std::vector<std::string> input) {
 	std::vector<std::string> wordsBackward = { "orez", "eno", "owt", "eerht", "ruof", "evif", "xis", "neves", "thgie", "enin" };
 
 	for (std::string line : input) {
-		if(line.empty()) break;
-		std::string::iterator firstNum = line.begin();
-		std::string::iterator lastNum = line.end() - 1;
+		if (line.empty()) break;
+		std::string::iterator firstPtr = line.begin();
+		std::string::iterator lastPtr = line.end() - 1;
 
-		int iterFrontCount = 0;
-		int iterBackCount = line.size();
-
-		while (firstNum < line.end()) {
-			if (*firstNum <= '9' && *firstNum >= '0') break;
-			firstNum++;
+		while (firstPtr < line.end()) {
+			if (*firstPtr <= '9' && *firstPtr >= '0') break;
+			firstPtr++;
 		}
 
-		while (lastNum > line.begin()) {
-			if (*lastNum <= '9' && *lastNum >= '0') break;
-			lastNum--;
+		while (lastPtr > line.begin()) {
+			if (*lastPtr <= '9' && *lastPtr >= '0') break;
+			lastPtr--;
 		}
 
-		for(std::string word : wordsForward
+		if (firstPtr == line.end()) firstPtr = line.end() - 1;
+
+		int firstIndex = firstPtr - line.begin();
+		int lastIndex = lastPtr - line.begin();
+		int firstNum = -1;
+		int lastNum = -1;
+		std::string before = line.substr(0, firstIndex);
+		std::string after = line.substr(lastIndex, line.end() - lastPtr);
+		std::reverse(after.begin(), after.end());
+
+		for (int i = 0; i < wordsForward.size(); i++) {
+			auto pos = before.find(wordsForward[i]);
+			if (pos == std::string::npos) continue;
+
+			if (pos < firstIndex) {
+				firstIndex = (int)pos;
+				firstNum = i;
+			}
+
+			if (firstIndex == 0) break;
+		}
+
+		for (int i = 0; i < wordsBackward.size(); i++) {
+			auto pos = after.find(wordsBackward[i]);
+			if (pos == std::string::npos) continue;
+
+			if (line.size() - pos > lastIndex) {
+				lastIndex = line.size() - (int)pos;
+				lastNum = i;
+			}
+
+			if (lastIndex == 0) break;
+		}
+
+		if (firstNum == -1) firstNum = *firstPtr - '0';
+		if (lastNum == -1) lastNum = *lastPtr - '0';
+
+		answer += (firstNum * 10) + lastNum;
 	}
-
 	return answer;
 }
+
 
 void Day1::puzzle1() {
 	std::vector<std::string> input = Reader::readFile(puzzleFile);
