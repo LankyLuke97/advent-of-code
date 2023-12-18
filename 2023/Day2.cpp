@@ -47,7 +47,41 @@ int Day2::calculatePuzzle1(std::vector<std::string> input) {
 }
 
 int Day2::calculatePuzzle2(std::vector<std::string> input) {
-	return 0;
+	int answer = 0;
+
+	for (std::string line : input) {
+		if (line.empty()) break;
+		int r = 0, g = 0, b = 0;
+		line.erase(std::remove(line.begin(), line.end(), ','));
+		line.erase(std::remove(line.begin(), line.end(), ';'));
+		line.erase(std::remove(line.begin(), line.end(), ':'));
+
+		std::string token;
+		std::istringstream iss(line);
+
+		iss >> token;
+		iss >> token;
+
+		int i;
+
+		while (iss >> token) {
+			try {
+				i = std::stoi(token);
+			} catch (std::invalid_argument const& ex) {
+				if(token.substr(0, 3) == "red" && i > r) {
+					r = i;
+				} else if(token.substr(0, 5) == "green" && i > g) {
+					g = i;
+				} else if(token.substr(0, 4) == "blue" && i > b) {
+					b = i;
+				}
+			}
+		}
+
+		answer += (r * g * b);
+	}
+
+	return answer;
 }
 
 
@@ -63,5 +97,5 @@ void Day2::puzzle2() {
 
 void Day2::test() {
 	assert(calculatePuzzle1(Reader::readFile(testFile1)) == 8);
-	assert(calculatePuzzle2(Reader::readFile(testFile2)) == 0);
+	assert(calculatePuzzle2(Reader::readFile(testFile2)) == 2286);
 }
