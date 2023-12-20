@@ -20,20 +20,13 @@ int Day3::calculatePuzzle1(std::vector<std::string> input) {
 		if(line.empty()) break;
 
 		std::match_results<std::string::const_iterator> results;
-		std::regex_search(line, results, specialCharExpr);
-		std::cout << results.size() << " results of special chars" << std::endl;
 
-		for(int i = 0; i < results.size(); i++) {
-			partSignifyingPositions.push_back(results.position(i) + (lineNum * lineLength));
+		for(std::sregex_iterator it(line.begin(), line.end(), specialCharExpr); it != std::sregex_iterator(); ++it) {
+			partSignifyingPositions.push_back(it->position() + (lineNum * lineLength));
 		}
-
-		std::regex_search(line, results, digitExpr);
-		std::cout << results.size() << " results of digits" << std::endl;
 
 		for(std::sregex_iterator it(line.begin(), line.end(), digitExpr); it != std::sregex_iterator(); ++it) {
 			int startPos = it->position();
-			////std::cout << "results[" <<  << "] = " << results[i] << ", results.position(" << i << ") = " << results.position(i) << std::endl;
-			std::cout << "EMPLACING - " << (startPos + (lineNum * lineLength)) << ": " << std::stoi(it->str()) << std::endl;
 			numberPositions.emplace(startPos + (lineNum * lineLength), std::stoi(it->str()));
 
 			for(int posInd = 0; posInd < it->str().size(); posInd++) {
@@ -42,18 +35,15 @@ int Day3::calculatePuzzle1(std::vector<std::string> input) {
 		}
 	}
 
-	std::cout << "ALL LINES DONE" << std::endl;
-
 	for(int partPos : partSignifyingPositions) {
-		std::vector<int> offsets = { -lineLength - 1, -lineLength, -lineLength + 1, -1, 0, 1, lineLength + 1, lineLength, lineLength + 1 };
+		std::vector<int> offsets = { -lineLength - 1, -lineLength, -lineLength + 1, -1, 1, lineLength - 1, lineLength, lineLength + 1 };
 
-		for(int offset : offsets) {
+		for (int offset : offsets) {
 			auto mappingsSearch = numberMappings.find(partPos + offset);
 			if(mappingsSearch == numberMappings.end()) continue;
 			auto partSearch = numberPositions.find(mappingsSearch->second);
 			if(partSearch == numberPositions.end()) continue;
 			answer += partSearch->second;
-			std::cout << "ADDING " << partSearch->second << std::endl;
 			numberMappings.erase(mappingsSearch);
 			numberPositions.erase(partSearch);
 		}
