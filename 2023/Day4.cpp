@@ -40,7 +40,6 @@ int Day4::calculatePuzzle1(std::vector<std::string> input) {
 }
 
 int Day4::calculatePuzzle2(std::vector<std::string> input) {
-	int answer = 0;
 	int lineNum = 0;
 	std::vector<int> cardMembers(input.size() - 1, 1);
 
