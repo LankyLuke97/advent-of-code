@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <cassert>
 #include <cmath>
+#include <numeric>
 #include <sstream>
 #include "Day4.h"
 
@@ -35,15 +36,44 @@ int Day4::calculatePuzzle1(std::vector<std::string> input) {
 		answer += std::pow(2, winning - 1);
 	}
 
-	std::cout << answer << std::endl;
-
 	return answer;
 }
 
 int Day4::calculatePuzzle2(std::vector<std::string> input) {
 	int answer = 0;
+	int lineNum = 0;
+	std::vector<int> cardMembers(input.size() - 1, 1);
 
-	return answer;
+	for (std::string line : input) {
+		if (line.empty()) break;
+
+		std::string token;
+		std::istringstream iss(line);
+		std::vector<int> winningNumbers;
+
+		iss >> token;
+		iss >> token;
+
+		while (true) {
+			iss >> token;
+			try {
+				winningNumbers.push_back(std::stoi(token));
+			}
+			catch (std::invalid_argument const& ex) {
+				break;
+			}
+		}
+
+		int copyCard = lineNum + 1;
+		int copyMultiplier = cardMembers[lineNum];
+		while (iss >> token) {
+			if(std::find(winningNumbers.begin(), winningNumbers.end(), std::stoi(token)) == winningNumbers.end()) continue;
+			cardMembers[copyCard++] += copyMultiplier;
+		}
+		lineNum++;
+	}
+
+	return std::accumulate(cardMembers.begin(), cardMembers.end(), 0);
 }
 
 
