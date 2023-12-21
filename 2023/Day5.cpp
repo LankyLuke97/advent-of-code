@@ -2,6 +2,7 @@
 #include <cassert>
 #include <sstream>
 #include <unordered_map>
+#include <Windows.h>
 #include "Day5.h"
 
 int Day5::calculatePuzzle1(std::vector<std::string> input) {
@@ -163,8 +164,13 @@ void Day5::puzzle2() {
 }
 
 void Day5::test() {
+	HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
 	assert(calculatePuzzle1(Reader::readFile(testFile1)) == 35);
+	SetConsoleTextAttribute(h, 2);
 	std::cout << "Day 5 part 1 test passed" << std::endl;
+	SetConsoleTextAttribute(h, 7);
 	assert(calculatePuzzle2(Reader::readFile(testFile2)) == 46);
+	SetConsoleTextAttribute(h, 2);
 	std::cout << "Day 5 part 2 test passed" << std::endl;
+	SetConsoleTextAttribute(h, 7);
 }

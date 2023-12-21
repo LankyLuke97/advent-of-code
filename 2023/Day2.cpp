@@ -1,6 +1,7 @@
 #pragma once
 #include <cassert>
 #include <sstream>
+#include <Windows.h>
 #include "Day2.h"
 
 int Day2::calculatePuzzle1(std::vector<std::string> input) {
@@ -96,8 +97,13 @@ void Day2::puzzle2() {
 }
 
 void Day2::test() {
+	HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
 	assert(calculatePuzzle1(Reader::readFile(testFile1)) == 8);
+	SetConsoleTextAttribute(h, 2);
 	std::cout << "Day 2 part 1 test passed" << std::endl;
+	SetConsoleTextAttribute(h, 7);
 	assert(calculatePuzzle2(Reader::readFile(testFile2)) == 2286);
+	SetConsoleTextAttribute(h, 2);
 	std::cout << "Day 2 part 2 test passed" << std::endl;
+	SetConsoleTextAttribute(h, 7);
 }

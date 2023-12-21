@@ -3,6 +3,7 @@
 #include <regex>
 #include <sstream>
 #include <unordered_map>
+#include <Windows.h>
 #include "Day3.h"
 
 int Day3::calculatePuzzle1(std::vector<std::string> input) {
@@ -116,8 +117,13 @@ void Day3::puzzle2() {
 }
 
 void Day3::test() {
+	HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
 	assert(calculatePuzzle1(Reader::readFile(testFile1)) == 4361);
+	SetConsoleTextAttribute(h, 2);
 	std::cout << "Day 3 part 1 test passed" << std::endl;
+	SetConsoleTextAttribute(h, 7);
 	assert(calculatePuzzle2(Reader::readFile(testFile2)) == 467835);
+	SetConsoleTextAttribute(h, 2);
 	std::cout << "Day 3 part 2 test passed" << std::endl;
+	SetConsoleTextAttribute(h, 7);
 }

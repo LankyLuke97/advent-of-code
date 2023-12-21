@@ -4,6 +4,7 @@
 #include <cmath>
 #include <numeric>
 #include <sstream>
+#include <Windows.h>
 #include "Day4.h"
 
 int Day4::calculatePuzzle1(std::vector<std::string> input) {
@@ -87,8 +88,13 @@ void Day4::puzzle2() {
 }
 
 void Day4::test() {
+	HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
 	assert(calculatePuzzle1(Reader::readFile(testFile1)) == 13);
+	SetConsoleTextAttribute(h, 2);
 	std::cout << "Day 4 part 1 test passed" << std::endl;
+	SetConsoleTextAttribute(h, 7);
 	assert(calculatePuzzle2(Reader::readFile(testFile2)) == 30);
+	SetConsoleTextAttribute(h, 2);
 	std::cout << "Day 4 part 2 test passed" << std::endl;
+	SetConsoleTextAttribute(h, 7);
 }
