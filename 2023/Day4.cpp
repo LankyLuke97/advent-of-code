@@ -88,5 +88,7 @@ void Day4::puzzle2() {
 
 void Day4::test() {
 	assert(calculatePuzzle1(Reader::readFile(testFile1)) == 13);
+	std::cout << "Day 4 part 1 test passed" << std::endl;
 	assert(calculatePuzzle2(Reader::readFile(testFile2)) == 30);
+	std::cout << "Day 4 part 2 test passed" << std::endl;
 }

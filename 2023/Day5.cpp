@@ -14,7 +14,7 @@ int Day5::calculatePuzzle1(std::vector<std::string> input) {
 	* 5: temperature to humidity
 	* 6: humidity to location
 	*/
-	std::vector<std::unordered_map<int64_t, int64_t>> mappings(7, std::unordered_map<int64_t, int64_t>());
+	std::vector<std::vector<std::vector<int64_t>>> mappings(7);
 	std::vector<int64_t> seeds;
 	std::istringstream seedsStream(input[0]);
 	std::string token;
@@ -36,7 +36,7 @@ int Day5::calculatePuzzle1(std::vector<std::string> input) {
 
 		while(iss >> token) {
 			try {
-				int64_t num = std::stol(token);
+				int64_t num = std::stoll(token);
 
 				if (mapping == -1) mapping = num;
 				else if (start == -1) start = num;
@@ -44,9 +44,7 @@ int Day5::calculatePuzzle1(std::vector<std::string> input) {
 
 				if (start == -1 || mapping == -1 || range == -1) continue;
 
-				for (int64_t j = 0; j < range; j++) {
-					mappings[currentMapping].emplace(start + j, mapping + j);
-				}
+				mappings[currentMapping].push_back(std::vector<int64_t>{start, mapping, range});
 			} catch (std::invalid_argument const& ex) {
 				currentMapping++;
 				break;
@@ -57,18 +55,15 @@ int Day5::calculatePuzzle1(std::vector<std::string> input) {
 	int64_t closestLocation = LLONG_MAX;
 
 	for (int64_t seed : seeds) {
-		int64_t location = -1;
-		auto search = mappings[0].find(seed);
-		if(search != mappings[0].end()) {
-			location = search->second;
-		} else {
-			location = seed;
-		}
-
-		for(int i = 1; i < mappings.size() - 1; i++) {
-			auto search = mappings[i].find(location);
-
-			if (search != mappings[i].end()) location = search->second;
+		int64_t location = seed;
+		for(int i = 0; i < mappings.size(); i++) {
+			for(int j = 0; j < mappings[i].size(); j++) {
+				int64_t start = mappings[i][j][0], mapping = mappings[i][j][1], range = mappings[i][j][2];
+				if(location < start) continue;
+				if(location >= start + range) continue;
+				location = (location - start) + mapping;
+				break;
+			}
 		}
 		if(location < closestLocation) closestLocation = location;
 	}
@@ -95,5 +90,7 @@ void Day5::puzzle2() {
 
 void Day5::test() {
 	assert(calculatePuzzle1(Reader::readFile(testFile1)) == 35);
+	std::cout << "Day 5 part 1 test passed" << std::endl;
 	assert(calculatePuzzle2(Reader::readFile(testFile2)) == 0);
+	std::cout << "Day 5 part 2 test passed" << std::endl;
 }

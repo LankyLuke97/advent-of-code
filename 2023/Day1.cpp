@@ -102,5 +102,7 @@ void Day1::puzzle2() {
 
 void Day1::test() {
 	assert(calculatePuzzle1(Reader::readFile(testFile1)) == 142);
+	std::cout << "Day 1 part 1 test passed" << std::endl;
 	assert(calculatePuzzle2(Reader::readFile(testFile2)) == 281);
+	std::cout << "Day 1 part 2 test passed" << std::endl;
 }
