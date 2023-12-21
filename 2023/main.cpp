@@ -5,6 +5,7 @@
 #include "Day4.h"
 #include "Day5.h"
 #include "Day6.h"
+#include "Day7.h"
 
 int main(int argc, char* argv[]) {
 	/*
@@ -44,12 +45,20 @@ int main(int argc, char* argv[]) {
 	day5.puzzle2();
 	return 0;
 	*/
-
+	/*
 	Day6 day6;
 
 	day6.test();
 	day6.puzzle1();
 	day6.puzzle2();
+	return 0;
+	*/
+	
+	Day7 day7;
+
+	day7.test();
+	day7.puzzle1();
+	day7.puzzle2();
 	return 0;
 	
 }
