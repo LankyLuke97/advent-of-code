@@ -5,7 +5,7 @@
 #include "Day6.h"
 
 int Day6::calculatePuzzle1(std::vector<std::string> input) {
-	int answer = 0;
+	int answer = 1;
 
 	std::vector<int> times;
 	std::vector<int> distances;
@@ -21,13 +21,13 @@ int Day6::calculatePuzzle1(std::vector<std::string> input) {
 	while (distanceStream >> token) distances.push_back(std::stoi(token));
 
 	for(int i = 0; i < times.size(); i++) {
-		std::cout << "a = 1, b(T) = " << times[i] << ", c(d) = " << distances[i] << ": solutions are ";
-		for (int j = -1; j < 2; j += 2) {
-			int solution = (times[i] + j * std::sqrt(std::pow(times[i], 2) - (4 * distances[i]))) / 2;
-			std::cout << solution;
-			if (j == -1) std::cout << " and ";
-			else std::cout << std::endl;
-		}
+		int solution1 = (times[i] + std::sqrt(std::pow(times[i], 2) - (4 * distances[i]))) / 2;
+		int solution2 = (times[i] - std::sqrt(std::pow(times[i], 2) - (4 * distances[i]))) / 2;
+		int range = solution1 - solution2;
+
+		if((times[i] - solution1) * solution1 <= distances[i]) range--;
+
+		answer *= range;
 	}
 
 	return answer;
