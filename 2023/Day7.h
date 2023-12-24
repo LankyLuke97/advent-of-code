@@ -16,30 +16,29 @@ public:
 	void test();
 };
 
-struct Hand {
+struct Hand1 {
 	std::string cards;
-	std::string hand;
 	int value = 0;
 	std::unordered_map<char, int> mappings{ {'A', 13}, {'K', 12}, {'Q', 11}, {'J', 10}, {'T', 9}, {'9', 8}, {'8', 7}, {'7', 6}, {'6', 5}, {'5', 4}, {'4', 3}, {'3', 2}, {'2', 1} };
 
-	Hand(std::string _cards) : cards(_cards) {
+	Hand1(std::string _cards) : cards(_cards) {
 		calculateValue();
 	}
 
-	friend bool operator < (Hand const& l, Hand const& r) {
+	friend bool operator < (Hand1 const& l, Hand1 const& r) {
 		return(l.value < r.value);
 	}
 
-	friend bool operator <= (Hand const& l, Hand const& r) {
+	friend bool operator <= (Hand1 const& l, Hand1 const& r) {
 		return(l.value <= r.value);
 
 	}
 
-	friend bool operator > (Hand const& l, Hand const& r) {
+	friend bool operator > (Hand1 const& l, Hand1 const& r) {
 		return(l.value > r.value);
 	}
 
-	friend bool operator >= (Hand const& l, Hand const& r) {
+	friend bool operator >= (Hand1 const& l, Hand1 const& r) {
 		return(l.value >= r.value);
 	}
 
@@ -80,6 +79,105 @@ struct Hand {
 			value += 1000000;
 			break;
 		default:
+			break;
+		}
+	}
+};
+
+struct Hand2 {
+	std::string cards;
+	int value = 0;
+	std::unordered_map<char, int> mappings{ {'A', 13}, {'K', 12}, {'Q', 11}, {'T', 10}, {'9', 9}, {'8', 8}, {'7', 7}, {'6', 6}, {'5', 5}, {'4', 4}, {'3', 3}, {'2', 2}, {'J', 1} };
+
+	Hand2(std::string _cards) : cards(_cards) {
+		calculateValue();
+	}
+
+	friend bool operator < (Hand2 const& l, Hand2 const& r) {
+		return(l.value < r.value);
+	}
+
+	friend bool operator <= (Hand2 const& l, Hand2 const& r) {
+		return(l.value <= r.value);
+
+	}
+
+	friend bool operator > (Hand2 const& l, Hand2 const& r) {
+		return(l.value > r.value);
+	}
+
+	friend bool operator >= (Hand2 const& l, Hand2 const& r) {
+		return(l.value >= r.value);
+	}
+
+	void calculateValue() {
+		std::unordered_map<char, int> cardTypes;
+		int jokers = 0;
+		//std::cout << "-----" << cards << "-----" << std::endl;
+
+		for (int i = 0; i < cards.size(); i++) {
+			char card = cards[i];
+			value += mappings[card] * std::pow(14, cards.size() - i - 1);
+			if (card == 'J') {
+				jokers++;
+				continue;
+			}
+			cardTypes.try_emplace(card, 0);
+			cardTypes[card]++;
+		}
+
+		if(jokers > 0) {
+			char strongest = cards[0];
+			int strongestNumCards = cardTypes[strongest];
+
+			for (int i = 1; i < cards.size(); i++) {
+				char card = cards[i];
+				if (card == 'J') continue;
+				int numCards = cardTypes[card];
+				if (numCards > strongestNumCards) {
+					strongestNumCards = numCards;
+					strongest = card;
+				}
+			}
+
+			//std::cout << "In " << cards << " switch J for " << strongest << " giving:"<<std::endl;
+			cardTypes[strongest] += jokers;
+			//for (auto kv : cardTypes) //std::cout << kv.first << ": " << kv.second << std::endl;
+			//std::cout << "Which leads to ";
+		}
+
+		switch (cardTypes.size()) {
+		case 1:
+			value += 6000000;
+			//std::cout << "5 of a kind." << std::endl;
+			break;
+		case 2:
+			for (auto kv : cardTypes) {
+				if (kv.second == 4 || kv.second == 1)  value += 5000000; //std::cout << "4 of a kind." << std::endl; }
+				else  value += 4000000; //std::cout << "a full house." << std::endl; }
+				break;
+			}
+			break;
+		case 3:
+			for (auto kv : cardTypes) {
+				if (kv.second == 3) {
+					value += 3000000;
+					//std::cout << "3 of a kind." << std::endl;
+					break;
+				}
+				if (kv.second == 2) {
+					value += 2000000;
+					//std::cout << "2 pairs." << std::endl;
+					break;
+				}
+			}
+			break;
+		case 4:
+			value += 1000000;
+			//std::cout << "1 pair." << std::endl;
+			break;
+		default:
+			//std::cout << "just a high card." << std::endl;
 			break;
 		}
 	}
