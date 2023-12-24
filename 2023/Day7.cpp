@@ -1,17 +1,29 @@
 #pragma once
 #include <cassert>
+#include <map>
 #include <sstream>
 #include <Windows.h>
 #include "Day7.h"
 
 int Day7::calculatePuzzle1(std::vector<std::string> input) {
-	int answer = 0;
+	int64_t answer = 0;
 
-	std::vector<int> bids(input.size());
+	std::map<Hand, int> bids;
+	std::string token;
 
 	for(std::string line : input) {
-
+		if(line.empty()) break;
+		std::istringstream iss(line);
+		if(iss >> token) {
+			Hand hand(token);
+			iss >> token;
+			int bid = std::stoi(token);
+			bids.emplace(hand, bid);
+		}
 	}
+
+	int rank = 1;
+	for(auto kv : bids) answer += kv.second * rank++;
 
 	return answer;
 }
