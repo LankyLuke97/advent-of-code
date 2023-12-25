@@ -47,8 +47,6 @@ int Day7::calculatePuzzle2(std::vector<std::string> input) {
 
 	int rank = 1;
 	for (auto kv : bids) answer += kv.second * rank++;
-	//rank = 1;
-	//for (auto kv : bids) std::cout << kv.first.cards << " is rank " << rank++ << " with a bid of " << kv.second << std::endl;
 
 	return answer;
 }

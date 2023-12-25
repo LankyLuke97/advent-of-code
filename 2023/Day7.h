@@ -113,7 +113,6 @@ struct Hand2 {
 	void calculateValue() {
 		std::unordered_map<char, int> cardTypes;
 		int jokers = 0;
-		//std::cout << "-----" << cards << "-----" << std::endl;
 
 		for (int i = 0; i < cards.size(); i++) {
 			char card = cards[i];
@@ -140,21 +139,17 @@ struct Hand2 {
 				}
 			}
 
-			//std::cout << "In " << cards << " switch J for " << strongest << " giving:"<<std::endl;
 			cardTypes[strongest] += jokers;
-			//for (auto kv : cardTypes) //std::cout << kv.first << ": " << kv.second << std::endl;
-			//std::cout << "Which leads to ";
 		}
 
 		switch (cardTypes.size()) {
 		case 1:
 			value += 6000000;
-			//std::cout << "5 of a kind." << std::endl;
 			break;
 		case 2:
 			for (auto kv : cardTypes) {
-				if (kv.second == 4 || kv.second == 1)  value += 5000000; //std::cout << "4 of a kind." << std::endl; }
-				else  value += 4000000; //std::cout << "a full house." << std::endl; }
+				if(kv.second == 4 || kv.second == 1) value += 5000000;
+				else value += 4000000;
 				break;
 			}
 			break;
@@ -162,22 +157,18 @@ struct Hand2 {
 			for (auto kv : cardTypes) {
 				if (kv.second == 3) {
 					value += 3000000;
-					//std::cout << "3 of a kind." << std::endl;
 					break;
 				}
 				if (kv.second == 2) {
 					value += 2000000;
-					//std::cout << "2 pairs." << std::endl;
 					break;
 				}
 			}
 			break;
 		case 4:
 			value += 1000000;
-			//std::cout << "1 pair." << std::endl;
 			break;
 		default:
-			//std::cout << "just a high card." << std::endl;
 			break;
 		}
 	}
