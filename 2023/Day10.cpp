@@ -22,6 +22,7 @@ int Day10::calculatePuzzle1(std::vector<std::string> input) {
 		}
 		if (lineNum > -1 && col > -1) break;
 		currentLine++;
+		currentCol = 0;
 	}
 
 	int steps = 0;
