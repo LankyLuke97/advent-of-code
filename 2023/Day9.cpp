@@ -48,6 +48,41 @@ int Day9::calculatePuzzle1(std::vector<std::string> input) {
 int Day9::calculatePuzzle2(std::vector<std::string> input) {
 	int answer = 0;
 
+	for (std::string line : input) {
+		if (line.empty()) break;
+
+		std::istringstream iss(line);
+		std::string token;
+		std::vector<std::vector<int>> sequences;
+
+		std::vector<int> sequence;
+		std::vector<int> prevSeq;
+
+		while (iss >> token) sequence.push_back(std::stoi(token));;
+
+		bool allZero = false;
+
+		while (!allZero) {
+			allZero = true;
+			sequences.push_back(sequence);
+			sequence.clear();
+			prevSeq = sequences.back();
+
+			for (int i = 1; i < prevSeq.size(); i++) {
+				int diff = prevSeq[i] - prevSeq[i - 1];
+				sequence.push_back(diff);
+				allZero = allZero && (diff == 0);
+			}
+		}
+
+		int add = 0;
+		for (int i = sequences.size() - 1; i > -1; i--) {
+			add = sequences[i].front() - add;
+		}
+
+		answer += add;
+	}
+
 	return answer;
 }
 
@@ -67,7 +102,7 @@ void Day9::test() {
 	SetConsoleTextAttribute(h, 2);
 	std::cout << "Day 9 part 1 test passed" << std::endl;
 	SetConsoleTextAttribute(h, 7);
-	assert(calculatePuzzle2(Reader::readFile(testFile2)) == 0);
+	assert(calculatePuzzle2(Reader::readFile(testFile2)) == 5);
 	SetConsoleTextAttribute(h, 2);
 	std::cout << "Day 9 part 2 test passed" << std::endl;
 	SetConsoleTextAttribute(h, 7);
