@@ -121,12 +121,14 @@ struct Hand2 {
 				jokers++;
 				continue;
 			}
+
 			cardTypes.try_emplace(card, 0);
 			cardTypes[card]++;
 		}
 
-		if(jokers > 0) {
-			char strongest = cards[0];
+		if(jokers > 0 && jokers < 5) {
+			auto first = cardTypes.begin();
+			char strongest = first->first;
 			int strongestNumCards = cardTypes[strongest];
 
 			for (int i = 1; i < cards.size(); i++) {
@@ -143,6 +145,7 @@ struct Hand2 {
 		}
 
 		switch (cardTypes.size()) {
+		case 0:
 		case 1:
 			value += 6000000;
 			break;
