@@ -164,8 +164,20 @@ void Day10::test() {
 	SetConsoleTextAttribute(h, 2);
 	std::cout << "Day 10 part 1 test 4 passed" << std::endl;
 	SetConsoleTextAttribute(h, 7);
-	assert(calculatePuzzle2(Reader::readFile(testFile2)) == 0);
+	assert(calculatePuzzle1(Reader::readFile(testFile2_1)) == 4);
 	SetConsoleTextAttribute(h, 2);
-	std::cout << "Day 10 part 2 test passed" << std::endl;
+	std::cout << "Day 10 part 2 test 1 passed" << std::endl;
+	SetConsoleTextAttribute(h, 7);
+	assert(calculatePuzzle1(Reader::readFile(testFile2_2)) == 4);
+	SetConsoleTextAttribute(h, 2);
+	std::cout << "Day 10 part 2 test 2 passed" << std::endl;
+	SetConsoleTextAttribute(h, 7);
+	assert(calculatePuzzle1(Reader::readFile(testFile2_3)) == 8);
+	SetConsoleTextAttribute(h, 2);
+	std::cout << "Day 10 part 2 test 3 passed" << std::endl;
+	SetConsoleTextAttribute(h, 7);
+	assert(calculatePuzzle1(Reader::readFile(testFile2_4)) == 10);
+	SetConsoleTextAttribute(h, 2);
+	std::cout << "Day 10 part 2 test 4 passed" << std::endl;
 	SetConsoleTextAttribute(h, 7);
 }
