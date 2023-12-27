@@ -131,9 +131,9 @@ void Day8::test() {
 	assert(calculatePuzzle1(Reader::readFile(testFile1)) == 6);
 	SetConsoleTextAttribute(h, 2);
 	std::cout << "Day 8 part 1 test passed" << std::endl;
-	SetConsoleTextAttribute(h, 8);
+	SetConsoleTextAttribute(h, 7);
 	assert(calculatePuzzle2(Reader::readFile(testFile2)) == 6);
 	SetConsoleTextAttribute(h, 2);
 	std::cout << "Day 8 part 2 test passed" << std::endl;
-	SetConsoleTextAttribute(h, 8);
+	SetConsoleTextAttribute(h, 7);
 }
