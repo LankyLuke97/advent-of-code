@@ -177,7 +177,7 @@ int Day10::calculatePuzzle2(std::vector<std::string> input) {
 
 	int exitDirection = direction;
 	bool end = false;
-	std::vector<std::vector<char>> cleaned(input.size(), std::vector<char>(input[0].size(), '.'));
+	std::vector<std::vector<char>> cleaned(input.size() - 1, std::vector<char>(input[0].size(), '.'));
 	int loopSegments = 0;
 
 	while (!end) {
@@ -423,13 +423,13 @@ int Day10::calculatePuzzle2(std::vector<std::string> input) {
 		}
 	}
 	*/
-
 	bool inside = true;
-	for(int i = 0; i < input.size(); i++) {
-		for (int j = 0; j < lineSize; j++) {
+
+	for (int i = 0; i < input.size() - 1; i++) {
+		for (int j = 0; j < input[0].size(); j++) {
 			for (int k = 0; k < 3; k++) {
 				for (int l = 0; l < 3; l++) {
-					if (enlarged[(i + k) * enlargedLineSize + j + l] != '.') {
+					if (enlarged[(((i * 3 + k) * enlargedLineSize) + (j * 3) + l)] != '.') {
 						inside = false;
 						break;
 					}
@@ -441,8 +441,6 @@ int Day10::calculatePuzzle2(std::vector<std::string> input) {
 			inside = true;
 		}
 	}
-
-	std::cout << "ANSWER " << answer << std::endl;
 
 	return answer;
 }
