@@ -98,10 +98,12 @@ void Day2::puzzle2() {
 
 void Day2::test() {
 	HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
+	SetConsoleTextAttribute(h, 4);
 	assert(calculatePuzzle1(Reader::readFile(testFile1)) == 8);
 	SetConsoleTextAttribute(h, 2);
 	std::cout << "Day 2 part 1 test passed" << std::endl;
 	SetConsoleTextAttribute(h, 7);
+	SetConsoleTextAttribute(h, 4);
 	assert(calculatePuzzle2(Reader::readFile(testFile2)) == 2286);
 	SetConsoleTextAttribute(h, 2);
 	std::cout << "Day 2 part 2 test passed" << std::endl;
