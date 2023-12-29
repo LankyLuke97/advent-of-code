@@ -24,4 +24,19 @@ public:
 		inputFile.close();
 		return lines;
 	}
+
+	static void view(const std::vector<std::vector<char>>& input) {
+		for (std::vector<char> line : input) {
+			if (line.empty()) break;
+			for (char c : line) std::cout << c;
+			std::cout << std::endl;
+		}
+	}
+
+	static void view(const std::vector<std::string>& input) {
+		for (std::string line : input) {
+			if (line.empty())break;
+			std::cout << line << std::endl;
+		}
+	}
 };
