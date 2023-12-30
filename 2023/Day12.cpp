@@ -5,6 +5,8 @@
 #include <Windows.h>
 #include "Day12.h"
 
+std::unordered_map<std::string, int> Day12::cache;
+
 int Day12::calculatePuzzle1(std::vector<std::string> input) {
 	int answer = 0;
 
@@ -106,10 +108,8 @@ int Day12::calculatePuzzle1(std::vector<std::string> input) {
 	return answer;
 }
 
-int Day12::calculatePuzzle2(std::vector<std::string> input) {
-	int answer = 0;
-
-	std::vector<int> contiguous;
+int64_t Day12::calculatePuzzle2(std::vector<std::string> input) {
+	int64_t answer = 0;
 
 	for (std::string initialLine : input) {
 		if (initialLine.empty()) break;
@@ -117,11 +117,11 @@ int Day12::calculatePuzzle2(std::vector<std::string> input) {
 		std::vector<char> unfolded;
 		unfolded.reserve(5 * (initialLine.size() + 1));
 		std::string token;
-		
+
 		std::istringstream unfoldIss(initialLine);
-		
+
 		unfoldIss >> token;
-		for(int i = 0; i < 5; i++) {
+		for (int i = 0; i < 5; i++) {
 			for (char c : token) unfolded.push_back(c);
 			if (i < 4) unfolded.push_back('?');
 		}
@@ -136,96 +136,98 @@ int Day12::calculatePuzzle2(std::vector<std::string> input) {
 
 		std::string line(unfolded.begin(), unfolded.end());
 
-		contiguous.clear();
+		std::queue<int> contiguous; 
 		std::replace(line.begin(), line.end(), ',', ' ');
 		std::istringstream iss(line);
 		std::string data;
 
 		iss >> data;
+		while (iss >> token) contiguous.push(std::stoi(token));
 
-		while (iss >> token) contiguous.push_back(std::stoi(token));
-		std::vector<std::vector<char>> prevArrangements;
-
-		if (data[0] == '.') prevArrangements.push_back({ '.' });
-		else if (data[0] == '#') prevArrangements.push_back({ '#' });
-		else {
-			prevArrangements.push_back({ '.' });
-			prevArrangements.push_back({ '#' });
-		}
-
-		std::vector<std::vector<char>> arrangements;
-
-		for (int i = 1; i < data.size(); i++) {
-			char c = data[i];
-			arrangements.clear();
-
-			for (std::vector<char> prev : prevArrangements) {
-				int currentContiguous = 0;
-				int contiguousIndex = -1;
-				bool brokenBlock = false;
-
-				for (char prevC : prev) {
-					if (prevC == '.') {
-						if (!brokenBlock) continue;
-						currentContiguous = 0;
-						brokenBlock = false;
-					}
-					else {
-						if (!brokenBlock) {
-							contiguousIndex++;
-							brokenBlock = true;
-						}
-						currentContiguous++;
-					}
-				}
-
-				if (c == '.' || c == '?') {
-					std::vector<char> newArrangement = prev;
-					newArrangement.push_back('.');
-					if (!brokenBlock) arrangements.push_back(newArrangement);
-					else if (currentContiguous == contiguous[contiguousIndex]) arrangements.push_back(newArrangement);
-				}
-
-				if (c == '#' || c == '?') {
-					std::vector<char> newArrangement = prev;
-					newArrangement.push_back('#');
-					if (!brokenBlock) {
-						if (++contiguousIndex < contiguous.size()) arrangements.push_back(newArrangement);
-					}
-					else if (++currentContiguous <= contiguous[contiguousIndex]) arrangements.push_back(newArrangement);
-				}
-			}
-
-			prevArrangements = arrangements;
-		}
-
-		for (std::vector<char> arrangement : arrangements) {
-			int currentContiguous = 0;
-			int contiguousIndex = -1;
-			int lastContiguous = 0;
-			bool brokenBlock = false;
-
-			for (char c : arrangement) {
-				if (c == '.') {
-					if (!brokenBlock) continue;
-					currentContiguous = 0;
-					brokenBlock = false;
-				}
-				else {
-					if (!brokenBlock) {
-						contiguousIndex++;
-						brokenBlock = true;
-					}
-					currentContiguous++;
-					lastContiguous = currentContiguous;
-				}
-			}
-
-			if (contiguousIndex == contiguous.size() - 1 && lastContiguous == *(contiguous.end() - 1)) answer++;
-		}
+		std::cout << "Part answer: " << part2Recursion(data, contiguous) << std::endl;
+		answer += part2Recursion(data, contiguous);
 	}
 
+	std::cout << "Final answer: " << answer << std::endl;
+
 	return answer;
+}
+
+int64_t Day12::part2Recursion(std::string& data, std::queue<int> groups) {
+	std::string groupKey;
+	std::queue<int> copy = groups;
+	while (!copy.empty()) {
+		groupKey += ',';
+		groupKey += std::to_string(copy.front());
+		copy.pop();
+	}
+	auto search = Day12::cache.find(data + groupKey);
+	if (search != Day12::cache.end()) return search->second;
+
+	if (data.size() == 0) return groups.size() == 0;
+	if (groups.size() == 0) {
+		for (char c : data) {
+			if (c == '#') return 0;
+		}
+		return 1;
+	}
+	char c = data[0];
+	std::string remainingData(data.begin() + 1, data.end());
+	if (c == '.') {
+		int64_t val = part2Recursion(remainingData, groups);
+		Day12::cache.try_emplace(remainingData + groupKey, val);
+		Day12::cache.try_emplace(data + groupKey, val);
+		return val;
+	}
+	if (c == '#') {
+		int group = groups.front();
+
+		if (data.size() < group) {
+			Day12::cache.try_emplace(data + groupKey, 0);
+			return 0;
+		}
+
+		for (int i = 0; i < group; i++) {
+			if (data[i] == '.') {
+				Day12::cache.try_emplace(data + groupKey, 0);
+				return 0;
+			}
+		}
+
+		if (data.size() > group && data[group] == '#') {
+			Day12::cache.try_emplace(data + groupKey, 0);
+			return 0;
+		}
+
+		std::string dataWithoutGroup(data.begin() + group, data.end());
+		std::queue<int> popped(groups);
+		popped.pop();
+		int64_t val = part2Recursion(dataWithoutGroup, popped);
+
+		std::string poppedKey;
+		std::queue<int> copy = popped;
+		while (!copy.empty()) {
+			poppedKey += ',';
+			poppedKey += std::to_string(copy.front());
+			copy.pop();
+		}
+
+		Day12::cache.try_emplace(dataWithoutGroup + poppedKey, val);
+		Day12::cache.try_emplace(data + groupKey, val);
+
+		return val;
+	}
+
+	std::string replacePeriod(data.begin(), data.end());
+	std::string replaceHash(data.begin(), data.end());
+	replacePeriod[0] = '.';
+	replaceHash[0] = '#';
+
+	int64_t valPeriod = part2Recursion(replacePeriod, groups), valHash = part2Recursion(replaceHash, groups);
+	Day12::cache.try_emplace(replacePeriod + groupKey, valPeriod);
+	Day12::cache.try_emplace(replaceHash + groupKey, valHash);
+	Day12::cache.try_emplace(data + groupKey, valPeriod + valHash);
+	return valPeriod + valHash;
 }
 
 void Day12::puzzle1() {

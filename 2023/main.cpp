@@ -97,9 +97,8 @@ int main(int argc, char* argv[]) {
 	Day12 day12;
 
 	day12.test();
-	day12.puzzle1();
-	day12.puzzle2();
-
+	//day12.puzzle1();
+	//day12.puzzle2();
 
 	return 0;
 }
