@@ -79,6 +79,8 @@ int Day12::calculatePuzzle1(std::vector<std::string> input) {
 			prevArrangements = arrangements;
 		}
 
+		int part = 0;
+
 		for (std::vector<char> arrangement : arrangements) {
 			int currentContiguous = 0;
 			int contiguousIndex = -1;
@@ -144,11 +146,8 @@ int64_t Day12::calculatePuzzle2(std::vector<std::string> input) {
 		iss >> data;
 		while (iss >> token) contiguous.push(std::stoi(token));
 
-		std::cout << "Part answer: " << part2Recursion(data, contiguous) << std::endl;
 		answer += part2Recursion(data, contiguous);
 	}
-
-	std::cout << "Final answer: " << answer << std::endl;
 
 	return answer;
 }
@@ -161,6 +160,7 @@ int64_t Day12::part2Recursion(std::string& data, std::queue<int> groups) {
 		groupKey += std::to_string(copy.front());
 		copy.pop();
 	}
+
 	auto search = Day12::cache.find(data + groupKey);
 	if (search != Day12::cache.end()) return search->second;
 
@@ -199,7 +199,8 @@ int64_t Day12::part2Recursion(std::string& data, std::queue<int> groups) {
 			return 0;
 		}
 
-		std::string dataWithoutGroup(data.begin() + group, data.end());
+		auto afterGroup = group == data.size() ? data.end() : data.begin() + group + 1;
+		std::string dataWithoutGroup(afterGroup, data.end());
 		std::queue<int> popped(groups);
 		popped.pop();
 		int64_t val = part2Recursion(dataWithoutGroup, popped);
