@@ -1,9 +1,22 @@
-﻿  Day6.cpp
-C:\Users\Luke\Documents\Studio\advent-of-code\2023\Day6.cpp(26,17): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
-  main.cpp
+﻿  Day10.cpp
+C:\Users\Luke\Documents\Studio\advent-of-code\2023\Day10.cpp(31,15): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\Luke\Documents\Studio\advent-of-code\2023\Day10.cpp(156,15): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+  Day7.cpp
+C:\Users\Luke\Documents\Studio\advent-of-code\2023\Day7.h(50,28): warning C4244: '+=': conversion from 'double' to 'int', possible loss of data
+  (compiling source file 'Day7.cpp')
+  
+C:\Users\Luke\Documents\Studio\advent-of-code\2023\Day7.h(119,28): warning C4244: '+=': conversion from 'double' to 'int', possible loss of data
+  (compiling source file 'Day7.cpp')
+  
+C:\Users\Luke\Documents\Studio\advent-of-code\2023\Day7.cpp(28,9): warning C4244: 'return': conversion from 'int64_t' to 'int', possible loss of data
+C:\Users\Luke\Documents\Studio\advent-of-code\2023\Day7.cpp(51,9): warning C4244: 'return': conversion from 'int64_t' to 'int', possible loss of data
+  Day8.cpp
+  Day9.cpp
+C:\Users\Luke\Documents\Studio\advent-of-code\2023\Day9.cpp(38,13): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\Luke\Documents\Studio\advent-of-code\2023\Day9.cpp(79,14): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
   Generating code
-  94 of 370 functions (25.4%) were compiled, the rest were copied from previous compilation.
-    7 functions were new in current compilation
-    13 functions had inline decision re-evaluated but remain unchanged
+  24 of 370 functions ( 6.5%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    87 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
   2023.vcxproj -> C:\Users\Luke\Documents\Studio\advent-of-code\2023\x64\Release\2023.exe
