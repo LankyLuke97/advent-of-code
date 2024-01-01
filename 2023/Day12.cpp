@@ -5,7 +5,7 @@
 #include <Windows.h>
 #include "Day12.h"
 
-std::unordered_map<std::string, int> Day12::cache;
+std::unordered_map<std::string, uint64_t> Day12::cache;
 
 int Day12::calculatePuzzle1(std::vector<std::string> input) {
 	int answer = 0;
@@ -110,9 +110,8 @@ int Day12::calculatePuzzle1(std::vector<std::string> input) {
 	return answer;
 }
 
-int64_t Day12::calculatePuzzle2(std::vector<std::string> input) {
-	int64_t answer = 0;
-
+uint64_t Day12::calculatePuzzle2(std::vector<std::string> input) {
+	uint64_t answer = 0;
 	for (std::string initialLine : input) {
 		if (initialLine.empty()) break;
 
@@ -121,19 +120,20 @@ int64_t Day12::calculatePuzzle2(std::vector<std::string> input) {
 		std::string token;
 
 		std::istringstream unfoldIss(initialLine);
+		int unfoldMult = 5;
 
 		unfoldIss >> token;
-		for (int i = 0; i < 5; i++) {
+		for (int i = 0; i < unfoldMult; i++) {
 			for (char c : token) unfolded.push_back(c);
-			if (i < 4) unfolded.push_back('?');
+			if (i < unfoldMult - 1) unfolded.push_back('?');
 		}
 
 		unfolded.push_back(' ');
 
 		unfoldIss >> token;
-		for (int i = 0; i < 5; i++) {
+		for (int i = 0; i < unfoldMult; i++) {
 			for (char c : token) unfolded.push_back(c);
-			if (i < 4) unfolded.push_back(',');
+			if (i < unfoldMult - 1) unfolded.push_back(',');
 		}
 
 		std::string line(unfolded.begin(), unfolded.end());
@@ -152,7 +152,7 @@ int64_t Day12::calculatePuzzle2(std::vector<std::string> input) {
 	return answer;
 }
 
-int64_t Day12::part2Recursion(std::string& data, std::queue<int> groups) {
+uint64_t Day12::part2Recursion(std::string& data, std::queue<int> groups) {
 	std::string groupKey;
 	std::queue<int> copy = groups;
 	while (!copy.empty()) {
@@ -174,7 +174,7 @@ int64_t Day12::part2Recursion(std::string& data, std::queue<int> groups) {
 	char c = data[0];
 	std::string remainingData(data.begin() + 1, data.end());
 	if (c == '.') {
-		int64_t val = part2Recursion(remainingData, groups);
+		uint64_t val = part2Recursion(remainingData, groups);
 		Day12::cache.try_emplace(remainingData + groupKey, val);
 		Day12::cache.try_emplace(data + groupKey, val);
 		return val;
@@ -203,7 +203,7 @@ int64_t Day12::part2Recursion(std::string& data, std::queue<int> groups) {
 		std::string dataWithoutGroup(afterGroup, data.end());
 		std::queue<int> popped(groups);
 		popped.pop();
-		int64_t val = part2Recursion(dataWithoutGroup, popped);
+		uint64_t val = part2Recursion(dataWithoutGroup, popped);
 
 		std::string poppedKey;
 		std::queue<int> copy = popped;
@@ -224,7 +224,7 @@ int64_t Day12::part2Recursion(std::string& data, std::queue<int> groups) {
 	replacePeriod[0] = '.';
 	replaceHash[0] = '#';
 
-	int64_t valPeriod = part2Recursion(replacePeriod, groups), valHash = part2Recursion(replaceHash, groups);
+	uint64_t valPeriod = part2Recursion(replacePeriod, groups), valHash = part2Recursion(replaceHash, groups);
 	Day12::cache.try_emplace(replacePeriod + groupKey, valPeriod);
 	Day12::cache.try_emplace(replaceHash + groupKey, valHash);
 	Day12::cache.try_emplace(data + groupKey, valPeriod + valHash);
