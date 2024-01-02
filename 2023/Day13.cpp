@@ -13,7 +13,7 @@ int Day13::calculatePuzzle1(std::vector<std::string> input) {
 	for (std::string line : input) {
 		if(line.empty()) {
 			bool reflected = true;
-			for (int i = 1; i < columnHashes.size() - 1; i++) {
+			for (int i = 1; i < columnHashes.size(); i++) {
 				reflected = true;
 				for (int j = 0; j <= i; j++) {
 					int r = (i * 2) - j - 1;
@@ -31,7 +31,7 @@ int Day13::calculatePuzzle1(std::vector<std::string> input) {
 			}
 
 			if (!reflected) {
-				for (int i = 1; i < rowHashes.size() - 1; i++) {
+				for (int i = 1; i < rowHashes.size(); i++) {
 					reflected = true;
 					for (int j = 0; j <= i; j++) {
 						int r = (i * 2) - j - 1;
