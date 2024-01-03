@@ -106,6 +106,6 @@ int main(int argc, char* argv[]) {
 
 	day13.test();
 	day13.puzzle1();
-	day13.puzzle2();
+	//day13.puzzle2();
 	return 0;
 }
