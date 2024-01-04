@@ -69,84 +69,108 @@ int Day13::calculatePuzzle1(std::vector<std::string> input) {
 	return answer;
 }
 
-int Day13::calculatePuzzle2(std::vector<std::string> input) {
-	int answer = 0;
+int64_t Day13::calculatePuzzle2(std::vector<std::string> input) {
+	int64_t answer = 0;
 
-	std::vector<int> columnHashes, rowHashes;
-	int row = 0;
+	std::vector<int64_t> columnHashes, rowHashes;
+	int64_t row = 0;
+	int pattern = 0;
+	int empties = 0;
 
 	for (std::string line : input) {
+		// std::cout << "Processing line " << line << std::endl;
 		if (line.empty()) {
+			// std::cout << "COLS: ";
+			// for (int64_t c : columnHashes) // std::cout << c << ", ";
+			// std::cout << std::endl;
+			// std::cout << "ROWS: ";
+			// for (int64_t r : rowHashes) // std::cout << r << ", ";
+			// std::cout << std::endl;
+
+			// std::cout << ++empties << " empties" << std::endl;
 			bool reflected = true;
-
-			std::cout << "COLS: ";
-			for (int c : columnHashes) std::cout << c << ", ";
-			std::cout << std::endl;
-			std::cout << "ROWS: ";
-			for (int r : rowHashes) std::cout << r << ", ";
-			std::cout << std::endl;
-
 			bool smudgeCorrected = true;
-			for (int i = 1; i < columnHashes.size(); i++) {
-				std::cout << "CHECKING " << i << std::endl;
+			for (int64_t i = 1; i < rowHashes.size(); i++) {
+				// std::cout << "CHECKING ROWS" << std::endl;
 				reflected = true;
 				smudgeCorrected = false;
-				for (int j = 0; j <= i; j++) {
-					int r = (i * 2) - j - 1;
-					if (r >= columnHashes.size()) continue;
-					if (columnHashes[j] != columnHashes[r]) {
+				for (int64_t j = 0; j < i; j++) {
+					int64_t r = (i * 2) - j - 1;
+					if (r >= rowHashes.size()) continue;
+					// std::cout << "COMPARING " << j << " WITH " << r << std::endl;
+					if(rowHashes[j] != rowHashes[r]) {
+						// std::cout << "DIFFERENCE BETWEEN " << j << " AND " << r << ": " << (rowHashes[j] - rowHashes[r]) << std::endl;
 						if (smudgeCorrected) {
-							std::cout << columnHashes[j] << " (colHash[" << j << "]) differs from " << columnHashes[r] << " (colHash[" << r << "]) but already corrected a smudge this selection." << std::endl;
+							// std::cout << "WOULD BE SMUDGE ROW " << j << ", " << r << std::endl;
 							reflected = false;
 							break;
 						}
 
-						int s = 0;
-						for (int smudgeShift = 0; smudgeShift < columnHashes.size(); smudgeShift++) {
-							s = 1 << smudgeShift;
-							if (columnHashes[j] - s == columnHashes[r] || columnHashes[j] + s == columnHashes[r]) {
+						int64_t s = 1;
+						for (int64_t smudgeShift = 0; smudgeShift < 32; smudgeShift++) {
+							// std::cout << "S here : " << s << std::endl;
+							if (rowHashes[j] - s == rowHashes[r] || rowHashes[j] + s == rowHashes[r]) {
+								// std::cout << "SMUDGE ROW " << j << ", " << r << ": " << s << std::endl;
 								smudgeCorrected = true;
-								std::cout << columnHashes[j] << " (colHash[" << j << "]) differs from " << columnHashes[r] << " (colHash[" << r << "]) by " << s << std::endl;
 							}
+							if (smudgeCorrected) break;
+							s *= 2;
+						}
+
+
+						if (!smudgeCorrected) {
+							reflected = false;
+							break;
 						}
 					}
 				}
 
 				if (reflected && smudgeCorrected) {
-					answer += i;
-					std::cout << "Reflection down column " << i << std::endl;
+					answer += i * 100;
+					std::cout << ++pattern << ". Reflection along row " << (i*100) << std::endl;
 					break;
-				}
+				} else reflected = false;
 			}
 
 			if (!reflected) {
-				for (int i = 1; i < rowHashes.size(); i++) {
+				// std::cout << "CHECKING COLUMNS" << std::endl;
+				for (int64_t i = 1; i < columnHashes.size(); i++) {
 					reflected = true;
 					smudgeCorrected = false;
-					for (int j = 0; j <= i; j++) {
-						int r = (i * 2) - j - 1;
-						if (r >= rowHashes.size()) continue;
-						if (rowHashes[j] != rowHashes[r]) {
+					for (int64_t j = 0; j < i; j++) {
+						int64_t r = (i * 2) - j - 1;
+						if (r >= columnHashes.size()) continue;
+						// std::cout << "COMPARING " << j << " WITH " << r << std::endl;
+						if (columnHashes[j] != columnHashes[r]) {
+							// std::cout << "DIFFERENCE BETWEEN " << j << " AND " << r << ": " << (columnHashes[j] - columnHashes[r]) << std::endl;
 							if (smudgeCorrected) {
-								std::cout << rowHashes[j] << " (rowHash[" << j << "]) differs from " << rowHashes[r] << " (rowHash[" << r << "]) but already corrected a smudge this selection." << std::endl;
+								// std::cout << "WOULD BE SMUDGE COLUMN " << j << ", " << r << std::endl;
 								reflected = false;
 								break;
 							}
 
-							int s = 0;
-							for (int smudgeShift = 0; smudgeShift < rowHashes.size(); smudgeShift++) {
-								s = 1 << smudgeShift;
-								if (rowHashes[j] - s == rowHashes[r] || rowHashes[j] + s == rowHashes[r]) {
+							int64_t s = 1;
+							for (int64_t smudgeShift = 0; smudgeShift < 32; smudgeShift++) {
+
+								// std::cout << "S here : " << s << std::endl;
+								if (columnHashes[j] - s == columnHashes[r] || columnHashes[j] + s == columnHashes[r]) {
+									// std::cout << "SMUDGE COLUMN " << j << ", " << r << ": " << s << std::endl;
 									smudgeCorrected = true;
-									std::cout << rowHashes[j] << " (rowHash[" << j << "]) differs from " << rowHashes[r] << " (rowHash[" << r << "]) by " << s << std::endl;
 								}
+								if (smudgeCorrected) break;
+								s *= 2;
+							}
+
+							if (!smudgeCorrected) {
+								reflected = false;
+								break;
 							}
 						}
 					}
 
-					if (reflected) {
-						answer += (i * 100);
-						std::cout << "Reflection along row " << i << std::endl;
+					if (reflected && smudgeCorrected) {
+						answer += (i * 1);
+						std::cout << ++pattern << ". Reflection along column " << i << std::endl;
 						break;
 					}
 				}
@@ -158,17 +182,18 @@ int Day13::calculatePuzzle2(std::vector<std::string> input) {
 			continue;
 		}
 
-		for (int i = 0; i < line.size(); i++) {
+		for (int64_t i = 0; i < line.size(); i++) {
 			if (i >= columnHashes.size()) columnHashes.push_back(1);
 			if (row >= rowHashes.size()) rowHashes.push_back(1);
-			int hash = line[i] == '#' ? 1 : 0;
-			columnHashes[i] = (columnHashes[i] << hash) + 1;
-			rowHashes[row] = (rowHashes[row] << 1) + hash;
+			int64_t hash = line[i] == '#' ? 1 : 0;
+			columnHashes[i] = (columnHashes[i] * 2) + hash;
+			rowHashes[row] = (rowHashes[row] * 2) + hash;
 		}
+
 		row++;
 	}
 
-	std::cout << "ANSWER: " << answer << std::endl;
+	// std::cout << "ANSWER: " << answer << std::endl;
 
 	return answer;
 }
