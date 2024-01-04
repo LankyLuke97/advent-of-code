@@ -78,39 +78,24 @@ int64_t Day13::calculatePuzzle2(std::vector<std::string> input) {
 	int empties = 0;
 
 	for (std::string line : input) {
-		// std::cout << "Processing line " << line << std::endl;
 		if (line.empty()) {
-			// std::cout << "COLS: ";
-			// for (int64_t c : columnHashes) // std::cout << c << ", ";
-			// std::cout << std::endl;
-			// std::cout << "ROWS: ";
-			// for (int64_t r : rowHashes) // std::cout << r << ", ";
-			// std::cout << std::endl;
-
-			// std::cout << ++empties << " empties" << std::endl;
 			bool reflected = true;
 			bool smudgeCorrected = true;
 			for (int64_t i = 1; i < rowHashes.size(); i++) {
-				// std::cout << "CHECKING ROWS" << std::endl;
 				reflected = true;
 				smudgeCorrected = false;
 				for (int64_t j = 0; j < i; j++) {
 					int64_t r = (i * 2) - j - 1;
 					if (r >= rowHashes.size()) continue;
-					// std::cout << "COMPARING " << j << " WITH " << r << std::endl;
 					if(rowHashes[j] != rowHashes[r]) {
-						// std::cout << "DIFFERENCE BETWEEN " << j << " AND " << r << ": " << (rowHashes[j] - rowHashes[r]) << std::endl;
 						if (smudgeCorrected) {
-							// std::cout << "WOULD BE SMUDGE ROW " << j << ", " << r << std::endl;
 							reflected = false;
 							break;
 						}
 
 						int64_t s = 1;
 						for (int64_t smudgeShift = 0; smudgeShift < 32; smudgeShift++) {
-							// std::cout << "S here : " << s << std::endl;
 							if (rowHashes[j] - s == rowHashes[r] || rowHashes[j] + s == rowHashes[r]) {
-								// std::cout << "SMUDGE ROW " << j << ", " << r << ": " << s << std::endl;
 								smudgeCorrected = true;
 							}
 							if (smudgeCorrected) break;
@@ -127,34 +112,26 @@ int64_t Day13::calculatePuzzle2(std::vector<std::string> input) {
 
 				if (reflected && smudgeCorrected) {
 					answer += i * 100;
-					std::cout << ++pattern << ". Reflection along row " << (i*100) << std::endl;
 					break;
 				} else reflected = false;
 			}
 
 			if (!reflected) {
-				// std::cout << "CHECKING COLUMNS" << std::endl;
 				for (int64_t i = 1; i < columnHashes.size(); i++) {
 					reflected = true;
 					smudgeCorrected = false;
 					for (int64_t j = 0; j < i; j++) {
 						int64_t r = (i * 2) - j - 1;
 						if (r >= columnHashes.size()) continue;
-						// std::cout << "COMPARING " << j << " WITH " << r << std::endl;
 						if (columnHashes[j] != columnHashes[r]) {
-							// std::cout << "DIFFERENCE BETWEEN " << j << " AND " << r << ": " << (columnHashes[j] - columnHashes[r]) << std::endl;
 							if (smudgeCorrected) {
-								// std::cout << "WOULD BE SMUDGE COLUMN " << j << ", " << r << std::endl;
 								reflected = false;
 								break;
 							}
 
 							int64_t s = 1;
 							for (int64_t smudgeShift = 0; smudgeShift < 32; smudgeShift++) {
-
-								// std::cout << "S here : " << s << std::endl;
 								if (columnHashes[j] - s == columnHashes[r] || columnHashes[j] + s == columnHashes[r]) {
-									// std::cout << "SMUDGE COLUMN " << j << ", " << r << ": " << s << std::endl;
 									smudgeCorrected = true;
 								}
 								if (smudgeCorrected) break;
@@ -170,7 +147,6 @@ int64_t Day13::calculatePuzzle2(std::vector<std::string> input) {
 
 					if (reflected && smudgeCorrected) {
 						answer += (i * 1);
-						std::cout << ++pattern << ". Reflection along column " << i << std::endl;
 						break;
 					}
 				}
@@ -183,17 +159,15 @@ int64_t Day13::calculatePuzzle2(std::vector<std::string> input) {
 		}
 
 		for (int64_t i = 0; i < line.size(); i++) {
-			if (i >= columnHashes.size()) columnHashes.push_back(1);
-			if (row >= rowHashes.size()) rowHashes.push_back(1);
+			if (i >= columnHashes.size()) columnHashes.push_back(0);
+			if (row >= rowHashes.size()) rowHashes.push_back(0);
 			int64_t hash = line[i] == '#' ? 1 : 0;
-			columnHashes[i] = (columnHashes[i] * 2) + hash;
-			rowHashes[row] = (rowHashes[row] * 2) + hash;
+			columnHashes[i] += hash << row;
+			rowHashes[row] += hash << i;
 		}
 
 		row++;
 	}
-
-	// std::cout << "ANSWER: " << answer << std::endl;
 
 	return answer;
 }
@@ -216,7 +190,7 @@ void Day13::test() {
 	std::cout << "Day 13 part 1 test passed" << std::endl;
 	SetConsoleTextAttribute(h, 7);
 	SetConsoleTextAttribute(h, 4);
-	assert(calculatePuzzle2(Reader::readFile(testFile2)) == 400);
+	assert(calculatePuzzle2(Reader::readFile(testFile2)) == 5);
 	SetConsoleTextAttribute(h, 2);
 	std::cout << "Day 13 part 2 test passed" << std::endl;
 	SetConsoleTextAttribute(h, 7);
