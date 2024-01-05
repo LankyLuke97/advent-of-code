@@ -6,7 +6,7 @@
 #include "Day7.h"
 
 int Day7::calculatePuzzle1(std::vector<std::string> input) {
-	int64_t answer = 0;
+	int answer = 0;
 
 	std::map<Hand1, int> bids;
 	std::string token;
@@ -29,7 +29,7 @@ int Day7::calculatePuzzle1(std::vector<std::string> input) {
 }
 
 int Day7::calculatePuzzle2(std::vector<std::string> input) {
-	int64_t answer = 0;
+	int answer = 0;
 
 	std::map<Hand2, int> bids;
 	std::string token;

@@ -47,7 +47,7 @@ struct Hand1 {
 
 		for (int i = 0; i < cards.size(); i++) {
 			char card = cards[i];
-			value += mappings[card] * std::pow(14, cards.size() - i - 1);
+			value += mappings[card] * int(std::pow(14, cards.size() - i - 1));
 			cardTypes.try_emplace(card, 0);
 			cardTypes[card]++;
 		}
@@ -116,7 +116,7 @@ struct Hand2 {
 
 		for (int i = 0; i < cards.size(); i++) {
 			char card = cards[i];
-			value += mappings[card] * std::pow(14, cards.size() - i - 1);
+			value += mappings[card] * int(std::pow(14, cards.size() - i - 1));
 			if (card == 'J') {
 				jokers++;
 				continue;

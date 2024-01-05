@@ -190,7 +190,7 @@ void Day13::test() {
 	std::cout << "Day 13 part 1 test passed" << std::endl;
 	SetConsoleTextAttribute(h, 7);
 	SetConsoleTextAttribute(h, 4);
-	assert(calculatePuzzle2(Reader::readFile(testFile2)) == 5);
+	assert(calculatePuzzle2(Reader::readFile(testFile2)) == 400);
 	SetConsoleTextAttribute(h, 2);
 	std::cout << "Day 13 part 2 test passed" << std::endl;
 	SetConsoleTextAttribute(h, 7);
