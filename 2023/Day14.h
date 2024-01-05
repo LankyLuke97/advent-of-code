@@ -8,6 +8,7 @@ private:
 	const std::string puzzleFile = "inputs/day14.txt";
 	int calculatePuzzle1(std::vector<std::string> input);
 	int calculatePuzzle2(std::vector<std::string> input);
+	void cycle(std::vector<std::string>& input);
 public:
 	void puzzle1();
 	void puzzle2();
