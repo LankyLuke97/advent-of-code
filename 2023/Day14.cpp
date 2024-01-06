@@ -36,12 +36,10 @@ int Day14::calculatePuzzle2(std::vector<std::string> input) {
 	std::unordered_map<std::string, int> hashes;
 	std::vector<int> currentEmpty(input[0].size(), 0);
 	int size = input.size() - 1;
-	int cycles = 10;
+	int cycles = 1000000000;
 	int finishIndex = 0;
 
 	for (int i = 0; i < cycles; i++) {
-		std::cout << "BEFORE" << std::endl;
-		Reader::view(input);
 		cycle(input);
 		std::string hash = "";
 		for (std::string chars : input) hash += chars;
@@ -51,11 +49,6 @@ int Day14::calculatePuzzle2(std::vector<std::string> input) {
 			hashes.try_emplace(hash, i);
 			continue;
 		}
-
-		std::cout << std::endl;
-		std::cout << "AFTER" << std::endl;
-		Reader::view(input);
-		std::cout << std::endl;
 
 		int cycleLength = i - search->second;
 		cycles -= i - 1;
@@ -100,12 +93,11 @@ void Day14::cycle(std::vector<std::string>& input) {
 				currentEmpty[cInd]++;
 			}
 		}
-
-		std::vector<std::vector<char>> tempInput(input[0].size(), std::vector<char>(input.size(), '.'));
+		std::vector<std::vector<char>> tempInput(input[0].size(), std::vector<char>(input.size() - 1, '.'));
 		for (int i = 0; i < input.size(); i++) {
 			if (input[i].empty()) break;
 			for (int j = 0; j < input[0].size(); j++) {
-				tempInput[j][input.size() - i - 1] = input[i][j];
+				tempInput[j][input.size() - i - 2] = input[i][j];
 			}
 		}
 
