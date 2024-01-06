@@ -1,4 +1,8 @@
 ﻿  Day14.cpp
 C:\Users\Luke\Documents\Studio\advent-of-code\2023\Day14.cpp(12,11): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
-C:\Users\Luke\Documents\Studio\advent-of-code\2023\Day14.cpp(38,11): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\Luke\Documents\Studio\advent-of-code\2023\Day14.cpp(60,18): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\Luke\Documents\Studio\advent-of-code\2023\Day14.cpp(61,16): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\Luke\Documents\Studio\advent-of-code\2023\Day14.cpp(71,11): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+  main.cpp
+  Generating Code...
   2023.vcxproj -> C:\Users\Luke\Documents\Studio\advent-of-code\2023\x64\Debug\2023.exe
