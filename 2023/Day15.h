@@ -13,3 +13,20 @@ public:
 	void puzzle2();
 	void test();
 };
+
+struct Lens {
+	std::string label;
+	int focalLength;
+
+	Lens(std::string _label, int _focalLength) : label(_label), focalLength(_focalLength) {
+		
+	}
+
+	std::string toString() {
+		return "[" + label + " " + std::to_string(focalLength) + "]";
+	}
+
+	friend bool operator == (Lens const& l, Lens const& r) {
+		return (l.label == r.label);
+	}
+};
