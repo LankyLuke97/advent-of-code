@@ -15,6 +15,16 @@
 #include "Day14.h"
 #include "Day15.h"
 #include "Day16.h"
+#include "Day17.h"
+#include "Day18.h"
+#include "Day19.h"
+#include "Day20.h"
+#include "Day21.h"
+#include "Day22.h"
+#include "Day23.h"
+#include "Day24.h"
+#include "Day25.h"
+
 
 int main(int argc, char* argv[]) {
 	/*
@@ -125,10 +135,75 @@ int main(int argc, char* argv[]) {
 	day15.puzzle1();
 	day15.puzzle2();
 	*/
+	/*
 	Day16 day16;
 
 	day16.test();
 	day16.puzzle1();
 	day16.puzzle2();
+	*/
+	
+	Day17 day17;
+
+	day17.test();
+	day17.puzzle1();
+	day17.puzzle2();
+	
+	/*
+	Day18 day18;
+
+	day18.test();
+	day18.puzzle1();
+	day18.puzzle2();
+	*/
+	/*
+	Day19 day19;
+
+	day19.test();
+	day19.puzzle1();
+	day19.puzzle2();
+	*/
+	/*
+	Day20 day20;
+
+	day20.test();
+	day20.puzzle1();
+	day20.puzzle2();
+	*/
+	/*
+	Day21 day21;
+
+	day21.test();
+	day21.puzzle1();
+	day21.puzzle2();
+	*/
+	/*
+	Day22 day22;
+
+	day22.test();
+	day22.puzzle1();
+	day22.puzzle2();
+	*/
+	/*
+	Day23 day23;
+
+	day23.test();
+	day23.puzzle1();
+	day23.puzzle2();
+	*/
+	/*
+	Day24 day24;
+
+	day24.test();
+	day24.puzzle1();
+	day24.puzzle2();
+	*/
+	/*
+	Day25 day25;
+
+	day25.test();
+	day25.puzzle1();
+	day25.puzzle2();
+	*/
 	return 0;
 }
