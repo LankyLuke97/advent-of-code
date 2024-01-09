@@ -20,6 +20,7 @@ struct Step {
 class Day17 {
 private:
 	static std::unordered_map<std::string, int> costs;
+	static std::vector<Step> visitedSteps;
 	const std::string testFile1 = "inputs/day17_part1_test.txt";
 	const std::string testFile2 = "inputs/day17_part2_test.txt";
 	const std::string puzzleFile = "inputs/day17.txt";
