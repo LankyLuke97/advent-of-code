@@ -1,5 +1,83 @@
 ﻿  Day17.cpp
-C:\Users\Luke\Documents\Studio\advent-of-code\2023\Day17.cpp(14,21): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
-C:\Users\Luke\Documents\Studio\advent-of-code\2023\Day17.cpp(14,53): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
-C:\Users\Luke\Documents\Studio\advent-of-code\2023\Day17.cpp(71,14): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
-  2023.vcxproj -> C:\Users\Luke\Documents\Studio\advent-of-code\2023\x64\Debug\2023.exe
+C:\Users\Luke\Documents\Studio\advent-of-code\2023\Day17.cpp(9,21): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\Luke\Documents\Studio\advent-of-code\2023\Day17.cpp(9,53): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\Luke\Documents\Studio\advent-of-code\2023\Day17.cpp(84,26): error C2065: 'input': undeclared identifier
+C:\Users\Luke\Documents\Studio\advent-of-code\2023\Day17.cpp(84,2): error C2059: syntax error: 'for'
+C:\Users\Luke\Documents\Studio\advent-of-code\2023\Day17.cpp(84,31): error C2059: syntax error: ')'
+C:\Users\Luke\Documents\Studio\advent-of-code\2023\Day17.cpp(84,33): error C4430: missing type specifier - int assumed. Note: C++ does not support default-int
+C:\Users\Luke\Documents\Studio\advent-of-code\2023\Day17.cpp(85,3): error C2059: syntax error: 'if'
+C:\Users\Luke\Documents\Studio\advent-of-code\2023\Day17.cpp(86,13): error C2143: syntax error: missing ';' before '+='
+C:\Users\Luke\Documents\Studio\advent-of-code\2023\Day17.cpp(86,13): error C4430: missing type specifier - int assumed. Note: C++ does not support default-int
+C:\Users\Luke\Documents\Studio\advent-of-code\2023\Day17.cpp(86,3): error C2371: 'flattened': redefinition; different basic types
+  C:\Users\Luke\Documents\Studio\advent-of-code\2023\Day17.cpp(83,14):
+  see declaration of 'flattened'
+  
+C:\Users\Luke\Documents\Studio\advent-of-code\2023\Day17.cpp(86,13): error C2059: syntax error: '+='
+C:\Users\Luke\Documents\Studio\advent-of-code\2023\Day17.cpp(87,2): error C2059: syntax error: '}'
+C:\Users\Luke\Documents\Studio\advent-of-code\2023\Day17.cpp(87,2): error C2143: syntax error: missing ';' before '}'
+C:\Users\Luke\Documents\Studio\advent-of-code\2023\Day17.cpp(90,2): error C2466: cannot allocate an array of constant size 0
+C:\Users\Luke\Documents\Studio\advent-of-code\2023\Day17.cpp(90,13): error C4430: missing type specifier - int assumed. Note: C++ does not support default-int
+C:\Users\Luke\Documents\Studio\advent-of-code\2023\Day17.cpp(90,11): error C2440: 'initializing': cannot convert from 'int' to 'int [0]'
+  C:\Users\Luke\Documents\Studio\advent-of-code\2023\Day17.cpp(90,11):
+  There are no conversions to array types, although there are conversions to references or pointers to arrays
+  
+C:\Users\Luke\Documents\Studio\advent-of-code\2023\Day17.cpp(95,2): error C2059: syntax error: 'for'
+C:\Users\Luke\Documents\Studio\advent-of-code\2023\Day17.cpp(95,2): error C2143: syntax error: missing ')' before ';'
+C:\Users\Luke\Documents\Studio\advent-of-code\2023\Day17.cpp(95,20): error C2143: syntax error: missing ';' before '<'
+C:\Users\Luke\Documents\Studio\advent-of-code\2023\Day17.cpp(95,20): error C4430: missing type specifier - int assumed. Note: C++ does not support default-int
+C:\Users\Luke\Documents\Studio\advent-of-code\2023\Day17.cpp(95,20): error C2059: syntax error: '<'
+C:\Users\Luke\Documents\Studio\advent-of-code\2023\Day17.cpp(95,41): error C2143: syntax error: missing ';' before '++'
+C:\Users\Luke\Documents\Studio\advent-of-code\2023\Day17.cpp(95,41): error C4430: missing type specifier - int assumed. Note: C++ does not support default-int
+C:\Users\Luke\Documents\Studio\advent-of-code\2023\Day17.cpp(95,40): error C2086: 'int i': redefinition
+  C:\Users\Luke\Documents\Studio\advent-of-code\2023\Day17.cpp(95,18):
+  see declaration of 'i'
+  
+C:\Users\Luke\Documents\Studio\advent-of-code\2023\Day17.cpp(95,41): error C2059: syntax error: '++'
+C:\Users\Luke\Documents\Studio\advent-of-code\2023\Day17.cpp(95,43): error C2059: syntax error: ')'
+C:\Users\Luke\Documents\Studio\advent-of-code\2023\Day17.cpp(95,45): error C2143: syntax error: missing ';' before '{'
+C:\Users\Luke\Documents\Studio\advent-of-code\2023\Day17.cpp(95,45): error C2447: '{': missing function header (old-style formal list?)
+C:\Users\Luke\Documents\Studio\advent-of-code\2023\Day17.cpp(99,2): error C2059: syntax error: 'while'
+C:\Users\Luke\Documents\Studio\advent-of-code\2023\Day17.cpp(99,34): error C2143: syntax error: missing ';' before '{'
+C:\Users\Luke\Documents\Studio\advent-of-code\2023\Day17.cpp(99,34): error C2447: '{': missing function header (old-style formal list?)
+C:\Users\Luke\Documents\Studio\advent-of-code\2023\Day17.cpp(103,2): error C2059: syntax error: 'return'
+C:\Users\Luke\Documents\Studio\advent-of-code\2023\Day17.cpp(104,1): error C2059: syntax error: '}'
+C:\Users\Luke\Documents\Studio\advent-of-code\2023\Day17.cpp(104,1): error C2143: syntax error: missing ';' before '}'
+C:\Users\Luke\Documents\Studio\advent-of-code\2023\Day17.cpp(106,61): error C2143: syntax error: missing ';' before '{'
+C:\Users\Luke\Documents\Studio\advent-of-code\2023\Day17.cpp(106,61): error C2447: '{': missing function header (old-style formal list?)
+  main.cpp
+  Generating Code...
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.38.33130\include\xmemory(723,82): error C2512: 'Node::Node': no appropriate default constructor available
+  (compiling source file 'main.cpp')
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.38.33130\include\xmemory(723,82):
+  while trying to match the argument list '()'
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.38.33130\include\xmemory(723,82):
+  the template instantiation context (the oldest one first) is
+  	C:\Users\Luke\Documents\Studio\advent-of-code\2023\Day17.h(8,20):
+  	see reference to class template instantiation 'std::vector<Node,std::allocator<Node>>' being compiled
+  	C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.38.33130\include\vector(616,5):
+  	while compiling class template member function 'std::vector<Node,std::allocator<Node>>::vector(const unsigned __int64,const _Alloc &)'
+          with
+          [
+              _Alloc=std::allocator<Node>
+          ]
+  		C:\Users\Luke\Documents\Studio\advent-of-code\2023\Day17.h(10,85):
+  		see the first reference to 'std::vector<Node,std::allocator<Node>>::vector' in 'Node::Node'
+  	C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.38.33130\include\vector(618,9):
+  	see reference to function template instantiation 'void std::vector<Node,std::allocator<Node>>::_Construct_n<>(const unsigned __int64)' being compiled
+  	C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.38.33130\include\vector(2077,36):
+  	see reference to function template instantiation 'Node *std::_Uninitialized_value_construct_n<std::allocator<Node>>(Node *,unsigned __int64,_Alloc &)' being compiled
+          with
+          [
+              _Alloc=std::allocator<Node>
+          ]
+  	C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.38.33130\include\xmemory(2041,17):
+  	see reference to function template instantiation 'void std::_Uninitialized_backout_al<std::allocator<Node>>::_Emplace_back<>(void)' being compiled
+  	C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.38.33130\include\xmemory(1801,35):
+  	see reference to function template instantiation 'void std::_Default_allocator_traits<_Alloc>::construct<_Ty,>(_Alloc &,_Objty *const )' being compiled
+          with
+          [
+              _Alloc=std::allocator<Node>,
+              _Ty=Node,
+              _Objty=Node
+          ]
+  
