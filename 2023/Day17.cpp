@@ -25,6 +25,7 @@ int Day17::calculatePuzzle1(std::vector<std::string> input) {
 	8..11 - three
 	*/
 
+	// Graph construction
 	for (int i = 0; i < verticalSize; i++) {
 		if (input[i].empty()) break;
 
@@ -32,71 +33,78 @@ int Day17::calculatePuzzle1(std::vector<std::string> input) {
 			for (int k = 0; k < 12; k++) {
 				int pos = (i * horizontalSize) + (j * 12) + k;
 				if (i > 0 && graph[pos].prevStep != 8) {
-					graph[pos - (12 * verticalSize)].weight = input[i - 1][j];
-					graph[pos].connectedNodes.push_back(graph[pos - (12 * verticalSize)]);
+					int weight1 = input[i - 1][j];
+					graph[pos - (12 * verticalSize) + 0].weight = weight1;
+					graph[pos].connectedNodes.push_back(graph[pos - (12 * verticalSize)+ 0]);
 
 					if (i > 1 && graph[pos].prevStep != 4) {
-						graph[pos - (24 * verticalSize)].weight = input[i - 2][j];
-						graph[pos].connectedNodes.push_back(graph[pos - (24 * verticalSize)]);
+						int weight2 = input[i - 2][j] + weight1;
+						graph[pos - (24 * verticalSize) + 4].weight = weight2;
+						graph[pos].connectedNodes.push_back(graph[pos - (24 * verticalSize) + 4]);
 
 						if (i > 2 && graph[pos].prevStep != 0) {
-							graph[pos - (36 * verticalSize)].weight = input[i - 3][j];
-							graph[pos].connectedNodes.push_back(graph[pos - (36 * verticalSize)]);
+							int weight3 = input[i - 3][j] + weight2;
+							graph[pos - (36 * verticalSize) + 8].weight = weight3;
+							graph[pos].connectedNodes.push_back(graph[pos - (36 * verticalSize) + 8]);
 						}
 					}
 				}
 
-				if (j > 0) {
+				if (j < horizontalSize - 1 && graph[pos].prevStep != 9) {
+					int weight1 = input[i][j + 1];
+					graph[pos + 12 + 1].weight = weight1;
+					graph[pos].connectedNodes.push_back(graph[pos + 12 + 1]);
 
+					if (j < horizontalSize - 2 && graph[pos].prevStep != 5) {
+						int weight2 = input[i][j + 2] + weight1;
+						graph[pos + 24 + 5].weight = weight2;
+						graph[pos].connectedNodes.push_back(graph[pos + 24 + 5]);
+
+						if (j < horizontalSize - 3 && graph[pos].prevStep != 1) {
+							int weight3 = input[i][j + 3] + weight2;
+							graph[pos + 36 + 9].weight = weight3;
+							graph[pos].connectedNodes.push_back(graph[pos + 36 + 9]);
+						}
+					}
 				}
-				if (j > 1) {
+				
+				if (i < verticalSize - 1 && graph[pos].prevStep != 10) {
+					int weight1 = input[i + 1][j];
+					graph[pos + (12 * verticalSize) + 2].weight = weight1;
+					graph[pos].connectedNodes.push_back(graph[pos + (12 * verticalSize) + 2]);
 
+					if (i < verticalSize - 2 && graph[pos].prevStep != 6) {
+						int weight2 = input[i + 2][j] + weight1;
+						graph[pos + (24 * verticalSize) + 6].weight = weight2;
+						graph[pos].connectedNodes.push_back(graph[pos + (24 * verticalSize) + 6]);
+
+						if (i < verticalSize - 3 && graph[pos].prevStep != 2) {
+							int weight3 = input[i + 3][j] + weight2;
+							graph[pos + (36 * verticalSize) + 10].weight = weight3;
+							graph[pos].connectedNodes.push_back(graph[pos + (36 * verticalSize) + 10]);
+						}
+					}
 				}
-				if (j > 2) {
 
-				}
+				if (j > 0 && graph[pos].prevStep != 11) {
+					int weight1 = input[i][j - 1];
+					graph[pos - 12 + 3].weight = weight1;
+					graph[pos].connectedNodes.push_back(graph[pos - 12 + 1]);
 
-				if (i < verticalSize - 1) {
+					if (j > 1 && graph[pos].prevStep != 7) {
+						int weight2 = input[i][j - 2] + weight1;
+						graph[pos - 24 + 7].weight = weight2;
+						graph[pos].connectedNodes.push_back(graph[pos - 24 + 5]);
 
-				}
-				if (i < verticalSize - 2) {
-
-				}
-				if (i < verticalSize - 3) {
-
-				}
-
-				if (j < verticalSize - 1) {
-
-				}
-				if (j < verticalSize - 2) {
-
-				}
-				if (j < verticalSize - 3) {
-
+						if (j > 2 && graph[pos].prevStep != 3) {
+							int weight3 = input[i][j - 3] + weight2;
+							graph[pos - 36 + 11].weight = weight3;
+							graph[pos].connectedNodes.push_back(graph[pos - 36 + 9]);
+						}
+					}
 				}
 			}
 		}
-	}
-
-	std::string flattened = "";
-	for (std::string line : input) {
-		if (line.empty()) break;
-		flattened += line;
-	}
-
-	std::vector<int> costs(flattened.size(), INT_MAX);
-	costs[0] = 0;
-	std::vector<int> visitedNodes{0};
-	std::vector<int> unvisitedNodes;
-	int currentNode = 0;
-
-	for (int i = 1; i < flattened.size(); i++) {
-		unvisitedNodes.push_back(i);
-	}
-
-	while (!unvisitedNodes.empty()) {
-
 	}
 
 	return answer;
