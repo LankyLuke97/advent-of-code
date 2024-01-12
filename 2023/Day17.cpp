@@ -14,7 +14,7 @@ int Day17::calculatePuzzle1(std::vector<std::string> input) {
 		if (input[i].empty()) break;
 		for (int j = 0; j < horizontalSize; j++) {
 			for (int k = 0; k < 12; k++) {
-				Node node((i * horizontalSize) + (j * 12) + k, k);
+				Node node((12 * i * horizontalSize) + (j * 12) + k, k, (i * horizontalSize) + j);
 				graph.push_back(node);
 			}
 		}
@@ -38,74 +38,88 @@ int Day17::calculatePuzzle1(std::vector<std::string> input) {
 		for (int j = 0; j < horizontalSize; j++) {
 			for (int k = 0; k < 12; k++) {
 				int pos = (i * horizontalSize * 12) + (j * 12) + k;
-				if (i > 0 && graph[pos].prevStep != 8) {
-					int weight1 = input[i - 1][j];
-					graph[pos - (12 * horizontalSize) + 0].weight = weight1;
-					graph[pos].connectedNodes.push_back(pos - (12 * horizontalSize)+ 0);
+				int connectPos = -1;
+
+				if (i > 0 && graph[pos].prevStep != 8 && graph[pos].prevStep % 4 != 2) {
+					int weight1 = input[i - 1][j] - '0';
+					connectPos = pos - k - (12 * horizontalSize) + 0;
+					graph[connectPos].weight = weight1;
+					graph[pos].connectedNodes.push_back(connectPos);
 
 					if (i > 1 && graph[pos].prevStep != 4) {
-						int weight2 = input[i - 2][j] + weight1;
-						graph[pos - (24 * horizontalSize) + 4].weight = weight2;
-						graph[pos].connectedNodes.push_back(pos - (24 * horizontalSize) + 4);
+						int weight2 = input[i - 2][j] - '0' + weight1;
+						connectPos = pos - k - (24 * horizontalSize) + 4;
+						graph[connectPos].weight = weight2;
+						graph[pos].connectedNodes.push_back(connectPos);
 
 						if (i > 2 && graph[pos].prevStep != 0) {
-							int weight3 = input[i - 3][j] + weight2;
-							graph[pos - (36 * horizontalSize) + 8].weight = weight3;
-							graph[pos].connectedNodes.push_back(pos - (36 * horizontalSize) + 8);
+							int weight3 = input[i - 3][j] - '0' + weight2;
+							connectPos = pos - k - (36 * horizontalSize) + 8;
+							graph[connectPos].weight = weight3;
+							graph[pos].connectedNodes.push_back(connectPos);
 						}
 					}
 				}
 
-				if (j < horizontalSize - 1 && graph[pos].prevStep != 9) {
-					int weight1 = input[i][j + 1];
-					graph[pos + 12 + 1].weight = weight1;
-					graph[pos].connectedNodes.push_back(pos + 12 + 1);
+				if (j < horizontalSize - 1 && graph[pos].prevStep != 9 && graph[pos].prevStep % 4 != 3) {
+					int weight1 = input[i][j + 1] - '0';
+					connectPos = pos - k + 12 + 1;
+					graph[connectPos].weight = weight1;
+					graph[pos].connectedNodes.push_back(connectPos);
 
 					if (j < horizontalSize - 2 && graph[pos].prevStep != 5) {
-						int weight2 = input[i][j + 2] + weight1;
-						graph[pos + 24 + 5].weight = weight2;
-						graph[pos].connectedNodes.push_back(pos + 24 + 5);
+						int weight2 = input[i][j + 2] - '0' + weight1;
+						connectPos = pos - k + 24 + 5;
+						graph[connectPos].weight = weight2;
+						graph[pos].connectedNodes.push_back(connectPos);
 
 						if (j < horizontalSize - 3 && graph[pos].prevStep != 1) {
-							int weight3 = input[i][j + 3] + weight2;
-							graph[pos + 36 + 9].weight = weight3;
-							graph[pos].connectedNodes.push_back(pos + 36 + 9);
+							int weight3 = input[i][j + 3] - '0' + weight2;
+							connectPos = pos - k + 36 + 9;
+							graph[connectPos].weight = weight3;
+							graph[pos].connectedNodes.push_back(connectPos);
 						}
 					}
 				}
 				
-				if (i < verticalSize - 1 && graph[pos].prevStep != 10) {
-					int weight1 = input[i + 1][j];
-					graph[pos + (12 * horizontalSize) + 2].weight = weight1;
-					graph[pos].connectedNodes.push_back(pos + (12 * horizontalSize) + 2);
+				if (i < verticalSize - 1 && graph[pos].prevStep != 10 && graph[pos].prevStep % 4 != 0) {
+					int weight1 = input[i + 1][j] - '0';
+					connectPos = pos - k + (12 * horizontalSize) + 2;
+					graph[connectPos].weight = weight1;
+					graph[pos].connectedNodes.push_back(connectPos);
 
 					if (i < verticalSize - 2 && graph[pos].prevStep != 6) {
-						int weight2 = input[i + 2][j] + weight1;
-						graph[pos + (24 * horizontalSize) + 6].weight = weight2;
-						graph[pos].connectedNodes.push_back(pos + (24 * horizontalSize) + 6);
+						int weight2 = input[i + 2][j] - '0' + weight1;
+						connectPos = pos - k + (24 * horizontalSize) + 6;
+						graph[connectPos].weight = weight2;
+						graph[pos].connectedNodes.push_back(connectPos);
 
 						if (i < verticalSize - 3 && graph[pos].prevStep != 2) {
-							int weight3 = input[i + 3][j] + weight2;
-							graph[pos + (36 * horizontalSize) + 10].weight = weight3;
-							graph[pos].connectedNodes.push_back(pos + (36 * horizontalSize) + 10);
+							int weight3 = input[i + 3][j] - '0' + weight2;
+							connectPos = pos - k + (36 * horizontalSize) + 10;
+							graph[connectPos].weight = weight3;
+							graph[pos].connectedNodes.push_back(connectPos);
 						}
 					}
 				}
 
-				if (j > 0 && graph[pos].prevStep != 11) {
-					int weight1 = input[i][j - 1];
-					graph[pos - 12 + 3].weight = weight1;
-					graph[pos].connectedNodes.push_back(pos - 12 + 1);
+				if (j > 0 && graph[pos].prevStep != 11 && graph[pos].prevStep % 4 != 1) {
+					int weight1 = input[i][j - 1] - '0';
+					connectPos = pos - k - 12 + 3;
+					graph[connectPos].weight = weight1;
+					graph[pos].connectedNodes.push_back(connectPos);
 
 					if (j > 1 && graph[pos].prevStep != 7) {
-						int weight2 = input[i][j - 2] + weight1;
-						graph[pos - 24 + 7].weight = weight2;
-						graph[pos].connectedNodes.push_back(pos - 24 + 5);
+						int weight2 = input[i][j - 2] - '0' + weight1;
+						connectPos = pos - 24 + 7;
+						graph[connectPos].weight = weight2;
+						graph[pos].connectedNodes.push_back(connectPos);
 
 						if (j > 2 && graph[pos].prevStep != 3) {
-							int weight3 = input[i][j - 3] + weight2;
-							graph[pos - 36 + 11].weight = weight3;
-							graph[pos].connectedNodes.push_back(pos - 36 + 9);
+							int weight3 = input[i][j - 3] - '0' + weight2;
+							connectPos = pos - k - 36 + 11;
+							graph[connectPos].weight = weight3;
+							graph[pos].connectedNodes.push_back(connectPos);
 						}
 					}
 				}
@@ -135,14 +149,59 @@ int Day17::calculatePuzzle1(std::vector<std::string> input) {
 			if (graph[n].visited) continue;
 
 			int newDist = minDist + graph[n].weight;
-			if (newDist < graph[n].distFromSource) graph[n].distFromSource = newDist;
+			if (newDist < graph[n].distFromSource) {
+				graph[n].distFromSource = newDist;
+				graph[n].predecessor = minInd;
+			}
 		}
 	}
 
+	int currentNodeIndex = -1;
+
 	for (Node n : graph) {
-		if (n.position < horizontalSize * (verticalSize - 1) + 12 * (horizontalSize - 1)) continue;
-		if (n.distFromSource < answer) answer = n.distFromSource;
+		if (n.originalPosition != horizontalSize * (verticalSize - 1) + horizontalSize - 1) continue;
+		if (n.distFromSource < answer) {
+			answer = n.distFromSource;
+			currentNodeIndex = n.position;
+		}
 	}
+
+	std::cout << "Final node: " << graph[currentNodeIndex].originalPosition << std::endl;
+
+	std::vector<int> shortestPath;
+
+	while (currentNodeIndex != -1) {
+		shortestPath.push_back(currentNodeIndex);
+		currentNodeIndex = graph[currentNodeIndex].predecessor;
+	}
+
+	// Reverse the path to get the correct order
+	std::reverse(shortestPath.begin(), shortestPath.end());
+
+
+	std::vector<int> path;
+
+	// Print or use the shortestPath vector as needed
+	for (int nodeIndex : shortestPath) {
+		std::cout << graph[nodeIndex].originalPosition << " ";
+		path.push_back(graph[nodeIndex].originalPosition);
+	}
+
+	std::cout << std::endl;
+
+	for (int i = 0; i < input.size(); i++) {
+		if (input[i].empty()) break;
+		for (int j = 0; j < input[0].size();  j++) {
+			if (std::find(path.begin(), path.end(), (i * horizontalSize) + j) != path.end()) std::cout << "#";
+			else std::cout << input[i][j];
+		}
+
+		std::cout << "\n";
+	}
+	std::cout << std::endl;
+
+
+	std::cout << "ANSWER: " << answer << std::endl;
 
 	return answer;
 }

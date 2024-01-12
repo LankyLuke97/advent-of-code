@@ -7,9 +7,11 @@ struct Node {
 	int prevStep;
 	int weight;
 	int distFromSource;
+	int predecessor;
+	int originalPosition;
 	std::vector<int> connectedNodes;
 
-	Node(int _pos, int _prevStep) : position(_pos), prevStep(_prevStep), visited(false), distFromSource(INT_MAX), weight(-1) {}
+	Node(int _pos, int _prevStep, int _origPos) : position(_pos), prevStep(_prevStep), visited(false), predecessor(-1), originalPosition(_origPos), distFromSource(INT_MAX), weight(-1) {}
 	
 };
 
