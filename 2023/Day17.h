@@ -2,12 +2,15 @@
 #include "Reader.h"
 
 struct Node {
+	bool visited;
 	int position;
-	int weight;
 	int prevStep;
-	std::vector<Node> connectedNodes;
+	int weight;
+	int distFromSource;
+	std::vector<int> connectedNodes;
 
-	Node(int _pos, int _prevStep) : position(_pos), prevStep(_prevStep), connectedNodes(std::vector<Node>(12)) {}
+	Node(int _pos, int _prevStep) : position(_pos), prevStep(_prevStep), visited(false), distFromSource(INT_MAX), weight(-1) {}
+	
 };
 
 class Day17 {
