@@ -32,6 +32,7 @@ int Day17::calculatePuzzle1(std::vector<std::string> input) {
 	*/
 
 	// Graph construction
+
 	for (int i = 0; i < verticalSize; i++) {
 		if (input[i].empty()) break;
 
@@ -40,7 +41,7 @@ int Day17::calculatePuzzle1(std::vector<std::string> input) {
 				int pos = (i * horizontalSize * 12) + (j * 12) + k;
 				int connectPos = -1;
 
-				if (i > 0 && graph[pos].prevStep != 8 && graph[pos].prevStep % 4 != 2) {
+				if (i > 0 && graph[pos].prevStep != 8 && graph[pos].prevStep % 2 != 0) {
 					int weight1 = input[i - 1][j] - '0';
 					connectPos = pos - k - (12 * horizontalSize) + 0;
 					graph[connectPos].weight = weight1;
@@ -61,7 +62,7 @@ int Day17::calculatePuzzle1(std::vector<std::string> input) {
 					}
 				}
 
-				if (j < horizontalSize - 1 && graph[pos].prevStep != 9 && graph[pos].prevStep % 4 != 3) {
+				if (j < horizontalSize - 1 && graph[pos].prevStep != 9 && graph[pos].prevStep % 2 != 1) {
 					int weight1 = input[i][j + 1] - '0';
 					connectPos = pos - k + 12 + 1;
 					graph[connectPos].weight = weight1;
@@ -82,7 +83,7 @@ int Day17::calculatePuzzle1(std::vector<std::string> input) {
 					}
 				}
 				
-				if (i < verticalSize - 1 && graph[pos].prevStep != 10 && graph[pos].prevStep % 4 != 0) {
+				if (i < verticalSize - 1 && graph[pos].prevStep != 10 && graph[pos].prevStep % 2 != 0) {
 					int weight1 = input[i + 1][j] - '0';
 					connectPos = pos - k + (12 * horizontalSize) + 2;
 					graph[connectPos].weight = weight1;
@@ -103,7 +104,7 @@ int Day17::calculatePuzzle1(std::vector<std::string> input) {
 					}
 				}
 
-				if (j > 0 && graph[pos].prevStep != 11 && graph[pos].prevStep % 4 != 1) {
+				if (j > 0 && graph[pos].prevStep != 11 && graph[pos].prevStep % 2 != 1) {
 					int weight1 = input[i][j - 1] - '0';
 					connectPos = pos - k - 12 + 3;
 					graph[connectPos].weight = weight1;
@@ -111,7 +112,7 @@ int Day17::calculatePuzzle1(std::vector<std::string> input) {
 
 					if (j > 1 && graph[pos].prevStep != 7) {
 						int weight2 = input[i][j - 2] - '0' + weight1;
-						connectPos = pos - 24 + 7;
+						connectPos = pos - k - 24 + 7;
 						graph[connectPos].weight = weight2;
 						graph[pos].connectedNodes.push_back(connectPos);
 
@@ -127,23 +128,17 @@ int Day17::calculatePuzzle1(std::vector<std::string> input) {
 		}
 	}
 
-	while (true) {
-		int minDist = INT_MAX, minInd = -1;
+	std::priority_queue<Node> priorityQueue;
+	priorityQueue.push(graph[0]);
 
-		for (int i = 0; i < graph.size(); i++) {
-			Node nI = graph[i];
-			if (nI.visited) continue;
+	while (!priorityQueue.empty()) {
+		Node closest = priorityQueue.top();
+		int minInd = closest.position;
+		int minDist = closest.distFromSource;
+		priorityQueue.pop();
 
-			if (nI.distFromSource < minDist || (minDist == INT_MAX && minInd == -1)) {
-				minDist = nI.distFromSource;
-				minInd = i;
-			}
-		}
-
-		if (minInd == -1) break;
-
+		if (graph[minInd].visited) continue;
 		graph[minInd].visited = true;
-		if (minDist == INT_MAX) continue;
 
 		for (int n : graph[minInd].connectedNodes) {
 			if (graph[n].visited) continue;
@@ -151,7 +146,7 @@ int Day17::calculatePuzzle1(std::vector<std::string> input) {
 			int newDist = minDist + graph[n].weight;
 			if (newDist < graph[n].distFromSource) {
 				graph[n].distFromSource = newDist;
-				graph[n].predecessor = minInd;
+				priorityQueue.push(graph[n]);
 			}
 		}
 	}
@@ -165,43 +160,6 @@ int Day17::calculatePuzzle1(std::vector<std::string> input) {
 			currentNodeIndex = n.position;
 		}
 	}
-
-	std::cout << "Final node: " << graph[currentNodeIndex].originalPosition << std::endl;
-
-	std::vector<int> shortestPath;
-
-	while (currentNodeIndex != -1) {
-		shortestPath.push_back(currentNodeIndex);
-		currentNodeIndex = graph[currentNodeIndex].predecessor;
-	}
-
-	// Reverse the path to get the correct order
-	std::reverse(shortestPath.begin(), shortestPath.end());
-
-
-	std::vector<int> path;
-
-	// Print or use the shortestPath vector as needed
-	for (int nodeIndex : shortestPath) {
-		std::cout << graph[nodeIndex].originalPosition << " ";
-		path.push_back(graph[nodeIndex].originalPosition);
-	}
-
-	std::cout << std::endl;
-
-	for (int i = 0; i < input.size(); i++) {
-		if (input[i].empty()) break;
-		for (int j = 0; j < input[0].size();  j++) {
-			if (std::find(path.begin(), path.end(), (i * horizontalSize) + j) != path.end()) std::cout << "#";
-			else std::cout << input[i][j];
-		}
-
-		std::cout << "\n";
-	}
-	std::cout << std::endl;
-
-
-	std::cout << "ANSWER: " << answer << std::endl;
 
 	return answer;
 }
@@ -226,7 +184,6 @@ void Day17::test() {
 	HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
 	SetConsoleTextAttribute(h, 4);
 	assert(calculatePuzzle1(Reader::readFile(testFile1)) == 102);
-	calculatePuzzle1(Reader::readFile(testFile1));
 	SetConsoleTextAttribute(h, 2);
 	std::cout << "Day 17 part 1 test passed" << std::endl;
 	SetConsoleTextAttribute(h, 7);
