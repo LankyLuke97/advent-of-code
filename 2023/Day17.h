@@ -13,7 +13,7 @@ struct Node {
 	Node(int _pos, int _prevStep, int _origPos) : position(_pos), prevStep(_prevStep), visited(false), originalPosition(_origPos), distFromSource(INT_MAX), weight(-1) {}
 	
 	friend bool operator < (Node const& l, Node const& r) {
-		return l.distFromSource > r.distFromSource; // This is reversed to implement a min heap for const look up in D's algo
+		return l.distFromSource > r.distFromSource; // This is reversed to implement a min heap for const look up in D's algo.
 	}
 };
 
