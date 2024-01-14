@@ -1,4 +1,5 @@
 #pragma once
+#include <algorithm>
 #include <cassert>
 #include <sstream>
 #include <Windows.h>
@@ -69,10 +70,56 @@ int Day18::calculatePuzzle1(std::vector<std::string> input) {
 	// main problem. Sometimes, Lady Luck is feeling generous.
 }
 
-int Day18::calculatePuzzle2(std::vector<std::string> input) {
-	int answer = 0;
+uint64_t Day18::calculatePuzzle2(std::vector<std::string> input) {
+	uint64_t answer = 0;
 
-	return answer;
+	std::vector<std::pair<uint64_t, uint64_t>> coordinates{ std::make_pair(0,0) };
+
+	for (std::string line : input) {
+		if (line.empty()) break;
+
+		std::replace(line.begin(), line.end(), '(', ' ');
+		std::replace(line.begin(), line.end(), ')', ' ');
+		std::replace(line.begin(), line.end(), '#', ' ');
+
+		std::istringstream iss(line);
+		std::string token;
+		iss >> token;
+		iss >> token;
+		iss >> token;
+		std::stringstream ss;
+		ss << std::hex << std::string(token.begin(), token.begin() + 5);
+		uint64_t dist;
+		ss >> dist;
+
+		int direction = token[5] - '0';
+
+		std::pair<uint64_t, uint64_t> lastCoords = coordinates.back();
+		switch (direction) {
+		case 3:
+			coordinates.push_back(std::make_pair(lastCoords.first, lastCoords.second - dist));
+			break;
+		case 0:
+			coordinates.push_back(std::make_pair(lastCoords.first + dist, lastCoords.second));
+			break;
+		case 1:
+			coordinates.push_back(std::make_pair(lastCoords.first, lastCoords.second + dist));
+			break;
+		case 2:
+			coordinates.push_back(std::make_pair(lastCoords.first - dist, lastCoords.second));
+			break;
+		}
+
+		answer += dist;
+	}
+
+	int j = 0;
+	for (int i = coordinates.size() - 2; i > -1; i--) {
+		answer += (coordinates[j].first + coordinates[i].first) * (coordinates[j].second - coordinates[i].second);
+		j = i;
+	}
+
+	return (answer / 2) + 1;
 }
 
 void Day18::puzzle1() {
@@ -93,7 +140,7 @@ void Day18::test() {
 	std::cout << "Day 18 part 1 test passed" << std::endl;
 	SetConsoleTextAttribute(h, 7);
 	SetConsoleTextAttribute(h, 4);
-	assert(calculatePuzzle2(Reader::readFile(testFile2)) == 0);
+	assert(calculatePuzzle2(Reader::readFile(testFile2)) == 952408144115);
 	SetConsoleTextAttribute(h, 2);
 	std::cout << "Day 18 part 2 test passed" << std::endl;
 	SetConsoleTextAttribute(h, 7);
