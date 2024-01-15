@@ -1,10 +1,16 @@
 ﻿  Day17.cpp
 C:\Users\Luke\Documents\Studio\advent-of-code\2023\Day17.cpp(10,21): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
 C:\Users\Luke\Documents\Studio\advent-of-code\2023\Day17.cpp(10,53): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\Luke\Documents\Studio\advent-of-code\2023\Day17.cpp(169,21): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\Luke\Documents\Studio\advent-of-code\2023\Day17.cpp(169,53): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+  Day18.cpp
+C:\Users\Luke\Documents\Studio\advent-of-code\2023\Day18.cpp(59,13): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\Luke\Documents\Studio\advent-of-code\2023\Day18.cpp(117,13): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+  Day19.cpp
   main.cpp
   Generating code
-  147 of 533 functions (27.6%) were compiled, the rest were copied from previous compilation.
-    33 functions were new in current compilation
-    25 functions had inline decision re-evaluated but remain unchanged
+  602 of 859 functions (70.1%) were compiled, the rest were copied from previous compilation.
+    284 functions were new in current compilation
+    42 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
   2023.vcxproj -> C:\Users\Luke\Documents\Studio\advent-of-code\2023\x64\Release\2023.exe
