@@ -100,10 +100,23 @@ uint64_t Day20::calculatePuzzle1(std::vector<std::string> input) {
 
 uint64_t Day20::calculatePuzzle2(std::vector<std::string> input) {
 	uint64_t numButtonPresses = 0;
-	const std::string FINAL_MODULE = "rx";
+	std::unordered_map<std::string, uint64_t> joinToFinal;
 	std::queue<Pulse> pulses;
 	std::vector<std::string> initial;
 	std::unordered_map<std::string, Module> modules;
+
+	for (auto line : input) {
+		if (line.empty()) break;
+
+		std::replace(line.begin(), line.end(), ',', ' ');
+
+		std::istringstream iss(line);
+		std::string token;
+		iss >> token;
+		std::string m = std::string(token.begin() + 1, token.end());
+		iss >> token;
+		while (iss >> token) if (token == "vd") joinToFinal.emplace(m, -1);
+	}
 
 	for (std::string line : input) {
 		if (line.empty()) break;
@@ -142,10 +155,11 @@ uint64_t Day20::calculatePuzzle2(std::vector<std::string> input) {
 		}
 	}
 
-	// I suspect part 2 will be too many pulses for a brute force approach and I'll need
-	// to implement cycle detection, but 1000 times is little enough that I'm trying the 
-	// brute force approach initially.
 	while(true) {
+		bool found = true;
+		for (auto kv : joinToFinal) found = found && kv.second != -1;
+		if (found) break;
+
 		numButtonPresses++; // button to broadcast
 		for (std::string init : initial) {
 			Pulse pulse("broadcast", init, false);
@@ -156,7 +170,10 @@ uint64_t Day20::calculatePuzzle2(std::vector<std::string> input) {
 			Pulse pulse = pulses.front();
 			pulses.pop();
 
-			if (pulse.to == FINAL_MODULE && !pulse.high) return numButtonPresses;
+			if (pulse.high) {
+				auto search = joinToFinal.find(pulse.from);
+				if (search != joinToFinal.end() && search->second == -1) joinToFinal[search->first] = numButtonPresses;
+			}
 
 			Module to = modules[pulse.to];
 			if (to.type == 0) {
@@ -186,7 +203,19 @@ uint64_t Day20::calculatePuzzle2(std::vector<std::string> input) {
 		}
 	}
 
-	return 0;
+	uint64_t lcm = 1;
+
+	for (auto kv : joinToFinal) {
+		if (lcm > kv.second) lcm = (lcm / gcd(lcm, kv.second)) * kv.second;
+		else lcm = (kv.second / gcd(lcm, kv.second)) * lcm;
+	}
+
+	return lcm;
+}
+
+uint64_t Day20::gcd(uint64_t x, uint64_t y) {
+	if (y == 0) return x;
+	return gcd(y, x % y);
 }
 
 void Day20::puzzle1() {

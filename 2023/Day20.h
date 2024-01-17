@@ -48,6 +48,7 @@ private:
 	const std::string puzzleFile = "inputs/day20.txt";
 	uint64_t calculatePuzzle1(std::vector<std::string> input);
 	uint64_t calculatePuzzle2(std::vector<std::string> input);
+	uint64_t gcd(uint64_t x, uint64_t y);
 public:
 	void puzzle1();
 	void puzzle2();
