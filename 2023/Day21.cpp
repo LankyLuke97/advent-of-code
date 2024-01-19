@@ -17,7 +17,7 @@ int Day21::calculatePuzzle1(std::vector<std::string> input) {
 		for (int j = 0; j < verticalSize; j++) {
 			char c = input[i][j];
 			plots.push_back(c == '#' ? 0 : 1);
-			if (c == 'S') prevPos.push_back((i * verticalSize) + j);
+			if (c == 'S') prevPos.push_back(i * horizontalSize + j);
 		}
 	}
 
@@ -40,16 +40,17 @@ int Day21::calculatePuzzle1(std::vector<std::string> input) {
 uint64_t Day21::calculatePuzzle2(std::vector<std::string> input) {
 	int answer = 0;
 
-	const std::vector<int> NUM_STEPS {65, 196, 327};
+	const std::vector<int> NUM_STEPS {65, 196, 327, 64};
+	const int MULT = 7;
 	std::vector<int> plots;
 	std::vector<int> currentPos;
 	std::vector<int> prevPos;
-	int horizontalSize = input[0].size() * 9, verticalSize = input.size() - 1 * 9;
+	int horizontalSize = input[0].size() * MULT, verticalSize = (input.size() - 1) * MULT;
 
-	for (int k1 = 0; k1 < 5; k1++) {
-		for (int i = 0; i < verticalSize; i++) {
-			for (int k2 = 0; k2 < 5; k2++) {
-				for (int j = 0; j < verticalSize; j++) {
+	for (int k1 = 0; k1 < MULT; k1++) {
+		for (int i = 0; i < 131; i++) {
+			for (int k2 = 0; k2 < MULT; k2++) {
+				for (int j = 0; j < 131; j++) {
 					char c = input[i][j];
 					plots.push_back(c == '#' ? 0 : 1);
 				}
@@ -57,12 +58,11 @@ uint64_t Day21::calculatePuzzle2(std::vector<std::string> input) {
 		}
 	}
 
-	prevPos.push_back(plots.size() / 2);
-
-	std::cout << "Plots size: " << plots.size() << ", " << prevPos[0] << std::endl;
-
 	std::vector<int> values;
 	for (int n : NUM_STEPS) {
+		prevPos.clear();
+		prevPos.push_back(plots.size() / 2);
+		currentPos.clear();
 		for (int i = 0; i < n; i++) {
 			for (int pos : prevPos) {
 				int up = pos - horizontalSize, right = pos + 1, down = pos + horizontalSize, left = pos - 1;
@@ -79,15 +79,15 @@ uint64_t Day21::calculatePuzzle2(std::vector<std::string> input) {
 		values.push_back(prevPos.size());
 	}
 	
-	int halfStepsHorizontal = (horizontalSize - 1) / 2, halfStepsVertical = (verticalSize - 1) / 2;
-	uint64_t n = (26501365 - halfStepsHorizontal) / horizontalSize;
+	int halfStepsHorizontal = (input[0].size() - 1) / 2, halfStepsVertical = (input.size() - 1) / 2;
+	uint64_t n = (26501365 - halfStepsHorizontal) / input[0].size();
 
 	//Lagrange interpolation (I guess?)
 	int a = values[0] / 2 - values[1] + values[2] / 2;
 	int b = -3 * (values[0] / 2) + 2 * values[1] - values[2] / 2;
 	int c = values[0];
 
-	return uint64_t(a) * n * n + uint64_t(b) * n + uint64_t(c);
+	return (uint64_t(a) * n * n) + (uint64_t(b) * n) + uint64_t(c);
 }
 
 void Day21::puzzle1() {
