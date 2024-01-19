@@ -27,6 +27,8 @@
 
 
 int main(int argc, char* argv[]) {
+	std::cin.tie(nullptr);
+	std::cout.sync_with_stdio(false);
 	/*
 	Day1 day1;
 
@@ -170,20 +172,20 @@ int main(int argc, char* argv[]) {
 	day20.puzzle1();
 	day20.puzzle2();
 	*/
-	
+	/*
 	Day21 day21;
 
 	day21.test();
 	day21.puzzle1();
 	day21.puzzle2();
+	*/
 	
-	/*
 	Day22 day22;
 
 	day22.test();
 	day22.puzzle1();
 	day22.puzzle2();
-	*/
+	
 	/*
 	Day23 day23;
 
