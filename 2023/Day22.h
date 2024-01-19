@@ -6,6 +6,7 @@ struct Brick {
 	int id;
 	int x1, x2, y1, y2, z1, z2;
 	std::vector<int> balancedOn;
+	std::vector<int> supporting;
 
 	Brick() : id(-1), x1(-1), x2(-1), y1(-1), y2(-1), z1(-1), z2(-1), canDisintegrate(false) {} // Can't decipher what's using this, but there's a build error without it :)
 
