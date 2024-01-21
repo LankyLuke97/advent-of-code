@@ -1,5 +1,6 @@
 #pragma once
 #include <cassert>
+#include <queue>
 #include <sstream>
 #include <Windows.h>
 #include "Day23.h"
@@ -109,6 +110,98 @@ int Day23::calculatePuzzle1(std::vector<std::string> input) {
 int Day23::calculatePuzzle2(std::vector<std::string> input) {
 	int answer = 0;
 
+	short horizontalSize = input[0].size(), verticalSize = input.size() - 1;
+	short start = 0, end = (verticalSize - 1) * horizontalSize;
+	std::vector<char> flattened;
+	std::queue<std::vector<short>> paths;
+
+	for (std::string line : input) {
+		if (line.empty()) break;
+
+		for (char c : line) flattened.push_back(c);
+	}
+
+	for (char c : input[0]) {
+		if (c == '.') break;
+		start++;
+	}
+	for (char c : input[input.size() - 2]) {
+		if (c == '.') break;
+		end++;
+	}
+
+	paths.push(std::vector<short>{start, short(start + horizontalSize)});
+	std::vector<std::vector<short>> finishedPaths;
+	std::vector<short> currentPath = paths.front();
+
+	while(true) {
+		short pos = currentPath.back();
+		short up = pos - horizontalSize, right = pos + 1, down = pos + horizontalSize, left = pos - 1, newPaths = 0;
+		bool continuesUp = (flattened[up] != '#' && std::find(currentPath.begin(), currentPath.end(), up) == currentPath.end());
+		bool continuesRight = (flattened[right] != '#' && std::find(currentPath.begin(), currentPath.end(), right) == currentPath.end());
+		bool continuesDown = (down < flattened.size() && flattened[down] != '#' && std::find(currentPath.begin(), currentPath.end(), down) == currentPath.end());
+		bool continuesLeft = (flattened[left] != '#' && std::find(currentPath.begin(), currentPath.end(), left) == currentPath.end());
+
+		if (continuesUp) newPaths++;
+		if (continuesRight) newPaths++;
+		if (continuesDown) newPaths++;
+		if (continuesLeft) newPaths++;
+
+		if (newPaths == 0) {
+			if (currentPath.back() == end) finishedPaths.push_back(currentPath);
+			paths.pop();
+			if (paths.empty()) break;
+			currentPath = paths.front();
+			continue;
+		}
+		if (newPaths == 1) {
+			if (continuesUp) currentPath.push_back(up);
+			if (continuesRight) currentPath.push_back(right);
+			if (continuesDown) currentPath.push_back(down);
+			if (continuesLeft) currentPath.push_back(left);
+			continue;
+		}
+		std::vector<short> pathToNow = currentPath;
+		bool adjustedCurrent = false;
+
+		if (continuesUp) {
+			currentPath.push_back(up);
+			adjustedCurrent = true;
+		}
+
+		if (continuesRight) {
+			if (!adjustedCurrent) {
+				currentPath.push_back(right);
+				adjustedCurrent = true;
+			} else {
+				std::vector<short> path = pathToNow;
+				path.push_back(right);
+				paths.push(path);
+			}
+		}
+
+		if (continuesDown) {
+			if (!adjustedCurrent) {
+				currentPath.push_back(down);
+				adjustedCurrent = true;
+			}
+			else {
+				std::vector<short> path = pathToNow;
+				path.push_back(down);
+				paths.push(path);
+			}
+		}
+
+		if (continuesLeft) {
+			std::vector<short> path = pathToNow;
+			path.push_back(left);
+			paths.push(path);
+		}
+	}
+
+	for (std::vector<short> path : finishedPaths) {
+		if (path.size() - 1 > answer) answer = path.size() - 1;
+	}
 	return answer;
 }
 
@@ -130,7 +223,7 @@ void Day23::test() {
 	std::cout << "Day 23 part 1 test passed" << std::endl;
 	SetConsoleTextAttribute(h, 7);
 	SetConsoleTextAttribute(h, 4);
-	assert(calculatePuzzle2(Reader::readFile(testFile2)) == 0);
+	assert(calculatePuzzle2(Reader::readFile(testFile2)) == 154);
 	SetConsoleTextAttribute(h, 2);
 	std::cout << "Day 23 part 2 test passed" << std::endl;
 	SetConsoleTextAttribute(h, 7);
