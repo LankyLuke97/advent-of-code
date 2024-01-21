@@ -7,8 +7,8 @@
 int Day23::calculatePuzzle1(std::vector<std::string> input) {
 	int answer = 0;
 
-	int start = 0, end = 0;
 	int horizontalSize = input[0].size(), verticalSize = input.size() - 1;
+	int start = 0, end = (verticalSize - 1) * horizontalSize;
 	std::vector<char> flattened;
 	std::vector<std::vector<int>> paths;
 
@@ -100,10 +100,8 @@ int Day23::calculatePuzzle1(std::vector<std::string> input) {
 	}
 
 	for (std::vector<int> path : paths) {
-		if (path.back() == end && path.size() > answer) answer = path.size();
+		if (path.back() == end && (path.size() - 1) > answer) answer = path.size() - 1;
 	}
-
-	std::cout << answer << std::endl;
 
 	return answer;
 }
