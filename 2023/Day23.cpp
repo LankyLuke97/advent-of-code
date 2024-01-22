@@ -1,7 +1,7 @@
 #pragma once
 #include <cassert>
-#include <queue>
 #include <sstream>
+#include <stack>
 #include <Windows.h>
 #include "Day23.h"
 
@@ -110,10 +110,10 @@ int Day23::calculatePuzzle1(std::vector<std::string> input) {
 int Day23::calculatePuzzle2(std::vector<std::string> input) {
 	int answer = 0;
 
-	short horizontalSize = input[0].size(), verticalSize = input.size() - 1;
-	short start = 0, end = (verticalSize - 1) * horizontalSize;
+	int horizontalSize = input[0].size(), verticalSize = input.size() - 1;
+	int start = 0, end = (verticalSize - 1) * horizontalSize;
 	std::vector<char> flattened;
-	std::queue<std::vector<short>> paths;
+	std::vector<GraphNode> graph;
 
 	for (std::string line : input) {
 		if (line.empty()) break;
@@ -125,83 +125,161 @@ int Day23::calculatePuzzle2(std::vector<std::string> input) {
 		if (c == '.') break;
 		start++;
 	}
+
 	for (char c : input[input.size() - 2]) {
 		if (c == '.') break;
 		end++;
 	}
 
-	paths.push(std::vector<short>{start, short(start + horizontalSize)});
-	std::vector<std::vector<short>> finishedPaths;
-	std::vector<short> currentPath = paths.front();
+	std::cout << "Node graph construction commencing" << std::endl;
 
-	while(true) {
-		short pos = currentPath.back();
-		short up = pos - horizontalSize, right = pos + 1, down = pos + horizontalSize, left = pos - 1, newPaths = 0;
-		bool continuesUp = (flattened[up] != '#' && std::find(currentPath.begin(), currentPath.end(), up) == currentPath.end());
-		bool continuesRight = (flattened[right] != '#' && std::find(currentPath.begin(), currentPath.end(), right) == currentPath.end());
-		bool continuesDown = (down < flattened.size() && flattened[down] != '#' && std::find(currentPath.begin(), currentPath.end(), down) == currentPath.end());
-		bool continuesLeft = (flattened[left] != '#' && std::find(currentPath.begin(), currentPath.end(), left) == currentPath.end());
+	GraphNode startNode(start);
+	std::stack<int> latestPos, latestNode, latestDirection;
+	std::vector<GraphNode> allNodes{ startNode };
+	int currentWeight = 1;
+	latestPos.push(start + horizontalSize);
+	latestDirection.push(2);
+	latestNode.push(start);
 
-		if (continuesUp) newPaths++;
-		if (continuesRight) newPaths++;
-		if (continuesDown) newPaths++;
-		if (continuesLeft) newPaths++;
+	while (!latestNode.empty()) {
+		GraphNode currentNode = *std::find(allNodes.begin(), allNodes.end(), latestNode.top());
+		latestNode.pop();
+		int pos = latestPos.top();
+		latestPos.pop();
+		int dir = latestDirection.top();
+		latestDirection.pop();
+		currentWeight = 1;
 
-		if (newPaths == 0) {
-			if (currentPath.back() == end) finishedPaths.push_back(currentPath);
-			paths.pop();
-			if (paths.empty()) break;
-			currentPath = paths.front();
-			continue;
-		}
-		if (newPaths == 1) {
-			if (continuesUp) currentPath.push_back(up);
-			if (continuesRight) currentPath.push_back(right);
-			if (continuesDown) currentPath.push_back(down);
-			if (continuesLeft) currentPath.push_back(left);
-			continue;
-		}
-		std::vector<short> pathToNow = currentPath;
-		bool adjustedCurrent = false;
+		while (true) {
+			int up = pos - horizontalSize, right = pos + 1, down = pos + horizontalSize, left = pos - 1;
+			int newPaths = 0;
+			bool continuesUp = flattened[up] != '#' && dir != 2;
+			bool continuesRight = flattened[right] != '#' && dir != 3;
+			bool continuesDown = down < flattened.size() && flattened[down] != '#' && dir != 0;
+			bool continuesLeft = flattened[left] != '#' && dir != 1;
 
-		if (continuesUp) {
-			currentPath.push_back(up);
-			adjustedCurrent = true;
-		}
+			if (continuesUp) newPaths++;
+			if (continuesRight) newPaths++;
+			if (continuesDown) newPaths++;
+			if (continuesLeft) newPaths++;
 
-		if (continuesRight) {
-			if (!adjustedCurrent) {
-				currentPath.push_back(right);
-				adjustedCurrent = true;
-			} else {
-				std::vector<short> path = pathToNow;
-				path.push_back(right);
-				paths.push(path);
+			if (newPaths == 0) {
+				GraphNode endNode(pos);
+				endNode.connectedTo.emplace(currentNode.pos, currentWeight);
+				currentNode.connectedTo.emplace(endNode.pos, currentWeight);
+				endNode.end = true;
+				allNodes.push_back(endNode);
+				*std::find(allNodes.begin(), allNodes.end(), currentNode.pos) = currentNode;
+				break;
 			}
-		}
-
-		if (continuesDown) {
-			if (!adjustedCurrent) {
-				currentPath.push_back(down);
-				adjustedCurrent = true;
+			if (newPaths == 1) {
+				currentWeight++;
+				if (continuesUp) {
+					pos = up;
+					dir = 0;
+				}
+				if (continuesRight) {
+					pos = right;
+					dir = 1;
+				}
+				if (continuesDown) {
+					pos = down;
+					dir = 2;
+				}
+				if (continuesLeft) {
+					pos = left;
+					dir = 3;
+				}
+				continue;
 			}
-			else {
-				std::vector<short> path = pathToNow;
-				path.push_back(down);
-				paths.push(path);
+			
+			auto search = std::find(allNodes.begin(), allNodes.end(), pos);
+			if (search != allNodes.end()) {
+				GraphNode node = *search;
+				node.connectedTo.emplace(currentNode.pos, currentWeight);
+				*search = node;
+				currentNode.connectedTo.emplace(node.pos, currentWeight);
+				search = std::find(allNodes.begin(), allNodes.end(), currentNode.pos);
+				*search = currentNode;
+				break;
 			}
-		}
 
-		if (continuesLeft) {
-			std::vector<short> path = pathToNow;
-			path.push_back(left);
-			paths.push(path);
+			GraphNode newNode(pos);
+			newNode.connectedTo.emplace(currentNode.pos, currentWeight);
+			currentNode.connectedTo.emplace(newNode.pos, currentWeight);
+			allNodes.push_back(newNode);
+			*std::find(allNodes.begin(), allNodes.end(), currentNode.pos) = currentNode;
+
+			if (continuesUp) {
+				latestDirection.push(0);
+				latestPos.push(up);
+				latestNode.push(newNode.pos);
+			}
+
+			if (continuesRight) {
+				latestDirection.push(1);
+				latestPos.push(right);
+				latestNode.push(newNode.pos);
+			}
+
+			if (continuesDown) {
+				latestDirection.push(2);
+				latestPos.push(down);
+				latestNode.push(newNode.pos);
+			}
+
+			if (continuesLeft) {
+				latestDirection.push(3);
+				latestPos.push(left);
+				latestNode.push(newNode.pos);
+			}
+			break;
 		}
 	}
 
-	for (std::vector<short> path : finishedPaths) {
-		if (path.size() - 1 > answer) answer = path.size() - 1;
+	std::cout << "Graph constructed" << std::endl;
+
+	std::cout << "Finding paths" << std::endl;
+
+	std::stack<std::vector<GraphNode>> paths{};
+	std::vector<std::vector<GraphNode>> finishedPaths;
+	paths.push(std::vector<GraphNode>{ *std::find(allNodes.begin(), allNodes.end(), start) });
+
+	while (!paths.empty()) {
+		GraphNode node = paths.top().back(); 
+		std::vector<GraphNode> currentPath = paths.top();
+		paths.pop();
+
+		if (node.end) {
+			finishedPaths.push_back(currentPath);
+			continue;
+		}
+
+		for (auto kv : node.connectedTo) {
+			if (std::find(currentPath.begin(), currentPath.end(), kv.first) != currentPath.end()) continue;
+			std::vector<GraphNode> newPath = currentPath;
+			newPath.push_back(*std::find(allNodes.begin(), allNodes.end(), kv.first));
+			paths.push(newPath);
+		}
 	}
+
+	std::cout << "Paths found" << std::endl;
+
+	std::cout << "Finding longest path" << std::endl;
+
+	for (std::vector<GraphNode> path : finishedPaths) {
+		int totalWeight = 0;
+		GraphNode currentNode = path[0];
+		GraphNode prevNode = currentNode;
+		for (int i = 1; i < path.size(); i++) {
+			currentNode = path[i];
+			totalWeight += prevNode.connectedTo[currentNode.pos];
+			prevNode = currentNode;
+		}
+		if (totalWeight > answer) answer = totalWeight;
+	}
+	std::cout << "Longest path: " << answer << std::endl;
+
 	return answer;
 }
 

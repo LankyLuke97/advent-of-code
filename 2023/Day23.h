@@ -1,5 +1,18 @@
 #pragma once
+#include <unordered_map>
 #include "Reader.h"
+
+struct GraphNode {
+	bool end;
+	int pos;
+	std::unordered_map<int, int> connectedTo;
+
+	GraphNode(int _pos) : pos(_pos), end(false) {}
+
+	bool operator == (int pos) {
+		return pos == this->pos;
+	}
+};
 
 class Day23 {
 private:
