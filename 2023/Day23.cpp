@@ -131,8 +131,6 @@ int Day23::calculatePuzzle2(std::vector<std::string> input) {
 		end++;
 	}
 
-	std::cout << "Node graph construction commencing" << std::endl;
-
 	GraphNode startNode(start);
 	std::stack<int> latestPos, latestNode, latestDirection;
 	std::vector<GraphNode> allNodes{ startNode };
@@ -237,12 +235,7 @@ int Day23::calculatePuzzle2(std::vector<std::string> input) {
 		}
 	}
 
-	std::cout << "Graph constructed" << std::endl;
-
-	std::cout << "Finding paths" << std::endl;
-
 	std::stack<std::vector<GraphNode>> paths{};
-	std::vector<std::vector<GraphNode>> finishedPaths;
 	paths.push(std::vector<GraphNode>{ *std::find(allNodes.begin(), allNodes.end(), start) });
 
 	while (!paths.empty()) {
@@ -251,7 +244,15 @@ int Day23::calculatePuzzle2(std::vector<std::string> input) {
 		paths.pop();
 
 		if (node.end) {
-			finishedPaths.push_back(currentPath);
+			int totalWeight = 0;
+			GraphNode currentNode = currentPath[0];
+			GraphNode prevNode = currentNode;
+			for (int i = 1; i < currentPath.size(); i++) {
+				currentNode = currentPath[i];
+				totalWeight += prevNode.connectedTo[currentNode.pos];
+				prevNode = currentNode;
+			}
+			if (totalWeight > answer) answer = totalWeight;
 			continue;
 		}
 
@@ -262,23 +263,6 @@ int Day23::calculatePuzzle2(std::vector<std::string> input) {
 			paths.push(newPath);
 		}
 	}
-
-	std::cout << "Paths found" << std::endl;
-
-	std::cout << "Finding longest path" << std::endl;
-
-	for (std::vector<GraphNode> path : finishedPaths) {
-		int totalWeight = 0;
-		GraphNode currentNode = path[0];
-		GraphNode prevNode = currentNode;
-		for (int i = 1; i < path.size(); i++) {
-			currentNode = path[i];
-			totalWeight += prevNode.connectedTo[currentNode.pos];
-			prevNode = currentNode;
-		}
-		if (totalWeight > answer) answer = totalWeight;
-	}
-	std::cout << "Longest path: " << answer << std::endl;
 
 	return answer;
 }
