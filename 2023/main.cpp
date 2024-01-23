@@ -186,20 +186,20 @@ int main(int argc, char* argv[]) {
 	day22.puzzle1();
 	day22.puzzle2();
 	*/
-
+	/*
 	Day23 day23;
 
 	day23.test();
 	day23.puzzle1();
 	day23.puzzle2();
+	*/
 
-	/*
 	Day24 day24;
 
 	day24.test();
 	day24.puzzle1();
 	day24.puzzle2();
-	*/
+
 	/*
 	Day25 day25;
 
