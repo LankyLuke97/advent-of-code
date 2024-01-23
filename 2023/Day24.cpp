@@ -6,8 +6,6 @@
 #include "Day24.h"
 
 int Day24::calculatePuzzle1(std::vector<std::string> input, int64_t minRange, int64_t maxRange) {
-	std::cout << minRange << std::endl;
-	std::cout << maxRange << std::endl;
 	int answer = 0;
 
 	std::vector<Hail> hailstones;
@@ -48,15 +46,19 @@ int Day24::calculatePuzzle1(std::vector<std::string> input, int64_t minRange, in
 			Hail h2 = hailstones[j];
 			if (h1.a * h2.b == h2.a * h1.b) continue;
 
-			int64_t x = ((h1.c * h2.b) - (h2.c * h1.b)) / ((h1.a * h2.b) - (h2.a * h1.b));
+			float x = ((h1.c * h2.b) - (h2.c * h1.b)) / ((h1.a * h2.b) - (h2.a * h1.b));
 			if (x < minRange || x > maxRange) continue;
-			int64_t y = ((h1.a * h2.c) - (h2.a * h1.c)) / ((h1.a * h2.b) - (h2.a * h1.b));
+			float y = ((h1.a * h2.c) - (h2.a * h1.c)) / ((h1.a * h2.b) - (h2.a * h1.b));
 			if (y < minRange || y > maxRange) continue;
+
+			if ((x - h1.x) * h1.vx < 0) continue;
+			if ((x - h2.x) * h2.vx < 0) continue;
+			if ((y - h1.y) * h1.vy < 0) continue;
+			if ((y - h2.y) * h2.vy < 0) continue;
+
 			answer++;
 		}
 	}
-
-
 
 	return answer;
 }
@@ -85,7 +87,7 @@ void Day24::test() {
 	std::cout << "Day 24 part 1 test passed" << std::endl;
 	SetConsoleTextAttribute(h, 7);
 	SetConsoleTextAttribute(h, 4);
-	assert(calculatePuzzle2(Reader::readFile(testFile2)) == 0);
+	assert(calculatePuzzle2(Reader::readFile(testFile2)) == 47);
 	SetConsoleTextAttribute(h, 2);
 	std::cout << "Day 24 part 2 test passed" << std::endl;
 	SetConsoleTextAttribute(h, 7);
