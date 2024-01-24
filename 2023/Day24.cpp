@@ -20,17 +20,17 @@ int Day24::calculatePuzzle1(std::vector<std::string> input, int64_t minRange, in
 		std::string token;
 
 		iss >> token;
-		int64_t x = std::stoll(token);
+		double x = std::stod(token);
 		iss >> token;
-		int64_t y = std::stoll(token);
+		double y = std::stod(token);
 		iss >> token;
-		int64_t z = std::stoll(token);
+		double z = std::stod(token);
 		iss >> token;
-		float vx = std::stof(token);
+		double vx = std::stod(token);
 		iss >> token;
-		float vy = std::stof(token);
+		double vy = std::stod(token);
 		iss >> token;
-		float vz = std::stof(token);
+		double vz = std::stod(token);
 		
 		Hail hail(x, y, z, vx, vy, vz);
 
@@ -65,8 +65,215 @@ int Day24::calculatePuzzle1(std::vector<std::string> input, int64_t minRange, in
 
 int Day24::calculatePuzzle2(std::vector<std::string> input) {
 	int answer = 0;
+	std::vector<Hail> hailstones;
+
+	for (std::string line : input) {
+		if (line.empty()) break;
+
+		std::replace(line.begin(), line.end(), ',', ' ');
+		std::replace(line.begin(), line.end(), '@', ' ');
+
+		std::istringstream iss(line);
+		std::string token;
+
+		iss >> token;
+		double x = std::stod(token);
+		iss >> token;
+		double y = std::stod(token);
+		iss >> token;
+		double z = std::stod(token);
+		iss >> token;
+		double vx = std::stod(token);
+		iss >> token;
+		double vy = std::stod(token);
+		iss >> token;
+		double vz = std::stod(token);
+
+		Hail hail(x, y, z, vx, vy, vz);
+
+		hail.a = vy;
+		hail.b = -vx;
+		hail.c = (vy * x) - (vx * y);
+		hailstones.push_back(hail);
+
+		//if (hailstones.size() == 4) break;
+	}
+
+	/*  From https://topaz.github.io/paste/#XQAAAQANDAAAAAAAAAArmUAGM0NwXMLp2PQFNgRmh8ezkFKvEQd5obzMZwooEj1R498QeYDSxeTiF400W5Ml85PHQXQ/t4JmA7LkXWLwCOuXjTUZ9cIX/jhhvcP8EwiigBA3i2aj2uwkTmPRUpEAhQcV3gFGRBZdv0QomIXupqptd/ZH+3xPKdlV6/b5otDSX93R82DTUevMK4ls0CJH7GExO62B4wsmGGLkWmUKpcUGjlRc6tnITVvD3GlONpMJeiLCP4CkT3fijH+LNeuijMoQO9curNNpIl/taPOLl36w+BZ4vroViny70gkz/pW1oV6mMkc5X+TUg+iszuafPivIAvsNmi5rdnobza5b1zLS1gG5VRBQm0xqlQ2ssvgQWD4pmrDVt0CUbQDnYN9SOUWUQhf9dH8Ih/78LE0mtSkUEX8yaTWqZkM1teONYoil2yC0gv2CcSKAAyBrWAqyiJ1IytGAMFpEnHnkWQBQHECQeQDBQwMV185CJMVXVJZvdbd673BNadRSmbY1tVaQo2Y2TAoqhglSQ2R+6vnl8a4kChB5XIMh/Rzf5Lre58IQ01Lu/EiJd7pe2ceM4U29XjhEmSUB4iQGLx3piB84WA8ixC0XLYEzjIfOKumlGMmoB2OtcBeio+MsLjBN8PdoUfiYX7EzBxv++JnFikhGKiJVDy6JWJPZgBYhYmHRVyz21u3NKwMqy4ET8shjXmT5UYh8MBQ/VHrKOF7YqDPkCvs2mm4PqRwjjMYbGmhmVXxU0emhxicM2H8XljNGsOmPk/EEziz6S3i8FDVIcFpkQkoQPLHhlI59Rg+ZePfiFn9zGbFQFfAXhiER+uKCuwndMY5ePfKhQIvdYTVVcjR5Hwhv8zMuAyAQeqHnyrce6XpPIBp5tpAvCmFTbUCDqJez5ONUX50z6gFcgtGOwM1DLOD8YAYZZdXQ03BPgcw53VdrCvdVxypRrGxPBQTHnu260g8PSSAT7oejUZC/Mx3KfPOrkThbZfylM4nijiNDi+JrReW8UeLEX3M/j7uz9r+lE6m1YnE9BYa0G6B/qdCU2QBct/lf1i5rgd2iwy63angdaCDRBNRNflV8MFBLox94kezB0lwMvussr6bSkkr52hHjcWGMwShj+URNOmkTEEEnB/Ik5HAi+BZBq8vG5LvOkWDCQRn2+x5un8XIAHjP24dzCcS/VAFtLA6CNs4nt9EtlqtS6FvEU8eI7Kx628WHFF/7l83TS4vhWMtwCqh+jr6BEna3YOoTMjkMMfibN5St+5/2dLGxUqN4vVP4p0CTqGQYH9ku+C+szbAPICIxaTjkJNZm6Ix+vJod/j0Gug==
+	
+		We can create first three equations from the fact that the hailstone 0 and our rock will meet at t0
+		1) px0 + vx0 * t0 = pxr + vxr * t0
+		2) py0 + vy0 * t0 = pyr + vyr * t0
+		3) py0 + vz0 * t0 = pzr + vzr * t0
+
+		We edit the three equations to isolate t0 because we don't really care about it
+		1) t0 = (pxr - px0) / (vx0 - vxr)
+		2) t0 = (pyr - py0) / (vy0 - vyr)
+		3) t0 = (pzr - pz0) / (vz0 - vzr)
+
+		Now we can create two equations eliminating t0 from the system
+		1) (pxr - px0) / (vx0 - vxr) = (pyr - py0) / (vy0 - vyr)
+		2) (pxr - px0) / (vx0 - vxr) = (pzr - pz0) / (vz0 - vzr)
+
+		We edit the two new equations to so that we get ready to expand them
+		1) (pxr - px0)* (vy0 - vyr) = (pyr - py0) * (vx0 - vxr)
+		2) (pxr - px0)* (vz0 - vzr) = (pzr - pz0) * (vx0 - vxr)
+
+		And now we expand the equations
+		1) pxr* vy0 - pxr * vyr - px0 * vy0 + px0 * vyr = pyr * vx0 - pyr * vxr - py0 * vx0 + py0 * vxr
+		2) pxr* vz0 - pxr * vzr - px0 * vz0 + px0 * vzr = pzr * vx0 - pzr * vxr - pz0 * vx0 + pz0 * vxr
+
+		We know that those equations are true actually for any hailstone, not just hailstone 0
+		So now we add two new equations for hailstone N which are identical to the two above
+		3) pxr* vyN - pxr * vyr - pxN * vyN + pxN * vyr = pyr * vxN - pyr * vxr - pyN * vxN + pyN * vxr
+		4) pxr* vzN - pxr * vzr - pxN * vzN + pxN * vzr = pzr * vxN - pzr * vxr - pzN * vxN + pzN * vxr
+
+		Now we can substract equations 1 & 3 and substract 2 & 4
+		It will help us to get rid of those pxr * vyr, pyr * vxr and so on
+		We really don't want them because for cramer rule we need a linear equation a1*x+a2*y+...=c
+		1 - 3) pxr* (vy0 - vyN) + pyr * (vxN - vx0) + vxr * (pyN - py0) + vyr * (px0 - pxN) = px0 * vy0 - py0 * vx0 - pxN * vyN + pyN * vxN
+		2 - 4) pxr* (vz0 - vzN) + pzr * (vxN - vx0) + vxr * (pzN - pz0) + vzr * (px0 - pxN) = px0 * vz0 - pz0 * vx0 - pxN * vzN + pzN * vxN
+
+		Now let's just add any missing variables to the two new equations
+		1) pxr* (vy0 - vyN) + pyr * (vxN - vx0) + pzr * (0) + vxr * (pyN - py0) + vyr * (px0 - pxN) + vzr * (0) = px0 * vy0 - py0 * vx0 - pxN * vyN + pyN * vxN
+		2) pxr* (vz0 - vzN) + pyr * (0) + pzr * (vxN - vx0) + vxr * (pzN - pz0) + vyr * (0) + vzr * (px0 - pxN) = px0 * vz0 - pz0 * vx0 - pxN * vzN + pzN * vxN
+
+		That's it now we have two equations with constant coefficients for our six variables (pxr, pyr, pzr, vxr, vyr, vzr)
+		It means that we can choose any three hailstones(1 to N) and have six equations linear system.
+
+		vy0 - vy1    vx1 - vx0    0            py1 - py0    px0 - px1    0			= px0 * vy0 - py0 * vx0 - px1 * vy1 + py1 * vx1
+		vz0 - vz1    0            vx1 - vx0    pz1 - pz0    0            px0 - px1	= px0 * vz0 - pz0 * vx0 - px1 * vz1 + pz1 * vx1
+		vy0 - vy2    vx2 - vx0    0            py2 - py0    px0 - px2    0			= px0 * vy0 - py0 * vx0 - px2 * vy2 + py2 * vx2
+		vz0 - vz2    0            vx2 - vx0    pz2 - pz0    0            px0 - px2	= px0 * vz0 - pz0 * vx0 - px2 * vz2 + pz2 * vx2
+		vy0 - vy3    vx3 - vx0    0            py3 - py0    px0 - px3    0			= px0 * vy0 - py0 * vx0 - px3 * vy3 + py3 * vx3
+		vz0 - vz3    0            vx3 - vx0    pz3 - pz0    0            px0 - px3	= px0 * vz0 - pz0 * vx0 - px3 * vz3 + pz3 * vx3
+
+		Feed this matrix into Cramer's rule and we have our result
+	*/
+
+	Hail hs0 = hailstones[0], hs1 = hailstones[1], hs2 = hailstones[2], hs3 = hailstones[3];
+
+	std::vector<std::vector<double>> origMatrix = {
+		{hs0.vy - hs1.vy, hs1.vx - hs0.vx, 0, hs1.y - hs0.y, hs0.x - hs1.x, 0},
+		{hs0.vz - hs1.vz, 0, hs1.vx - hs0.vx, hs1.z - hs0.z, 0, hs0.x - hs1.x},
+		{hs0.vy - hs2.vy, hs2.vx - hs0.vx, 0, hs2.y - hs0.y, hs0.x - hs2.x, 0},
+		{hs0.vz - hs2.vz, 0, hs2.vx - hs0.vx, hs2.z - hs0.z, 0, hs0.x - hs2.x},
+		{hs0.vy - hs3.vy, hs3.vx - hs0.vx, 0, hs3.y - hs0.y, hs0.x - hs3.x, 0},
+		{hs0.vz - hs3.vz, 0, hs3.vx - hs0.vx, hs3.z - hs0.z, 0, hs0.x - hs1.x},
+	};
+
+	std::vector<std::vector<double>> baseMatrix = {
+		{hs0.vy - hs1.vy, hs1.vx - hs0.vx, 0, hs1.y - hs0.y, hs0.x - hs1.x, 0},
+		{hs0.vz - hs1.vz, 0, hs1.vx - hs0.vx, hs1.z - hs0.z, 0, hs0.x - hs1.x},
+		{hs0.vy - hs2.vy, hs2.vx - hs0.vx, 0, hs2.y - hs0.y, hs0.x - hs2.x, 0},
+		{hs0.vz - hs2.vz, 0, hs2.vx - hs0.vx, hs2.z - hs0.z, 0, hs0.x - hs2.x},
+		{hs0.vy - hs3.vy, hs3.vx - hs0.vx, 0, hs3.y - hs0.y, hs0.x - hs3.x, 0},
+		{hs0.vz - hs3.vz, 0, hs3.vx - hs0.vx, hs3.z - hs0.z, 0, hs0.x - hs1.x},
+	};
+
+	double origDet = determinant(origMatrix);
+
+	std::vector<double> col = {
+		(hs0.x * hs0.vy) - (hs0.y * hs0.vx) - (hs1.x * hs1.vy) + (hs1.y * hs1.vx),
+		(hs0.x * hs0.vz) - (hs0.z * hs0.vx) - (hs1.x * hs1.vz) + (hs1.z * hs1.vx),
+		(hs0.x * hs0.vy) - (hs0.y * hs0.vx) - (hs2.x * hs2.vy) + (hs2.y * hs2.vx),
+		(hs0.x * hs0.vz) - (hs0.z * hs0.vx) - (hs2.x * hs2.vz) + (hs2.z * hs2.vx),
+		(hs0.x * hs0.vy) - (hs0.y * hs0.vx) - (hs3.x * hs3.vy) + (hs3.y * hs3.vx),
+		(hs0.x * hs0.vz) - (hs0.z * hs0.vx) - (hs3.x * hs3.vz) + (hs3.z * hs3.vx)
+	};
+
+	std::cout << "Base" << std::endl;
+	for (int i = 0; i < 6; i++) {
+		std::cout << "{";
+		for (int j = 0; j < 6; j++) {
+			std::cout << baseMatrix[i][j] << ", ";
+		}
+		std::cout << "}" << std::endl;
+	}
+
+	std::cout << "Col" << std::endl;
+
+	std::cout << "{";
+	for (int i = 0; i < col.size(); i++) std::cout << col[i] << ", ";
+	std::cout << "}" << std::endl;
+
+	for (int i = 0; i < 3; i++) {
+		std::vector<std::vector<double>> replaced = baseMatrix;
+		for (int j = 0; j < replaced.size(); j++) {
+			replaced[j][i] = col[j];
+		}
+
+		std::cout << "replaced " <<i << std::endl;
+		for (int k = 0; k < 6; k++) {
+			std::cout << "{";
+			for (int j = 0; j < 6; j++) {
+				std::cout << replaced[k][j] << ", ";
+			}
+			std::cout << "}" << std::endl;
+		}
+		double pos = determinant(replaced) / origDet;  // Corrected the type to double
+		std::cout << pos << std::endl;
+		answer += pos;
+	}
+
+	std::cout << answer << std::endl;
 
 	return answer;
+}
+
+// Function to perform Gaussian elimination and calculate determinant
+double Day24::determinant(std::vector<std::vector<double>>& matrix) {
+	int n = matrix.size();
+	double det = 1.0;
+
+	for (int i = 0; i < n; ++i) {
+		// Find the pivot element and swap rows if necessary
+		int pivotRow = i;
+		for (int j = i + 1; j < n; ++j) {
+			if (std::abs(matrix[j][i]) > std::abs(matrix[pivotRow][i])) {
+				pivotRow = j;
+			}
+		}
+		if (pivotRow != i) {
+			std::swap(matrix[i], matrix[pivotRow]);
+			// Change the sign of determinant because of row swap
+			det *= -1.0;
+		}
+
+		// Perform Gaussian elimination
+		for (int j = i + 1; j < n; ++j) {
+			double factor = matrix[j][i] / matrix[i][i];
+			for (int k = i; k < n; ++k) {
+				matrix[j][k] -= factor * matrix[i][k];
+			}
+		}
+
+		// Multiply the determinant by the pivot element
+		det *= matrix[i][i];
+
+		// If the pivot element is zero, the determinant is zero
+		if (matrix[i][i] == 0.0) {
+			return 0.0;
+		}
+	}
+
+	return det;
+}
+
+std::vector<double> Day24::crossProduct(const std::vector<double>& v1, const std::vector<double>& v2) {
+	// Ensure both vectors have three elements
+	if (v1.size() != 3 || v2.size() != 3) {
+		std::cerr << "Error: Vectors must have three elements each." << std::endl;
+		return {};
+	}
+
+	// Calculate cross product
+	std::vector<double> result(3);
+	result[0] = v1[1] * v2[2] - v1[2] * v2[1];
+	result[1] = v1[2] * v2[0] - v1[0] * v2[2];
+	result[2] = v1[0] * v2[1] - v1[1] * v2[0];
+
+	return result;
 }
 
 void Day24::puzzle1() {
