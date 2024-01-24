@@ -20,17 +20,17 @@ int Day24::calculatePuzzle1(std::vector<std::string> input, int64_t minRange, in
 		std::string token;
 
 		iss >> token;
-		double x = std::stod(token);
+		long double x = std::stod(token);
 		iss >> token;
-		double y = std::stod(token);
+		long double y = std::stod(token);
 		iss >> token;
-		double z = std::stod(token);
+		long double z = std::stod(token);
 		iss >> token;
-		double vx = std::stod(token);
+		long double vx = std::stod(token);
 		iss >> token;
-		double vy = std::stod(token);
+		long double vy = std::stod(token);
 		iss >> token;
-		double vz = std::stod(token);
+		long double vz = std::stod(token);
 		
 		Hail hail(x, y, z, vx, vy, vz);
 
@@ -77,17 +77,17 @@ int Day24::calculatePuzzle2(std::vector<std::string> input) {
 		std::string token;
 
 		iss >> token;
-		double x = std::stod(token);
+		long double x = std::stod(token);
 		iss >> token;
-		double y = std::stod(token);
+		long double y = std::stod(token);
 		iss >> token;
-		double z = std::stod(token);
+		long double z = std::stod(token);
 		iss >> token;
-		double vx = std::stod(token);
+		long double vx = std::stod(token);
 		iss >> token;
-		double vy = std::stod(token);
+		long double vy = std::stod(token);
 		iss >> token;
-		double vz = std::stod(token);
+		long double vz = std::stod(token);
 
 		Hail hail(x, y, z, vx, vy, vz);
 
@@ -151,129 +151,112 @@ int Day24::calculatePuzzle2(std::vector<std::string> input) {
 		Feed this matrix into Cramer's rule and we have our result
 	*/
 
-	Hail hs0 = hailstones[0], hs1 = hailstones[1], hs2 = hailstones[2], hs3 = hailstones[3];
+	Hail hs0 = hailstones[0], hs1 = hailstones[1], hs2 = hailstones[2];
 
-	std::vector<std::vector<double>> origMatrix = {
-		{hs0.vy - hs1.vy, hs1.vx - hs0.vx, 0, hs1.y - hs0.y, hs0.x - hs1.x, 0},
-		{hs0.vz - hs1.vz, 0, hs1.vx - hs0.vx, hs1.z - hs0.z, 0, hs0.x - hs1.x},
-		{hs0.vy - hs2.vy, hs2.vx - hs0.vx, 0, hs2.y - hs0.y, hs0.x - hs2.x, 0},
-		{hs0.vz - hs2.vz, 0, hs2.vx - hs0.vx, hs2.z - hs0.z, 0, hs0.x - hs2.x},
-		{hs0.vy - hs3.vy, hs3.vx - hs0.vx, 0, hs3.y - hs0.y, hs0.x - hs3.x, 0},
-		{hs0.vz - hs3.vz, 0, hs3.vx - hs0.vx, hs3.z - hs0.z, 0, hs0.x - hs1.x},
+	std::vector<std::vector<long double>> origMatrix = {
+		{hs0.vy - hs1.vy, hs1.vx - hs0.vx,				 0, hs1.y - hs0.y, hs0.x - hs1.x,			  0},
+		{hs0.vy - hs2.vy, hs2.vx - hs0.vx,				 0, hs2.y - hs0.y, hs0.x - hs2.x,			  0},
+		{hs1.vz - hs0.vz,				0, hs0.vx - hs1.vx, hs0.z - hs1.z, 			   0, hs1.x - hs0.x},
+		{hs2.vz - hs0.vz,				0, hs0.vx - hs2.vx, hs0.z - hs2.z,			   0, hs2.x - hs0.x},
+		{			   0, hs0.vz - hs1.vz, hs1.vy - hs0.vy, 			0, hs1.z - hs0.z, hs0.y - hs1.y},
+		{			   0, hs0.vz - hs2.vz, hs2.vy - hs0.vy, 			0, hs2.z - hs0.z, hs0.y - hs2.y},
 	};
 
-	std::vector<std::vector<double>> baseMatrix = {
-		{hs0.vy - hs1.vy, hs1.vx - hs0.vx, 0, hs1.y - hs0.y, hs0.x - hs1.x, 0},
-		{hs0.vz - hs1.vz, 0, hs1.vx - hs0.vx, hs1.z - hs0.z, 0, hs0.x - hs1.x},
-		{hs0.vy - hs2.vy, hs2.vx - hs0.vx, 0, hs2.y - hs0.y, hs0.x - hs2.x, 0},
-		{hs0.vz - hs2.vz, 0, hs2.vx - hs0.vx, hs2.z - hs0.z, 0, hs0.x - hs2.x},
-		{hs0.vy - hs3.vy, hs3.vx - hs0.vx, 0, hs3.y - hs0.y, hs0.x - hs3.x, 0},
-		{hs0.vz - hs3.vz, 0, hs3.vx - hs0.vx, hs3.z - hs0.z, 0, hs0.x - hs1.x},
+	std::vector<long double> col = {
+		((hs1.y * hs1.vx) - (hs1.x * hs1.vy)) - ((hs0.y * hs0.vx) - (hs0.x * hs0.vy)),
+		((hs2.y * hs2.vx) - (hs2.x * hs2.vy)) - ((hs0.y * hs0.vx) - (hs0.x * hs0.vy)),
+		((hs1.x * hs1.vz) - (hs1.z * hs1.vx)) - ((hs0.x * hs0.vz) - (hs0.z * hs0.vx)),
+		((hs1.x * hs2.vz) - (hs2.z * hs2.vx)) - ((hs0.x * hs0.vz) - (hs0.z * hs0.vx)),
+		((hs1.z * hs1.vy) - (hs1.y * hs1.vz)) - ((hs0.z * hs0.vy) - (hs0.y * hs0.vz)),
+		((hs2.z * hs2.vy) - (hs2.y * hs2.vz)) - ((hs0.z * hs0.vy) - (hs0.y * hs0.vz))
 	};
 
-	double origDet = determinant(origMatrix);
-
-	std::vector<double> col = {
-		(hs0.x * hs0.vy) - (hs0.y * hs0.vx) - (hs1.x * hs1.vy) + (hs1.y * hs1.vx),
-		(hs0.x * hs0.vz) - (hs0.z * hs0.vx) - (hs1.x * hs1.vz) + (hs1.z * hs1.vx),
-		(hs0.x * hs0.vy) - (hs0.y * hs0.vx) - (hs2.x * hs2.vy) + (hs2.y * hs2.vx),
-		(hs0.x * hs0.vz) - (hs0.z * hs0.vx) - (hs2.x * hs2.vz) + (hs2.z * hs2.vx),
-		(hs0.x * hs0.vy) - (hs0.y * hs0.vx) - (hs3.x * hs3.vy) + (hs3.y * hs3.vx),
-		(hs0.x * hs0.vz) - (hs0.z * hs0.vx) - (hs3.x * hs3.vz) + (hs3.z * hs3.vx)
-	};
+	std::vector<std::vector<long double>> inverse = findInverse(origMatrix);
 
 	std::cout << "Base" << std::endl;
 	for (int i = 0; i < 6; i++) {
 		std::cout << "{";
 		for (int j = 0; j < 6; j++) {
-			std::cout << baseMatrix[i][j] << ", ";
+			std::cout << origMatrix[i][j] << ", ";
 		}
 		std::cout << "}" << std::endl;
 	}
 
-	std::cout << "Col" << std::endl;
-
-	std::cout << "{";
-	for (int i = 0; i < col.size(); i++) std::cout << col[i] << ", ";
-	std::cout << "}" << std::endl;
-
-	for (int i = 0; i < 3; i++) {
-		std::vector<std::vector<double>> replaced = baseMatrix;
-		for (int j = 0; j < replaced.size(); j++) {
-			replaced[j][i] = col[j];
+	std::cout << "Inverse" << std::endl;
+	for (int i = 0; i < 6; i++) {
+		std::cout << "{";
+		for (int j = 0; j < 6; j++) {
+			std::cout << inverse[i][j] << ", ";
 		}
-
-		std::cout << "replaced " <<i << std::endl;
-		for (int k = 0; k < 6; k++) {
-			std::cout << "{";
-			for (int j = 0; j < 6; j++) {
-				std::cout << replaced[k][j] << ", ";
-			}
-			std::cout << "}" << std::endl;
-		}
-		double pos = determinant(replaced) / origDet;  // Corrected the type to double
-		std::cout << pos << std::endl;
-		answer += pos;
+		std::cout << "}," << std::endl;
 	}
 
-	std::cout << answer << std::endl;
+	int numRows = inverse.size();
+	int numCols = inverse[0].size();
+
+	// Check if the dimensions are valid for multiplication
+	if (numCols != col.size()) {
+		std::cerr << "Invalid dimensions for matrix-vector multiplication!" << std::endl;
+		return answer;
+	}
+
+	// Perform matrix-vector multiplication
+	std::vector<long double> result(numRows, 0.0);
+	for (int i = 0; i < numRows; ++i) {
+		for (int j = 0; j < numCols; ++j) {
+			result[i] += inverse[i][j] * col[j];
+		}
+	}
+	std::cout << "{";
+	for (long double c : col) std::cout << c << ", ";
+	std::cout << "}" << std::endl;
+
+	std::cout << result[0] << ", " << result[1] << ", " << result[2] << std::endl;
 
 	return answer;
 }
 
-// Function to perform Gaussian elimination and calculate determinant
-double Day24::determinant(std::vector<std::vector<double>>& matrix) {
+std::vector<std::vector<long double>> Day24::findInverse(const std::vector<std::vector<long double>>& matrix) {
 	int n = matrix.size();
-	double det = 1.0;
 
+	// Augment the matrix with the identity matrix
+	std::vector<std::vector<long double>> augmentedMatrix(n, std::vector<long double>(2 * n, 0.0));
 	for (int i = 0; i < n; ++i) {
-		// Find the pivot element and swap rows if necessary
-		int pivotRow = i;
-		for (int j = i + 1; j < n; ++j) {
-			if (std::abs(matrix[j][i]) > std::abs(matrix[pivotRow][i])) {
-				pivotRow = j;
-			}
-		}
-		if (pivotRow != i) {
-			std::swap(matrix[i], matrix[pivotRow]);
-			// Change the sign of determinant because of row swap
-			det *= -1.0;
-		}
-
-		// Perform Gaussian elimination
-		for (int j = i + 1; j < n; ++j) {
-			double factor = matrix[j][i] / matrix[i][i];
-			for (int k = i; k < n; ++k) {
-				matrix[j][k] -= factor * matrix[i][k];
-			}
-		}
-
-		// Multiply the determinant by the pivot element
-		det *= matrix[i][i];
-
-		// If the pivot element is zero, the determinant is zero
-		if (matrix[i][i] == 0.0) {
-			return 0.0;
+		augmentedMatrix[i][i + n] = 1.0;
+		for (int j = 0; j < n; ++j) {
+			augmentedMatrix[i][j] = matrix[i][j];
 		}
 	}
 
-	return det;
-}
+	// Perform Gauss-Jordan elimination
+	for (int i = 0; i < n; ++i) {
+		double pivot = augmentedMatrix[i][i];
 
-std::vector<double> Day24::crossProduct(const std::vector<double>& v1, const std::vector<double>& v2) {
-	// Ensure both vectors have three elements
-	if (v1.size() != 3 || v2.size() != 3) {
-		std::cerr << "Error: Vectors must have three elements each." << std::endl;
-		return {};
+		// Normalize the row
+		for (int j = 0; j < 2 * n; ++j) {
+			augmentedMatrix[i][j] /= pivot;
+		}
+
+		// Eliminate other rows
+		for (int k = 0; k < n; ++k) {
+			if (k != i) {
+				double factor = augmentedMatrix[k][i];
+				for (int j = 0; j < 2 * n; ++j) {
+					augmentedMatrix[k][j] -= factor * augmentedMatrix[i][j];
+				}
+			}
+		}
 	}
 
-	// Calculate cross product
-	std::vector<double> result(3);
-	result[0] = v1[1] * v2[2] - v1[2] * v2[1];
-	result[1] = v1[2] * v2[0] - v1[0] * v2[2];
-	result[2] = v1[0] * v2[1] - v1[1] * v2[0];
+	// Extract the inverse from the augmented matrix
+	std::vector<std::vector<long double>> inverse(n, std::vector<long double>(n, 0.0));
+	for (int i = 0; i < n; ++i) {
+		for (int j = 0; j < n; ++j) {
+			inverse[i][j] = augmentedMatrix[i][j + n];
+		}
+	}
 
-	return result;
+	return inverse;
 }
 
 void Day24::puzzle1() {
