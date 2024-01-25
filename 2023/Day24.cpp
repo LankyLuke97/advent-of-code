@@ -77,17 +77,17 @@ int Day24::calculatePuzzle2(std::vector<std::string> input) {
 		std::string token;
 
 		iss >> token;
-		long double x = std::stod(token);
+		long double x = std::stold(token);
 		iss >> token;
-		long double y = std::stod(token);
+		long double y = std::stold(token);
 		iss >> token;
-		long double z = std::stod(token);
+		long double z = std::stold(token);
 		iss >> token;
-		long double vx = std::stod(token);
+		long double vx = std::stold(token);
 		iss >> token;
-		long double vy = std::stod(token);
+		long double vy = std::stold(token);
 		iss >> token;
-		long double vz = std::stod(token);
+		long double vz = std::stold(token);
 
 		Hail hail(x, y, z, vx, vy, vz);
 
@@ -213,7 +213,7 @@ int Day24::calculatePuzzle2(std::vector<std::string> input) {
 
 	std::cout << result[0] << ", " << result[1] << ", " << result[2] << std::endl;
 
-	return answer;
+	return result[0] + result[1] + result[2];
 }
 
 std::vector<std::vector<long double>> Day24::findInverse(const std::vector<std::vector<long double>>& matrix) {
