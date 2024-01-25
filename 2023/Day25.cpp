@@ -60,8 +60,6 @@ int Day25::calculatePuzzle1(std::vector<std::string> input) {
 
 	std::cout << "Finished creating laplacian matrix" << std::endl;
 
-	std::cout << laplaceMatrix << std::endl;
-
 	// Compute eigenvectors and eigenvalues
 	Eigen::EigenSolver<Eigen::MatrixXd> solver(laplaceMatrix);
 
@@ -71,9 +69,8 @@ int Day25::calculatePuzzle1(std::vector<std::string> input) {
 
 	std::cout << "Solved eigenvectors/values" << std::endl;
 
-	int smallestEigenValue = eigenvalues.minCoeff();
-	int secondSmallestIndex = 0; // Assuming the eigenvalues are sorted in ascending order
-	for (int i = 0; i < eigenvalues.size(); ++i) if (eigenvalues(i) < eigenvalues(secondSmallestIndex) && eigenvalues(i) != smallestEigenValue) secondSmallestIndex = i;
+	int secondSmallestIndex = 1; // Assuming the eigenvalues are sorted in ascending order
+	for (int i = 2; i < eigenvalues.size(); ++i) if (eigenvalues(i) < eigenvalues(secondSmallestIndex)) secondSmallestIndex = i;
 
 	std::cout << "Found second smallest: "<<secondSmallestIndex << std::endl;
 
@@ -83,8 +80,6 @@ int Day25::calculatePuzzle1(std::vector<std::string> input) {
 	std::cout << "Selected second smallest" << std::endl;
 
 	int part1 = 0, part2 = 0;
-
-	std::cout << secondSmallestEigenvector << std::endl;
 
 	for (double i : secondSmallestEigenvector) {
 		part1 += (i < 0.0);
