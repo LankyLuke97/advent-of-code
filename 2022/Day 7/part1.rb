@@ -3,9 +3,17 @@ require 'Set'
 $dirStack = ['/']
 
 $dirs = Set.new
+$dirDepth = Hash.new()
 $dirMappings = Hash.new([])
 $dirSizes = Hash.new(0)
 $finalisedDirSizes = Hash.new
+
+sum = 0
+MAX_SIZE = 100000
+
+def createPath(stack)
+    return stack.join("\\")
+end
 
 def findDirSize(dir)
     if $finalisedDirSizes.has_key?(dir)
@@ -13,8 +21,10 @@ def findDirSize(dir)
     end
 
     size = $dirSizes[dir]
-    $dirMappings.each do |subDir|
-        size += findDirSize(subDir)
+    unless $dirMappings[dir].nil? 
+        $dirMappings[dir].each do |subDir|
+            size += findDirSize(subDir)
+        end
     end
     $finalisedDirSizes[dir] = size
     return size
@@ -36,20 +46,21 @@ File.readlines(filename).each do |line|
             end
         end
     else
+        path = createPath($dirStack)
         if tokens[0] == 'dir'
-            $dirs.add (tokens[1])
-            $dirMappings[$dirStack[-1]] << tokens[1]
+            newDir = path + "\\" + tokens[1]
+            $dirs.add(newDir)
+            $dirMappings[path] += [newDir]
         else
-            $dirSizes[$dirStack[-1]] += tokens[0].to_i
+            $dirSizes[path] += tokens[0].to_i
         end
     end
 end
 
 sum = 0
-MAX_SIZE = 100000
-
-$dirs.each do |dir|
-    size = findDirSize(dir)
+$dirs.each do |key, val|
+    $dirs.add(key)
+    size = findDirSize(key)
     if size <= MAX_SIZE
         sum += size
     end
