@@ -38,9 +38,9 @@ lines.each do |line|
     end
 end
 
-items.each_with_index do |item, index|
+# items.each_with_index do |item, index|
     # puts "Monkey #{index}: #{item.join(",")}"
-end
+# end
 
 inspected = Array.new(items.size, 0)
 

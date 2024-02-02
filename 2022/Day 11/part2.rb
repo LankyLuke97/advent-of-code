@@ -38,9 +38,11 @@ lines.each do |line|
     end
 end
 
-items.each_with_index do |item, index|
+divisor = tests.map { |t| t[0] }.reduce(1) { |acc, n| acc.lcm(n) }
+
+# items.each_with_index do |item, index|
     # puts "Monkey #{index}: #{item.join(",")}"
-end
+# end
 
 inspected = Array.new(items.size, 0)
 
@@ -64,6 +66,8 @@ inspected = Array.new(items.size, 0)
                 # puts "\t\tWorry level is multiplied by itself to #{newItem}"
             end
 
+            newItem = newItem % divisor
+
             if newItem % t[0] == 0
                 items[t[1]].unshift(newItem)
                 # puts "\t\tCurrent worry level is divisible by #{t[0]}"
@@ -76,9 +80,9 @@ inspected = Array.new(items.size, 0)
         end
     end
     # puts "After round #{r}"
-    #items.each_with_index do |item, index|
+    # items.each_with_index do |item, index|
         # puts "Monkey #{index}: #{item.join(",")}"
-    #end
+    # end
 end
 
 inspected.sort! {|x, y| y <=> x}
