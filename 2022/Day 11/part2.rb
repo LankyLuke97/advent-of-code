@@ -44,8 +44,7 @@ end
 
 inspected = Array.new(items.size, 0)
 
-(1..20).each do |r|
-
+(1..10000).each do |r|
     items.each_with_index do |item, monkeyIndex|
         operation = operations[monkeyIndex]
         t = tests[monkeyIndex]
@@ -64,8 +63,6 @@ inspected = Array.new(items.size, 0)
                 newItem = newItem * newItem
                 # puts "\t\tWorry level is multiplied by itself to #{newItem}"
             end
-            newItem = (newItem / 3).floor
-            # puts "\t\tMonkey gets bored with item. Worry level is divided by 3 to #{newItem}"
 
             if newItem % t[0] == 0
                 items[t[1]].unshift(newItem)
@@ -79,9 +76,9 @@ inspected = Array.new(items.size, 0)
         end
     end
     # puts "After round #{r}"
-    # items.each_with_index do |item, index|
+    #items.each_with_index do |item, index|
         # puts "Monkey #{index}: #{item.join(",")}"
-    # end
+    #end
 end
 
 inspected.sort! {|x, y| y <=> x}
