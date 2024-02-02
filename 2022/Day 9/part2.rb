@@ -15,8 +15,6 @@ lines.each do |line|
     dist = instruction[1].to_i
     earlyStop = false
 
-    puts "\n#{line}"
-
     if instruction[0] == 'U'
         (1..dist).each do
             rows[0] += 1
@@ -31,16 +29,17 @@ lines.each do |line|
                     rows[k] = rows[k-1]
                     if colDiff < 0
                         cols[k] -= 1
-                    else
+                    elsif colDiff > 0
                         cols[k] += 1
                     end
+                    next
                 end
 
                 rows[k] += 1
                 colDiff = cols[k - 1] - cols[k]
-                if colDiff == -2
+                if colDiff < 0
                     cols[k] -= 1
-                elsif colDiff == 2
+                elsif colDiff > 0
                     cols[k] += 1
                 end
             end
@@ -61,20 +60,21 @@ lines.each do |line|
                     cols[k] = cols[k-1]
                     if rowDiff < 0
                         rows[k] -= 1
-                    else
+                    elsif rowDiff > 0
                         rows[k] += 1
                     end
+                    next
                 end
 
                 cols[k] += 1
-                rowDif = rows[k - 1] - rows[k]
-                if rowDiff == -2
+                rowDiff = rows[k - 1] - rows[k]
+                if rowDiff < 0
                     rows[k] -= 1
-                elsif rowDiff == 2
+                elsif rowDiff > 0
                     rows[k] += 1
                 end
             end
-               
+
             visited.add([cols[-1], rows[-1]])
         end
     elsif instruction[0] == 'D'
@@ -91,16 +91,17 @@ lines.each do |line|
                     rows[k] = rows[k-1]
                     if colDiff < 0
                         cols[k] -= 1
-                    else
+                    elsif colDiff > 0
                         cols[k] += 1
                     end
+                    next
                 end
 
                 rows[k] -= 1
                 colDiff = cols[k - 1] - cols[k]
-                if colDiff == -2
+                if colDiff < 0
                     cols[k] -= 1
-                elsif colDiff == 2
+                elsif colDiff > 0
                     cols[k] += 1
                 end
             end
@@ -121,26 +122,23 @@ lines.each do |line|
                     cols[k] = cols[k-1]
                     if rowDiff < 0
                         rows[k] -= 1
-                    else
+                    elsif rowDiff > 0
                         rows[k] += 1
                     end
+                    next
                 end
 
                 cols[k] -= 1
-                rowDif = rows[k - 1] - rows[k]
-                if rowDiff == -2
+                rowDiff = rows[k - 1] - rows[k]
+                if rowDiff < 0
                     rows[k] -= 1
-                elsif rowDiff == 2
+                elsif rowDiff > 0
                     rows[k] += 1
                 end
             end
 
             visited.add([cols[-1], rows[-1]])
         end
-    end
-
-    rows.each_with_index do |_, index|
-        puts "#{rows[index]}, #{cols[index]}"
     end
 end
 
