@@ -34,46 +34,24 @@ end
 
 display = Hash.new { |hash, key| hash[key] = Array.new }
 
-sensorsDistances.each do |sx, sy, dist|
-    puts "Building #{sx}, #{sy}, #{dist}"
-    (-dist..dist).each do |y|
-        if sy + y < 0
-            next
-        end
-        if sy + y > testCoord
-            break
-        end
-        ((-dist + y.abs)..(dist - y.abs)).each do |x|
-            if sx + x < 0
-                next
-            end
-            if sx + x > testCoord
+(0..testCoord).each do |y|
+    puts y
+    within = false
+    (0..testCoord).each do |x|
+        within = false
+        sensorsDistances.each do |sx, sy, dist|
+            if (sx - x).abs + (sy - y).abs <= dist
+                within = true
                 break
             end
-            display[sy + y] << (sx + x)
-        end
-    end
-end
-
-
-found = false
-display.each do |y, v|
-    v = v.to_set
-    unless v.size == testCoord
-        next
-    end
-
-    (0..testCoord).each do |x|
-        if v.include?(x)
-            next
         end
 
-        found = true
-        puts (x*4000000) + y
-        break
+        unless within
+            puts (x*4000000) + y
+            break
+        end
     end
-
-    if found
+    unless within
         break
     end
 end
