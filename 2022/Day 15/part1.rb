@@ -4,9 +4,14 @@ filename = ARGV.length() == 0 ? "input.txt" : ARGV[0].to_s
 testRow = filename == "input.txt" ? 2000000 : 10
 
 lines = File.readlines(filename)
+sensorsDistances = Array.new
+beacons = Set.new
 sensors = Array.new
 minX = 10000000000
 maxX = -1
+minY = 10000000000
+maxY = -1
+maxDist = -1
 
 lines.each do |line|
     line.gsub! "Sensor at x=", ""
@@ -16,38 +21,42 @@ lines.each do |line|
 
     sX, sY, bX, bY = line.split(',').map(&:to_i)
 
-    if bX < minX
-        minX = bX
-    end
-    if bX > maxX
-        maxX = bX
-    end
+    minX = [sX, bX, minX].min
+    maxX = [sX, bX, maxX].max
+    minY = [sY, bY, minY].min
+    maxY = [sY, bY, maxY].max
+    maxDist = [(bX - sX).abs + (bY - sY).abs, maxDist].max
 
-    sensors << [sX, sY, (bX - sX).abs + (bY - sY).abs]
+    sensorsDistances << [sX, sY, (bX - sX).abs + (bY - sY).abs]
+    beacons.add([bX, bY])
+    sensors << [sX, sY]
 end
 
 display = Hash.new { |hash, key| hash[key] = Set.new }
 
-sensors.each do |sx, sy, dist|
+sensorsDistances.each do |sx, sy, dist|
     (-dist..dist).each do |y|
+        unless sy + y == testRow
+            next
+        end
         ((-dist + y.abs)..(dist - y.abs)).each do |x|
             display[sy + y].add(sx + x)
         end
     end
 end
 
-str = ""
-(0..display.size - 1).each do |i|
-    unless i == 10
-        next
+answer = display[testRow].size
+
+sensors.each do |sx, sy|
+    if sy == testRow
+        answer -= 1
     end
-    (minX..maxX).each do |j|
-        if display[i].include?(j)
-            str += "#"
-        else
-            str += "."
-        end
-    end
-    puts str
-    str = ""
 end
+
+beacons.each do |bx, by|
+    if by == testRow
+        answer -= 1
+    end
+end
+
+puts answer
