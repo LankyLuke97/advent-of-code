@@ -8,7 +8,7 @@ $distanceGraph = Hash.new
 $maxPressureReleased = 0
 $checked = Hash.new
 
-def pressureRelease(minutes, currentValve, openValves, currentPressurePerMinute, pressureReleased)
+def pressureRelease(minutes, currentValve, openValves, pressureReleased)
     if minutes == 0
         $maxPressureReleased = [$maxPressureReleased, pressureReleased].max
         return
@@ -28,7 +28,7 @@ def pressureRelease(minutes, currentValve, openValves, currentPressurePerMinute,
         
         newOpenValves = openValves.dup
         newOpenValves << nextValve
-        pressureRelease(remainingTime, nextValve, newOpenValves, currentPressurePerMinute + $flows[nextValve], pressureReleased)
+        pressureRelease(remainingTime, nextValve, newOpenValves, pressureReleased)
     end
 
     $maxPressureReleased = [$maxPressureReleased, pressureReleased].max
@@ -74,6 +74,6 @@ $distanceGraph.each do |key, inner_hash|
     $distanceGraph[key] = inner_hash.transform_values { |val| val + 1 }
 end
 
-pressureRelease(30, 'AA', [], 0, 0)
+pressureRelease(30, 'AA', [], 0)
 
 puts $maxPressureReleased
