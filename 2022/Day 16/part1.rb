@@ -4,33 +4,34 @@ filename = ARGV.length() == 0 ? "input.txt" : ARGV[0].to_s
 lines = File.readlines(filename)
 
 $flows = Hash.new
-$graph = Hash.new
+$distanceGraph = Hash.new
 $maxPressureReleased = 0
 $checked = Hash.new
 
 def pressureRelease(minutes, currentValve, openValves, currentPressurePerMinute, pressureReleased)
     if minutes == 0
         $maxPressureReleased = [$maxPressureReleased, pressureReleased].max
-        $checked[currentValve] = 0
-        return 0
+        return
     end
+    pressureReleased += $flows[currentValve] * minutes
 
-    pressureReleased += currentPressurePerMinute
-
-    unless openValves.include?(currentValve) or $flows[currentValve] == 0
-        newOpenValves = openValves.dup
-        newOpenValves << currentValve
-        pressureRelease(minutes - 1, currentValve, newOpenValves, currentPressurePerMinute + $flows[currentValve], pressureReleased)
-    end
-
-    $graph[currentValve].each do |nextValve|
-        if $checked.keys.include?(nextValve)
-
-        else 
-            pressureRelease(minutes - 1, nextValve, openValves, currentPressurePerMinute, pressureReleased)
+    $distanceGraph[currentValve].each do |nextValve, time|
+        if openValves.include?(nextValve) or $flows[nextValve] == 0
+            next
         end
+
+        remainingTime = minutes - time
+
+        if remainingTime < 0
+            next
+        end
+        
+        newOpenValves = openValves.dup
+        newOpenValves << nextValve
+        pressureRelease(remainingTime, nextValve, newOpenValves, currentPressurePerMinute + $flows[nextValve], pressureReleased)
     end
 
+    $maxPressureReleased = [$maxPressureReleased, pressureReleased].max
     return
 end
 
@@ -49,13 +50,28 @@ lines.each do |line|
     leadsTo = Set.new(line[2..-1])
     
     $flows[valve] = flow
-    $graph[valve] = leadsTo
+    $distanceGraph[valve] = leadsTo
 end
 
-$graph.each do |key, val|
-    val.each do |v|
-        $graph[v].add(key)
+$distanceGraph.each do |valve, leadsTo|
+    newValue = Hash[$distanceGraph.keys.map {|k| [k, 1000000]}]
+    leadsTo.each do |v|
+        newValue[v] = 1
     end
+    newValue[valve] = 0
+    $distanceGraph[valve] = newValue
+end
+
+$distanceGraph.keys.each do |k|
+    $distanceGraph.keys.each do |i|
+        $distanceGraph.keys.each do |j|
+            $distanceGraph[i][j] = [$distanceGraph[i][j], $distanceGraph[i][k] + $distanceGraph[k][j]].min
+        end
+    end
+end
+
+$distanceGraph.each do |key, inner_hash|
+    $distanceGraph[key] = inner_hash.transform_values { |val| val + 1 }
 end
 
 pressureRelease(30, 'AA', [], 0, 0)
