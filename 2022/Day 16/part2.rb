@@ -5,123 +5,38 @@ lines = File.readlines(filename)
 
 $flows = Hash.new
 $distanceGraph = Hash.new
-$maxPressureReleased = 0
+$pressureWithValves = Hash.new
 $checked = Hash.new
 
-def pressureRelease(minutes, mValve, mTime, eValve, eTime, openValves, pressureReleased)
+def pressureRelease(minutes, currentValve, openValves, pressureReleased)
     if minutes == 0
-        
-        if openValves == ["DD", "JJ", "BB", "HH", "CC", "EE"]
-            puts "1. #{openValves} IS CORRECT: #{pressureReleased}, #{minutes} remaining"
+        if !$pressureWithValves.include?(openValves)
+            $pressureWithValves[openValves] = pressureReleased
         end
-        $maxPressureReleased = [$maxPressureReleased, pressureReleased].max
         return
+    end
+    pressureReleased += $flows[currentValve] * minutes
+
+    $distanceGraph[currentValve].each do |nextValve, time|
+        if openValves.include?(nextValve) or $flows[nextValve] == 0
+            next
+        end
+
+        remainingTime = minutes - time
+
+        if remainingTime < 0
+            next
+        end
+        
+        newOpenValves = openValves.dup
+        newOpenValves << nextValve
+        pressureRelease(remainingTime, nextValve, newOpenValves, pressureReleased)
     end
 
-    if mTime == eTime
-        minutes -= mTime
-        if minutes < 0
-            return
-        end
-        if openValves == ["DD", "JJ", "BB", "HH", "CC", "EE"] or openValves == ["DD", "JJ", "BB", "HH", "CC"]  or openValves == ["DD", "JJ", "BB", "HH"] or openValves == ["DD", "JJ", "BB"]   or openValves == ["DD", "JJ"]  or openValves == ["DD"] 
-            releasing = 0
-            openValves.each do |o|
-                releasing += $flows[o]
-            end
-            puts "a) #{openValves.inspect} are open at minute #{26 - minutes}, releasing #{releasing} pressure"
-            puts "a1) Valve #{mValve} will release #{$flows[mValve]} for #{minutes} minutes for a total of #{$flows[mValve] * minutes}"
-            puts "a2) Valve #{eValve} will release #{$flows[eValve]} for #{minutes} minutes for a total of #{$flows[eValve] * minutes}"
-        end
-        pressureReleased += ($flows[mValve] + $flows[eValve]) * minutes
-        mTime = 0
-        eTime = 0
-    elsif mTime < eTime
-        minutes -= mTime
-        if minutes < 0
-            return
-        end
-        if openValves == ["DD", "JJ", "BB", "HH", "CC", "EE"] or openValves == ["DD", "JJ", "BB", "HH", "CC"]  or openValves == ["DD", "JJ", "BB", "HH"] or openValves == ["DD", "JJ", "BB"]   or openValves == ["DD", "JJ"]  or openValves == ["DD"] 
-            releasing = 0
-            openValves.each do |o|
-                releasing += $flows[o]
-            end
-            puts "b) #{openValves.inspect} are open at minute #{26 - minutes}, releasing #{releasing} pressure"
-            puts "b1) Valve #{mValve} will release #{$flows[mValve]} for #{minutes} minutes for a total of #{$flows[mValve] * minutes}"
-        end
-        pressureReleased += ($flows[mValve]) * minutes
-        mTime = 0
-        eTime -= mTime
-    elsif mTime > eTime
-        minutes -= eTime
-        if minutes < 0
-            return
-        end
-        if openValves == ["DD", "JJ", "BB", "HH", "CC", "EE"] or openValves == ["DD", "JJ", "BB", "HH", "CC"]  or openValves == ["DD", "JJ", "BB", "HH"] or openValves == ["DD", "JJ", "BB"]   or openValves == ["DD", "JJ"]  or openValves == ["DD"] 
-            releasing = 0
-            openValves.each do |o|
-                releasing += $flows[o]
-            end
-            puts "c) #{openValves.inspect} are open at minute #{26 - minutes}, releasing #{releasing} pressure"
-            puts "c1) Valve #{eValve} will release #{$flows[eValve]} for #{minutes} minutes for a total of #{$flows[eValve] * minutes}"
-        end
-        pressureReleased += ($flows[eValve]) * minutes
-        mTime -= eTime
-        eTime = 0
+    if !$pressureWithValves.include?(openValves)
+        $pressureWithValves[openValves] = pressureReleased
     end
-
-    if mTime == 0 and eTime == 0
-        $distanceGraph[mValve].each do |nextMValve, nextMTime|
-            $distanceGraph[eValve].each do |nextEValve, nextETime|
-                if nextEValve == nextMValve or openValves.include?(nextEValve) or openValves.include?(nextMValve) or $flows[nextEValve] == 0 or $flows[nextMValve] == 0
-                    next
-                end
-                
-                newOpenValves = openValves.dup
-                newOpenValves << nextEValve
-                newOpenValves << nextMValve
-                pressureRelease(minutes, nextMValve, nextMTime, nextEValve, nextETime, newOpenValves, pressureReleased)
-            end
-        end
-    
-        if openValves == ["DD", "JJ", "BB", "HH", "CC", "EE"]
-            puts "2. #{openValves} IS CORRECT: #{pressureReleased}, #{minutes} remaining"
-        end
-        $maxPressureReleased = [$maxPressureReleased, pressureReleased].max
-        return
-    elsif mTime == 0
-        $distanceGraph[mValve].each do |nextValve, time|
-            if nextValve == eValve or openValves.include?(nextValve) or $flows[nextValve] == 0
-                next
-            end
-            
-            newOpenValves = openValves.dup
-            newOpenValves << nextValve
-            pressureRelease(minutes, nextValve, time, eValve, eTime, newOpenValves, pressureReleased)
-        end
-    
-        
-        if openValves == ["DD", "JJ", "BB", "HH", "CC", "EE"]
-            puts "3. #{openValves} IS CORRECT: #{pressureReleased}, #{minutes} remaining"
-        end
-        $maxPressureReleased = [$maxPressureReleased, pressureReleased].max
-        return
-    elsif eTime == 0
-        $distanceGraph[eValve].each do |nextValve, time|
-            if nextValve == mValve or openValves.include?(nextValve) or $flows[nextValve] == 0
-                next
-            end
-            
-            newOpenValves = openValves.dup
-            newOpenValves << nextValve
-            pressureRelease(minutes, mValve, mTime, nextValve, time, newOpenValves, pressureReleased)
-        end
-        
-        if openValves == ["DD", "JJ", "BB", "HH", "CC", "EE"]
-            puts "4. #{openValves} IS CORRECT: #{pressureReleased}, #{minutes} remaining"
-        end
-        $maxPressureReleased = [$maxPressureReleased, pressureReleased].max
-        return
-    end
+    return
 end
 
 lines.each do |line|
@@ -163,10 +78,16 @@ $distanceGraph.each do |key, inner_hash|
     $distanceGraph[key] = inner_hash.transform_values { |val| val + 1 }
 end
 
-$distanceGraph.each do |key, value|
-    puts "#{key}: #{value.inspect}"
+pressureRelease(26, 'AA', [], 0)
+maxPressure = 0
+
+$pressureWithValves.each do |key1, value1|
+    $pressureWithValves.each do |key2, value2|
+        unless key1 & key2 == []
+            next
+        end
+        maxPressure = [maxPressure, value1 + value2].max
+    end
 end
 
-pressureRelease(26, 'AA', 0, 'AA', 0, [], 0)
-
-puts $maxPressureReleased
+puts maxPressure
