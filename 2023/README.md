@@ -6,6 +6,9 @@ I can't say with confidence that I'm now an expert in the language, but I feel m
 
 ## Day 1
 ### Part 1
+We start the year off being somewhat unwittingly loaded into a trebuchet to investigate an issue with global snow production - I gather that, despite 2000-something years of Christmas, Santa's elves don't have the month of December down to a fine art.  
+Aside from anything else, one of them has been playing silly buggers with the trbuchet calibration. Might need to get OSHA involved...  
+
 The challenges started off simple, as always. Given a list of strings:
 ```
 1abc2
@@ -20,13 +23,13 @@ Once they were found, the two digit number could be constructed and added to the
 ### Part 3
 We're told now that some of the digits are actually spelled out with letters; **one**, **two**, **three**, and so on, as below.
 ```
-*two*1*nine*
-*eight*wo*three*
-abc*one*2*three*xyz
-x*two*ne3*four*
-*4*nineeightseven*2*
-z*one*ight23*4*
-*7*pqrst*six*teen
+two1nine
+eightwothree
+abcone2threexyz
+xtwone3four
+4nineeightseven*2
+zoneight234
+7pqrstsixteen
 ```
 We now had to find the first digit, either numeric or spelled out, and construct the two digit number for each.
 #### Solution
@@ -34,10 +37,58 @@ This one didn't feel pretty, but again, for just a thousand input strings it wor
 I first iterated through each string forward and backward, looking for the first numeric string in each case - I kept track of where this was located with a pointer for each.  
 I then took the substring of the start of the line to the first numeric digit and the reversed substring from the last numeric digit to the end.
 ```
-*zoneight*__2__3harold5__4__*dfsixteen*
+xtwone   3    four
 ```
 In the first string, I searched for all the spelled out numbers - in the second, I searched for all the spelled out numbers written backwards. If in either case one was found, then the first (or last) digit was in fact, that number. If multiple were found, then the lowest start index was the first (or last).  
-```
-*z__one__ight*__2__3harold5__4__*df__six__teen*
-```
 In hindsight, as I write this report, the double reversing for finding the last written number could have been avoided entirely by simply using the number with the highest start index rather than the lowest. Likewise, I could have skipped the substring section and simply checked if any instances were found before the numeric digits.
+
+## Day 2
+### Part 1
+Having been successfully launched to a floating Snow Island, we're met by an elf apologising for the lack of snow and explaining that he can help pass the rather long walk with a simple game involving coloured cubes. Personally, I'd have preferred a strong drink and an air-condition limo after the traumatic experience of being launched into the air by a medieval instrument of war, but there were apparently budget constraints.  
+The game to which we are treated involves numbers of red, green, and blue cubes being placed secretly into a bag; we are then shown multiple selections of the cubes (with replacement) per game.
+```
+Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green
+Game 2: 1 blue, 2 green; 3 green, 4 blue, 1 red; 1 green, 1 blue
+Game 3: 8 green, 6 blue, 20 red; 5 blue, 4 red, 13 green; 5 green, 1 red
+Game 4: 1 green, 3 red, 6 blue; 3 green, 6 red; 3 green, 15 blue, 14 red
+Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green
+```
+We must determine which of the games were possible if the bag had been loaded each time with 12 red, 13 green, and 14 blue cubes. Sum the possible game IDs for the answer.
+#### Solution
+Very simple problem this one. Just a bit of string manipulation to get the game ID, then looping through tokens in each line. If the token can be parsed to an int, then it's the current number. If it can't, then it must be a word indicating the colour associated with that number. After that, it's just a simple check that the number is less than or equal to what we would expect.
+```
+while(iss >> token) {
+	try {
+		i = std::stoi(token);
+	} catch(std::invalid_argument const& ex) {
+		if((token.substr(0, 3) == "red" && i > r) || (token.substr(0, 5) == "green" && i > g) || (token.substr(0, 4) == "blue" && i > b)) {
+			add = false;
+			break;
+		}
+	}
+}
+
+if (add) answer += id;
+```
+### Part 2
+
+#### Solution
+Another gentle part 2 that required almost no adjustments to my code. Instead of checking whether a game is valid based on the arbitrarily given 12 red, 13 green, and 14 blue cubes, we instead had to determine the minimum number of cubes required for each game to be possible.  
+Keeping the same process of looping through the line, this time I tracked the largest number seen for each colour; this will be our minimum number for that colour cube for that game. For each line, multiply them together, sum all of them for the answer. Done in double quick time.
+```
+while (iss >> token) {
+	try {
+		i = std::stoi(token);
+	} catch (std::invalid_argument const& ex) {
+		if(token.substr(0, 3) == "red" && i > r) {
+			r = i;
+		} else if(token.substr(0, 5) == "green" && i > g) {
+			g = i;
+		} else if(token.substr(0, 4) == "blue" && i > b) {
+			b = i;
+		}
+	}
+}
+
+answer += (r * g * b);
+```
