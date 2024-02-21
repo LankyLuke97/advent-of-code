@@ -71,7 +71,6 @@ while(iss >> token) {
 if (add) answer += id;
 ```
 ### Part 2
-
 #### Solution
 Another gentle part 2 that required almost no adjustments to my code. Instead of checking whether a game is valid based on the arbitrarily given 12 red, 13 green, and 14 blue cubes, we instead had to determine the minimum number of cubes required for each game to be possible.  
 Keeping the same process of looping through the line, this time I tracked the largest number seen for each colour; this will be our minimum number for that colour cube for that game. For each line, multiply them together, sum all of them for the answer. Done in double quick time.
@@ -92,3 +91,35 @@ while (iss >> token) {
 
 answer += (r * g * b);
 ```
+
+## Day 3
+### Part 1
+Having been enjoyably diverted by the cube game, we've found ourselves at a gondola lift station housing (shock) broken gondolas and we are once again roped into fixing it. These elves, do any of them have the expertise their jobs require?  
+Given an '*engine schematic*', we have to sum up the part numbers in the schematic. A number is a part number if it adjacent (including diagonally adjacent) to any non-number, non-period character. In the below example, ```114``` and ```58``` are not part numbers - the rest are.
+```
+467..114..
+...*......
+..35..633.
+......#...
+617*......
+.....+.58.
+..592.....
+......755.
+...$.*....
+.664.598..
+```
+#### Solution
+Even this early on, I started to feel that I was writing less-than concise code. Nevertheless, the approach I took was as followed.  
+The first step was to iterate over all lines, searching for any special characters or numbers, both using regex searching. I've not done anything with regex in C++, and like many software engineers the concept as a whole tends to feel unassailable. I'm not yet confident in C++ with the concepts - I would like to perhaps revisit it.  
+I tracked the positions of all special characters - simple enough. For the potential part numbers, I create a dictionary called ```numberPositions```, the keys of which are each position lying within a part number, the value being the start position. So if the first row of the input were ```..897...```, then I would emplace ```{2: 2, 3: 2, 4: 2}```. I simultaneously created a separate dictionary called ```numberMappings```, the keys of which were the start positions of those numbers and the values being the part number it self. In the prior example, this would be ```{2: 897}```.  
+Having mapped the information, I then interated through all of the special characters, for each one checking all the surrounding positions for matches in the ```numberPositions``` dictionary. If there were any matches, I found the matching part number in the ```numberMappings`` dictionary and added it to the result. I then removed each result from its respective dictionary to prevent duplicate part additions.  
+Happy with my solution, I hit run and - it failed my test case. What on earth...  
+
+Much debugging later, I had to call it a night. I just couldn't figure out the solution.  
+Undeterred despite falling at such an early hurdle, I returned the next day for further debugging; my patience was eventually rewarded. I changed how I was doing the regex searches, as they weren't returning all the values (I think just the first one?). I realised I had also made a mistake in the way I was searching around each part. The mistake was such that it didn't flag up in my test, which caused an incorrect submission, but eventually I noticed the '-' that should have been a '+' and sent the bugger on his way. Part 1, complete.
+### Part 2
+Snatching defeat from the jaws of victory! It seems something is still wrong. Turns out, one of the gears is wrong. A gear is any ```*``` symbol adjacent to exactly two part numbers. The gear ratio is the multiplication of each of those part numbers. We need to sum all the gear ratios.  
+In the given example, there are two gears: in the top left, adjacent to ```467``` and ```35``` - this has a gear ratio of ```16345```; and in the lower right, adjacent to ```755``` and ```598```, with a gear ratio of ```467835```.
+#### Solution
+Thanks to the way I had written my part 1, this took no time at all. I exactly replicated the code to start with; then, I changed the special character search to only look for ```*```, as only this character could be a gear.  
+Then, when searching for adjacent part numbers, this happens on a per potential-gear basis. I tracked all the adjacent parts in a vector; if the length of that vector was two, I added the multiplication of the two elements to the answer. 
