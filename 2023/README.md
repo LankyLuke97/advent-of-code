@@ -112,7 +112,7 @@ Given an '*engine schematic*', we have to sum up the part numbers in the schemat
 Even this early on, I started to feel that I was writing less-than concise code. Nevertheless, the approach I took was as followed.  
 The first step was to iterate over all lines, searching for any special characters or numbers, both using regex searching. I've not done anything with regex in C++, and like many software engineers the concept as a whole tends to feel unassailable. I'm not yet confident in C++ with the concepts - I would like to perhaps revisit it.  
 I tracked the positions of all special characters - simple enough. For the potential part numbers, I create a dictionary called ```numberPositions```, the keys of which are each position lying within a part number, the value being the start position. So if the first row of the input were ```..897...```, then I would emplace ```{2: 2, 3: 2, 4: 2}```. I simultaneously created a separate dictionary called ```numberMappings```, the keys of which were the start positions of those numbers and the values being the part number it self. In the prior example, this would be ```{2: 897}```.  
-Having mapped the information, I then interated through all of the special characters, for each one checking all the surrounding positions for matches in the ```numberPositions``` dictionary. If there were any matches, I found the matching part number in the ```numberMappings`` dictionary and added it to the result. I then removed each result from its respective dictionary to prevent duplicate part additions.  
+Having mapped the information, I then interated through all of the special characters, for each one checking all the surrounding positions for matches in the ```numberPositions``` dictionary. If there were any matches, I found the matching part number in the ```numberMappings``` dictionary and added it to the result. I then removed each result from its respective dictionary to prevent duplicate part additions.  
 Happy with my solution, I hit run and - it failed my test case. What on earth...  
 
 Much debugging later, I had to call it a night. I just couldn't figure out the solution.  
@@ -126,7 +126,7 @@ Then, when searching for adjacent part numbers, this happens on a per potential-
 
 ## Day 4
 ### Part 1
-Having discovered a new talent as a gondola engineer, we wave goodbye to Snow Island and take to the sky, arriving on a new, decidedly warmer and more humid island. An elf playing with coloured cards informs us this is Island Island (?) and that the gardener might know where the water source is - of course, he's on a different floating island. The elf promises to lend us his boat if we help him with his cards.  
+Having discovered a new talent as a gondola engineer, we wave goodbye to Snow Island and take to the sky, arriving on a new, decidedly warmer and more humid island. An elf playing with coloured cards informs us this is Island Island (?) and that the gardener might know where the water source is - of course, he's on a different island. The small kind, surrounded by water, not the giant physics-defying floating kind. The elf promises to lend us his boat if we help him with his cards.  
 Each card has two lists of numbers. One is a list of winning numbers and the other is a list of the numbers we have.
 ```
 Card 1: 41 48 83 86 17 | 83 86  6 31 17  9 48 53
@@ -185,3 +185,82 @@ lineNum++;
 ```
 At the end, I returned the sum of the values of the dictionary. A job well done.
 
+## Day 5
+### Part 1
+The gardener is horrified when he realises how long it's been since they turned off the water supply - he was distracted with feeding everyone (a laudable goal, I'm sure). It turns out the issue is that they have no sand to filter the water, and they can't make snow with dirty water, apparently.  
+In the same breath as sending us off to check on the sand, he also asks for help with the food production. They're having trouble with understanding the latest Island Island Almanac, which lists:
+- All of the seeds that need to be plant
+- The type of soil to use with each seed
+- The type of fertiliser to use with each soil
+- The type of water (?) to use with each fertiliser
+- Ad nauseam
+Our example input looks like so:
+```
+seeds: 79 14 55 13
+
+seed-to-soil map:
+50 98 2
+52 50 48
+
+soil-to-fertilizer map:
+0 15 37
+37 52 2
+39 0 15
+
+fertilizer-to-water map:
+49 53 8
+0 11 42
+42 0 7
+57 7 4
+
+water-to-light map:
+88 18 7
+18 25 70
+
+light-to-temperature map:
+45 77 23
+81 45 19
+68 64 13
+
+temperature-to-humidity map:
+0 69 1
+1 0 69
+
+humidity-to-location map:
+60 56 37
+56 93 4
+```
+Rather than listing one to one, the lines are ranges. Taking the ```seed-to-soil map``` as an example:
+```
+50 98 2
+52 50 48
+```
+The first line describes a destination range starting at 50, a source range starting at 98, and a range length of 2. So:
+```
+98 -> 50
+99 -> 51
+```
+The second line means that the source range starts at ```50``` and contains ```48``` numbers, corresponding to a destination range starting at ```52```, which will also contain ```48``` consecutive numbers.  
+Any source numbers that aren't mapped correspond to the same destination number. The ```seed-to-soil map``` therefore looks like this:
+```
+seed  soil
+0     0
+1     1
+...   ...
+48    48
+49    49
+50    52
+51    53
+...   ...
+96    98
+97    99
+98    50
+99    51
+```
+We can repeat this process for all the maps. The gardener wants to know the lowest location number corresponding to any of the seeds.
+#### Solution
+
+### Part 2
+Turns out, they didn't RTFM properly (again). Instead of individual seeds, the almanac describes ranges of seeds. The seed numbers come in pairs, the first number referring to the start of a range and the second number describing the length of the range.
+So, in the example, ```seeds: 79 14 55 13``` actually means two ranges, the first starting at ```79``` and containing ```14``` values (```79``` to ```92``` inclusive), the second starting at ```55``` and containing ```13``` values (```55``` to ```67``` inclusive).  
+The problem remains the same - of those seeds, which corresponds with the lowest location number?
