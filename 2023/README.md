@@ -118,8 +118,70 @@ Happy with my solution, I hit run and - it failed my test case. What on earth...
 Much debugging later, I had to call it a night. I just couldn't figure out the solution.  
 Undeterred despite falling at such an early hurdle, I returned the next day for further debugging; my patience was eventually rewarded. I changed how I was doing the regex searches, as they weren't returning all the values (I think just the first one?). I realised I had also made a mistake in the way I was searching around each part. The mistake was such that it didn't flag up in my test, which caused an incorrect submission, but eventually I noticed the '-' that should have been a '+' and sent the bugger on his way. Part 1, complete.
 ### Part 2
-Snatching defeat from the jaws of victory! It seems something is still wrong. Turns out, one of the gears is wrong. A gear is any ```*``` symbol adjacent to exactly two part numbers. The gear ratio is the multiplication of each of those part numbers. We need to sum all the gear ratios.  
+Snatching defeat from the jaws of victory! It seems something is still wrong. Turns out, one of the gears needs to be replaced. A gear is any ```*``` symbol adjacent to exactly two part numbers. The gear ratio is the multiplication of each of those part numbers. We need to sum all the gear ratios.  
 In the given example, there are two gears: in the top left, adjacent to ```467``` and ```35``` - this has a gear ratio of ```16345```; and in the lower right, adjacent to ```755``` and ```598```, with a gear ratio of ```467835```.
 #### Solution
 Thanks to the way I had written my part 1, this took no time at all. I exactly replicated the code to start with; then, I changed the special character search to only look for ```*```, as only this character could be a gear.  
-Then, when searching for adjacent part numbers, this happens on a per potential-gear basis. I tracked all the adjacent parts in a vector; if the length of that vector was two, I added the multiplication of the two elements to the answer. 
+Then, when searching for adjacent part numbers, this happens on a per potential-gear basis. I tracked all the adjacent parts in a vector; if the length of that vector was two, I added the multiplication of the two eleents to the answer. 
+
+## Day 4
+### Part 1
+Having discovered a new talent as a gondola engineer, we wave goodbye to Snow Island and take to the sky, arriving on a new, decidedly warmer and more humid island. An elf playing with coloured cards informs us this is Island Island (?) and that the gardener might know where the water source is - of course, he's on a different floating island. The elf promises to lend us his boat if we help him with his cards.  
+Each card has two lists of numbers. One is a list of winning numbers and the other is a list of the numbers we have.
+```
+Card 1: 41 48 83 86 17 | 83 86  6 31 17  9 48 53
+Card 2: 13 32 20 16 61 | 61 30 68 82 17 32 24 19
+Card 3:  1 21 53 59 44 | 69 82 63 72 16 21 14  1
+Card 4: 41 92 73 84 69 | 59 84 76 51 58  5 54 83
+Card 5: 87 83 26 28 32 | 88 30 70 12 93 22 82 36
+Card 6: 31 18 13 56 72 | 74 77 10 23 35 67 36 11
+```
+You get one point for each card for the first winning number; it is then doubled for each successive winning number. The points are therefore 8 2, 2, 1, 0, 0 for cards 1 to 6 respectively. What'st the sum of all the winning cards?
+#### Solution
+I was clearly taking advantage of some time off work and some easy challenges here, as my commit history shows day 3, day 4, and an attempt at day 5 all committed on the same day.  
+I iterated through each line, ignoring the card number. I stored each token as a number in a vector of winning numbers, until the looped failed to parse a token as a number - this was the pipe.  
+```
+while(true) {
+	iss >> token;
+	try {
+		winningNumbers.push_back(std::stoi(token));
+	} catch (std::invalid_argument const& ex) {
+		break;
+	}
+}
+```
+I am aware that using a ```try {...} catch {...}``` statement for control flow is something of a [faux pas](https://blog.awesomesoftwareengineer.com/p/throwing-exceptions-vs-control-flow), but the thing is, this is AoC, not production ready code; pipe down. (See what I did there? It's a pipe symbol that causes the exception. Humour me.)  
+I then continued parsing the rest of the line, which contained the numbers we had. For each one, if it was found in the winning numbers, I incremented a counter. At the end of each line, I added 2 to the power of (winning - 1) to the answer. Something nice to note here is that if there are no winning numbers, this is 2 to the power of -1, which is 0.5, which gets rounded down to 0 during the integer maths as required. Complete accident at first.  
+```
+while(iss >> token) {
+	winning += (std::find(winningNumbers.begin(), winningNumbers.end(), std::stoi(token)) != winningNumbers.end());
+}
+answer += std::pow(2, winning - 1);
+```
+### Part 2
+Turns out, the elf hadn't actually read the rules of the game and instead had just gone for it with his presumptions of how it worked. I think I see why there's so many problems around Christmas every year.  
+There's no such thing as points. For each winning number on a card, you win copies of that number of the following cards. From the page:  
+> - Card 1 has four matching numbers, so you win one copy each of the next four cards: cards 2, 3, 4, and 5.
+> - Your original card 2 has two matching numbers, so you win one copy each of cards 3 and 4.
+> - Your copy of card 2 also wins one copy each of cards 3 and 4.
+> - Your four instances of card 3 (one original and three copies) have two matching numbers, so you win four copies each of cards 4 and 5.
+> - Your eight instances of card 4 (one original and seven copies) have one matching number, so you win eight copies of card 5.
+> - Your fourteen instances of card 5 (one original and thirteen copies) have no matching numbers and win no more cards.
+> - Your one instance of card 6 (one original) has no matching numbers and wins no more cards.
+We need to sum how many original and copied cards we have at the end. Thanks to a neatly constructed set of inputs, we'll never generate a copy of a card that isn't in the input.  
+#### Solution
+I started the same way; for each line, iterate through the tokens to get the winning numbers until I hit the pipe symbol. Here's where it differs: instead of adding the 'power' of the card, I tracked the number of copies of each card in a dictionary, starting with 1 for every card (the original). When we generate a copy of a card, we add to the dictionary the number of copies of the current card we have.
+
+```
+std::vector<int> cardMembers(input.size() - 1, 1);
+...
+int copyCard = lineNum + 1;
+int copyMultiplier = cardMembers[lineNum];
+while (iss >> token) {
+	if(std::find(winningNumbers.begin(), winningNumbers.end(), std::stoi(token)) == winningNumbers.end()) continue;
+	cardMembers[copyCard++] += copyMultiplier;
+}
+lineNum++;
+```
+At the end, I returned the sum of the values of the dictionary. A job well done.
+
