@@ -12,21 +12,20 @@ ITERATIONS = 1000000000000
 
 sim = 0
 cycleHeight = 0
-(0..ITERATIONS).each do |sim|
-    hash = "#{chamber[-1]}|#{rocksIndex}|#{jetsIndex}"
-    if seen.include? hash
-        before = seen.keys.find_index(hash)
-        sizePerCycle = chamber.size - 1 - seen[hash]
-        numCycles = ((ITERATIONS - sim - 1) / (sim - 1 - before)).floor + 1
-        numRemaining = (ITERATIONS - sim - 1) % (sim - 1 - before)
-        if numRemaining == 0
-            puts "#{chamber.size - 1 + ((chamber.size - 1 - seen[hash]) * numCycles)}"
-            break
+while sim < ITERATIONS
+    unless chamber.length < 4
+        hash = "#{(chamber[-1] << 24) | (chamber[-2] << 16) | (chamber[-3] << 8) | (chamber[-4] << 0)}|#{rocksIndex}|#{jetsIndex}"
+        if seen.include? hash
+            s, t = seen[hash]
+            d, m = (ITERATIONS - sim).divmod(sim - s)
+            if m == 0
+                puts chamber.size - 1 + (chamber.size - 1 - t) * d
+                break
+            end
+        else
+            seen[hash] = [sim, chamber.size - 1]
         end
-        cycleHeight = sizePerCycle * numCycles
-        
     end
-    seen[hash] = chamber.size - 1
 
     rock = rocks[rocksIndex]
     rocksIndex = (rocksIndex + 1) % rocks.size
