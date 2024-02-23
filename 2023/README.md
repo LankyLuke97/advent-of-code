@@ -230,7 +230,7 @@ humidity-to-location map:
 60 56 37
 56 93 4
 ```
-Rather than listing one to one, the lines are ranges. Taking the ```seed-to-soil map``` as an example:
+Rather than listing every source and corresponding destination one by one, the lines are ranges. Taking the ```seed-to-soil map``` as an example:
 ```
 50 98 2
 52 50 48
@@ -259,8 +259,38 @@ seed  soil
 ```
 We can repeat this process for all the maps. The gardener wants to know the lowest location number corresponding to any of the seeds.
 #### Solution
-
+My first attempt used a naive implementation of creating a dictionary for every map given in the input. Finding the location of a seed was then a straightforward task of iteratively feeding the seed input through the chain of maps in the correct order.  
+This worked perfectly for the exmaple input. However, the actual input had much larger numbers for the ranges, and so my laptop ran out of memory in which to store the behemoth dictionaries. Sometimes, you can't just brute force the problem.  
+Coming back the next day, I got to work. I switched out my map of every single number for the more intelligent approach of storing the ranges given to us as a vector of vectors of vectors. The top level of vectors contained seven vectors, one for each map type. Each of those vectors contained all the maps given for that type.  
+For each seed, I then went through this loop:
+```
+int64_t location = seed;
+for(int i = 0; i < mappings.size(); i++) {
+	for(int j = 0; j < mappings[i].size(); j++) {
+		int64_t start = mappings[i][j][0], mapping = mappings[i][j][1], range = mappings[i][j][2];
+		if(location < start) continue;
+		if(location >= start + range) continue;
+		location = (location - start) + mapping;
+		break;
+	}
+}
+if(location < closestLocation) closestLocation = location;
+```
+For each mapping, I check if the current ```location``` (which is only the location once it has filtered through the pipeline) is within the range described by the mapping. If it is, I alter it's value to the corresponding mapping and pipe it through the next type of mapping. If not, we keep checking current mappings. If it doesn't match any, it's passed to the next mapping type unchanged, as it should be.
 ### Part 2
 Turns out, they didn't RTFM properly (again). Instead of individual seeds, the almanac describes ranges of seeds. The seed numbers come in pairs, the first number referring to the start of a range and the second number describing the length of the range.
 So, in the example, ```seeds: 79 14 55 13``` actually means two ranges, the first starting at ```79``` and containing ```14``` values (```79``` to ```92``` inclusive), the second starting at ```55``` and containing ```13``` values (```55``` to ```67``` inclusive).  
 The problem remains the same - of those seeds, which corresponds with the lowest location number?
+#### Solution
+I decided that my previous implementation was perfectly reasonable. All I did was add an additional loop to deal with the range of seed numbers:
+```
+for (int64_t i = 0; i < inp; i++) {
+	int64_t location = start + i;
+	for (int i = 0; i < mappings.size(); i++) {
+		for (int j = 0; j < mappings[i].size(); j++) {
+			...
+		}
+	}
+	if (location < closestLocation) closestLocation = location;
+}
+My commit message says **...naive solution, pretty slow, but better than the version that consumed all my RAM in a dumpster fire of inefficiency**. Interesting.
