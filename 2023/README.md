@@ -288,7 +288,7 @@ for(int i = 0; i < mappings.size(); i++) {
 }
 if(location < closestLocation) closestLocation = location;
 ```
-For each mapping, I check if the current ```location``` (which is only the location once it has filtered through the pipeline) is within the range described by the mapping. If it is, I alter it's value to the corresponding mapping and pipe it through the next type of mapping. If not, we keep checking current mappings. If it doesn't match any, it's passed to the next mapping type unchanged, as it should be.
+For each mapping, I check if the current ```location``` (which is only the location once it has filtered through the pipeline) is within the range described by the mapping. If it is, I alter its value to the corresponding mapping and pipe it through the next type of mapping. If not, we keep checking current mappings. If it doesn't match any, it's passed to the next mapping type unchanged, as it should be.
 ### Part 2
 Turns out, they didn't RTFM properly (again). Instead of individual seeds, the almanac describes ranges of seeds. The seed numbers come in pairs, the first number referring to the start of a range and the second number describing the length of the range.
 So, in the example, ```seeds: 79 14 55 13``` actually means two ranges, the first starting at ```79``` and containing ```14``` values (```79``` to ```92``` inclusive), the second starting at ```55``` and containing ```13``` values (```55``` to ```67``` inclusive).  
@@ -305,6 +305,7 @@ for (int64_t i = 0; i < inp; i++) {
 	}
 	if (location < closestLocation) closestLocation = location;
 }
+```
 My commit message says **...naive solution, pretty slow, but better than the version that consumed all my RAM in a dumpster fire of inefficiency**. Interesting.
 
 **Part 1:** *7 ms*
