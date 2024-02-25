@@ -42,6 +42,9 @@ xtwone   3    four
 In the first string, I searched for all the spelled out numbers - in the second, I searched for all the spelled out numbers written backwards. If in either case one was found, then the first (or last) digit was in fact, that number. If multiple were found, then the lowest start index was the first (or last).  
 In hindsight, as I write this report, the double reversing for finding the last written number could have been avoided entirely by simply using the number with the highest start index rather than the lowest. Likewise, I could have skipped the substring section and simply checked if any instances were found before the numeric digits.
 
+**Part 1:** *1 ms*
+**Part 2:** *2 ms*
+
 ## Day 2
 ### Part 1
 Having been successfully launched to a floating Snow Island, we're met by an elf apologising for the lack of snow and explaining that he can help pass the rather long walk with a simple game involving coloured cubes. Personally, I'd have preferred a strong drink and an air-condition limo after the traumatic experience of being launched into the air by a medieval instrument of war, but there were apparently budget constraints.  
@@ -92,6 +95,9 @@ while (iss >> token) {
 answer += (r * g * b);
 ```
 
+**Part 1:** *708 ms*
+**Part 2:** *2626 ms*
+
 ## Day 3
 ### Part 1
 Having been enjoyably diverted by the cube game, we've found ourselves at a gondola lift station housing (shock) broken gondolas and we are once again roped into fixing it. These elves, do any of them have the expertise their jobs require?  
@@ -123,6 +129,9 @@ In the given example, there are two gears: in the top left, adjacent to ```467``
 #### Solution
 Thanks to the way I had written my part 1, this took no time at all. I exactly replicated the code to start with; then, I changed the special character search to only look for ```*```, as only this character could be a gear.  
 Then, when searching for adjacent part numbers, this happens on a per potential-gear basis. I tracked all the adjacent parts in a vector; if the length of that vector was two, I added the multiplication of the two eleents to the answer. 
+
+**Part 1:** *20 ms*
+**Part 2:** *18 ms*
 
 ## Day 4
 ### Part 1
@@ -184,6 +193,9 @@ while (iss >> token) {
 lineNum++;
 ```
 At the end, I returned the sum of the values of the dictionary. A job well done.
+
+**Part 1:** *228 ms*
+**Part 2:** *197 ms*
 
 ## Day 5
 ### Part 1
@@ -294,3 +306,73 @@ for (int64_t i = 0; i < inp; i++) {
 	if (location < closestLocation) closestLocation = location;
 }
 My commit message says **...naive solution, pretty slow, but better than the version that consumed all my RAM in a dumpster fire of inefficiency**. Interesting.
+
+**Part 1:** *7 ms*
+**Part 2:** *132004 ms*
+
+## Day 6
+### Part 1
+Our strange progression through the islands continues. Having reached the erstwhile sand pile, we see a boat racing competition; the grand prize of which is a trip to Desert Island - presumably we can find some sand there?  
+In order to guarantee ourselves the prize, we feel we need to beat the current record in every race. For our example input, we're given this:
+```
+Time:      7  15   30
+Distance:  9  40  200
+```
+This describes the time and corresponding record distance for three different races. Our toy boat has a starting speed of zero millimiterers per millisecond. We can hold a button at the start of the race, using some of the race time, to increase its speed. Each second we spend holding the button, its speed upon release increases by one millimiter per millisecond. For the first race we have these options:
+```
+- Don't hold the button at all (that is, hold it for 0 milliseconds) at the start of the race. The boat won't move; it will have traveled 0 millimeters by the end of the race.
+- Hold the button for 1 millisecond at the start of the race. Then, the boat will travel at a speed of 1 millimeter per millisecond for 6 milliseconds, reaching a total distance traveled of 6 millimeters.
+- Hold the button for 2 milliseconds, giving the boat a speed of 2 millimeters per millisecond. It will then get 5 milliseconds to move, reaching a total distance of 10 millimeters.
+- Hold the button for 3 milliseconds. After its remaining 4 milliseconds of travel time, the boat will have gone 12 millimeters.
+- Hold the button for 4 milliseconds. After its remaining 3 milliseconds of travel time, the boat will have gone 12 millimeters.
+- Hold the button for 5 milliseconds, causing the boat to travel a total of 10 millimeters.
+- Hold the button for 6 milliseconds, causing the boat to travel a total of 6 millimeters.
+- Hold the button for 7 milliseconds. That's the entire duration of the race. You never let go of the button. The boat can't move until you let go of the button. Please make sure you let go of the button so the boat gets to move. 0 millimeters.
+```
+We need to calculate the number of different ways to beat each race and return the product of all the different races.
+#### Solution
+This puzzle seemed to me to indicate the quadratic function. I'm not exactly sure why, as I'm not generally a very visual thinker, but a picture came to mind of a parabolic curve for the various distances the toy boat would travel after certain lengths of charging time. It seemed to me that, if I plugged the correct values into the quadratic equation, I would be able to find the two "solutions", which would be the minimum and maximum time the button could be held for.
+Once I had those, the number of different ways to win a race would just be the range between the two.  
+This approach was broadly correct but I was finding that the results for each race were sometimes correct, sometimes off by one.  
+I eventually realised that sometimes the maximum time was actually one too high - I think perhaps due to integer rounding, it was giving a 'button holding time' that was one millisecond too long. I added in a check to validate that the upper value did in fact beat the race record - if not, I reduced the range for that race by 1.
+```
+for(int i = 0; i < times.size(); i++) {
+	int solution1 = (times[i] + std::sqrt(std::pow(times[i], 2) - (4 * distances[i]))) / 2;
+	int solution2 = (times[i] - std::sqrt(std::pow(times[i], 2) - (4 * distances[i]))) / 2;
+	int range = solution1 - solution2;
+
+	if((times[i] - solution1) * solution1 <= distances[i]) range--;
+
+	answer *= range;
+}
+```
+### Part 2
+Turns out that there's actually only one race -  the spaces on the paper we were given were just due to extremely bad kerning. I had a hearty laugh at finding out that this is known as *keming* (for some reason, my partner found it only mildly amusing). Our example input went from this:
+```
+Time:      7  15   30
+Distance:  9  40  200
+```
+to this:
+```
+Time:      71530
+Distance:  940200
+```
+We now just need to know how many ways there are to beat this single race.
+#### Solution
+Thanks to the mathematical approach to the first part, I was able to reuse the code almost exactly. The only issue I encountered was that the numbers were large enough for me to encounter integer overflow - as soon as I switched to int64_t (though it could have been a 32 bit integer it turns out), I had the correct answer.  
+One noteworthy point from the code:
+```
+while (timeStream >> token) {
+	for(char c : token) time *= 10;
+	time += std::stoi(token);
+}
+
+while (distanceStream >> token) {
+	for (char c : token) distance *= 10;
+	distance += std::stoi(token);
+}
+```
+That is a strange what in which to construct the time and the distance. I don't know if I hadn't figured out that theres a ```stol``` and ```stoll``` in the standard library, or if I didn't think to just remove the whitespace from the input. Either way, that's odd. The main thing is it worked.
+
+**Part 1:** *7 ms*
+**Part 2:** *1 ms*
