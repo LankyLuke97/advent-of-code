@@ -377,3 +377,176 @@ That is a strange what in which to construct the time and the distance. I don't 
 
 **Part 1:** *7 ms*
 **Part 2:** *1 ms*
+
+## Day 7
+### Part 1
+My narrative self has apparently become equally exasperated with the elves, as the story makes a point of predicting they'll want our help with the missing parts for their sand machine.  
+But first, time for a multiple-day camel ride now. Having done this once in real life for half an hour, I can attest to the need for some sort of distraction if you were to do it for extended periods of time. To this end, our new guide offers to play a game of Camel Cards.  
+Somewhat dubiously descrivd as similar to poker, in Camel Cards we get a list of hands of five cards with the same values as normal cards (T replaces 10 to keep everything 1 character). The strength of a hand follows this order:
+```
+- Five of a kind, where all five cards have the same label: AAAAA
+- Four of a kind, where four cards have the same label and one card has a different label: AA8AA
+- Full house, where three cards have the same label, and the remaining two cards share a different label: 23332
+- Three of a kind, where three cards have the same label, and the remaining two cards are each different from any other card in the hand: TTT98
+- Two pair, where two cards share one label, two other cards share a second label, and the remaining card has a third label: 23432
+- One pair, where two cards share one label, and the other three cards have a different label from the pair and each other: A23A4
+- High card, where all cards' labels are distinct: 23456
+```
+Aces high for any tiebreaks beteen hands, with the importance of the cards being left to right - that is to say, if you have ```A2222``` and ```4AAAA```, they are both four of a kind but the first hand is stronger because its leftmost card is higher. The same would be true of ```AAA4A``` and ```A4AAA``` - left is stronger here.
+Each hand we are given has a corresponding bid. Our example input looks like this:  
+```
+32T3K 765
+T55J5 684
+KK677 28
+KTJJT 220
+QQQJA 483
+```
+We have to rank the hands from weakest to strongest and return the sum of the products of bids and ranks.
+#### Solution
+This seemed like an initially complicated problem, but with the right data structures it ends up being almost trivial in the final implementation.  
+I created the concept of a Hand struct - it has three jobs. 
+- Firstly, store the value of Ace to 2, which is 13 to 1 (that could have maybe been more sensible, but oh well). 
+- Secondly, implement a comparison between hands on the basis of the values of the hands (next point).
+- Thirdly, calculate the value of a hand.
+
+It's this last point where the magic happens. I needed a way to ensure that a better type of hand is always higher in comparison to a worse type of hand, but where two of the same type of hand took into account the face values of cards in order of importance.  
+Although I had the right idea for a while, it took a little bit of fiddling to get the numbers exactly right. The final value calculation for a hand looked like this:
+```
+for (int i = 0; i < cards.size(); i++) {
+	char card = cards[i];
+	value += mappings[card] * std::pow(14, cards.size() - i - 1);
+	cardTypes.try_emplace(card, 0);
+	cardTypes[card]++;
+}
+
+switch(cardTypes.size()) {
+case 1:
+	value += 6000000;
+	break;
+case 2:
+	for(auto kv : cardTypes) {
+		if(kv.second == 4 || kv.second == 1) value += 5000000;
+		else value += 4000000;
+		break;
+	}
+	break;
+case 3:
+	for (auto kv : cardTypes) {
+		if(kv.second == 3) {
+			value += 3000000;
+			break;
+		}
+		if(kv.second == 2) {
+			value += 2000000;
+			break;
+		}
+	}
+	break;
+case 4:
+	value += 1000000;
+	break;
+default:
+	break;
+}
+```
+Breaking this down: I iterated through the cards, storing the types of card and the number of them in a map, as well as creating a base 14 value using the card types - base 14 to ensure that a '2' earlier than an 'A' is more valuable.  
+Once that was done, I checked the number of types of card in the dictionary to see what type of hand it was. 
+- If there was one type, it must be a 5 of a kind.
+- If there were two types of card, it could either be a full house or a four of a kind - I could tell based on whether the first card type had either 1 or 4 instances, or neither.
+- Three types of card and we were either looking at three of a kind or two pairs - again, I could discern this based on the values of the cards dictionary.
+- Four types of cards meant it was definitely a single pair.
+- Otherwise, we're looking at a high card.
+Having determined what type of hand I was dealing with, I added a large integer to ensure that, for example, all hands of two pairs were worth less than three of a kind, regardless of the values or orderings of the actual cards; Three of a kind was less than a full house; and so on.  
+
+With the calculation of the value of a hand complete, the main problem is solved by simply constructing an **ordered** map of the hands and bids, using the hands as the keys. This ordered map, along with the hand value and custom comparison, means that once I'd read the file, I had an already ranked list of bids, and could perform a simple sum of products for the answer. A very satisfying final solution.  
+### Part 2
+We have had an additional rule introduced (perhaps because we were winning and the elf is a sore loser? Who can say). Regardless, now the 'J' stands for Joker. Any 'J's are counted as the card that would create the strongest hand. To compensate, they are now worth the least themselves - that is, the cards now run in value 'A', 'K', ..., '2', 'J'.  
+How do we rank the bids now?
+#### Solution
+For some reason, I struggled with this one initially. The approach seems obvious and near enough identical to part 1 - I simply needed to calculate the strength of a hand differently.  
+My approach, after a lot of debugging edge cases, was this. When iterating through the cards, keep track of the numbers of jokers. Don't put jokers in the card dictionary. Once I'd figured out how many jokers there were and how many of the other types of cards there were, I added the number of jokers to the card which had the most cards already - this always gave the best possible hand.
+```
+for (int i = 0; i < cards.size(); i++) {
+	char card = cards[i];
+	value += mappings[card] * std::pow(14, cards.size() - i - 1);
+	if (card == 'J') {
+		jokers++;
+		continue;
+	}
+	cardTypes.try_emplace(card, 0);
+	cardTypes[card]++;
+}
+
+if(jokers > 0) {
+	char strongest = cards[0];
+	int strongestNumCards = cardTypes[strongest];
+
+	for (int i = 1; i < cards.size(); i++) {
+		char card = cards[i];
+		if (card == 'J') continue;
+		int numCards = cardTypes[card];
+		if (numCards > strongestNumCards) {
+			strongestNumCards = numCards;
+			strongest = card;
+		}
+	}
+
+	cardTypes[strongest] += jokers;
+}
+
+switch(cardTypes.size()) {
+case 1:
+	value += 6000000;
+	break;
+...
+```
+After this adjustment, everything else should be the same. It even worked for the example input - but on the real input, it was wrong, presumably by not much. I couldn't figure it out, even after hours of debugging.  
+At this point, it was Christmas Eve, thanks to start-delaying exploding laptop. I decided not to torture myself on Christmas Day and instead did the first part of day 8 - I don't actually remember squeezing this in. I took Boxing Day off - my first day not programming for some time at this point, as I'd been on a roll.  
+But December 27th I was back with a fiery vengence, ready to beat this problem into submission. I did what I should have done as soon as it was clear there were edge cases I was missing - come up with a bunch of scenarios involving jokers and check the orderings manually. As soon as I decided to do that, I could see a problem with a single hand.  
+J.  
+J.  
+J.  
+J.  
+J.  
+A hand full of jokers. This should be one of the strongest hands in the game barring any other five-of-a-kinds, so why was it sitting as the very weakest hand in my test?  
+Eventually, it came down to the smallest of changes. I needed to ignore the 'strongestCard' checks when there were 0 or 5 jokers, not just 0 - and then, in the case of no card types in the dictionary, we must be looking at a hand full of jokers so act accordingly. The changes came down to this:
+```
+for (int i = 0; i < cards.size(); i++) {
+	char card = cards[i];
+	value += mappings[card] * std::pow(14, cards.size() - i - 1);
+	if (card == 'J') {
+		jokers++;
+		continue;
+	}
+	cardTypes.try_emplace(card, 0);
+	cardTypes[card]++;
+}
+
+if(jokers > 0 && jokers < 5) { <------------------------------
+	char strongest = cards[0];
+	int strongestNumCards = cardTypes[strongest];
+
+	for (int i = 1; i < cards.size(); i++) {
+		char card = cards[i];
+		if (card == 'J') continue;
+		int numCards = cardTypes[card];
+		if (numCards > strongestNumCards) {
+			strongestNumCards = numCards;
+			strongest = card;
+		}
+	}
+
+	cardTypes[strongest] += jokers;
+}
+
+switch(cardTypes.size()) {
+case 0:	<------------------------------
+case 1:
+	value += 6000000;
+	break;
+...
+```
+How frustrating...
+
+**Part 1:** *83 ms*
+**Part 2:** *14 ms*
