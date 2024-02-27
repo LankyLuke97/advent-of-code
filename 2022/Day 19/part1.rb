@@ -14,7 +14,7 @@ blueprints.each do |blueprint|
     maxCosts = costs.transpose.map(&:max)
     maxCosts[3] = 10000
 
-    (24..0).step(-1).each do |i|
+    (24..1).step(-1).each do |i|
         newResources = Array.new
         currentMax = resources.max_by{|resource| resource[3]}[3]
         resources.each do |resource|
@@ -28,7 +28,7 @@ blueprints.each do |blueprint|
                         next
                     end
                     r = have.zip(make).map {|h, m| h + m}.zip(cost).map { |n, c| n - c} + newMake
-                    if (((i - 1) * i) / 2) + r[3] + (i * r[7]) < currentMax
+                    if (((i - 1) * i) / 2) + r[3] + i * r[7] < currentMax
                         next
                     end
                     newResources.append(r)
@@ -37,13 +37,13 @@ blueprints.each do |blueprint|
             r = have.zip(make).map {|h, m| h + m} + make
             newResources.append(r)
         end
+        newResources = newResources.sort_by { |arr| -(arr[3] + arr[7] + arr[6]) }
+        newResources = newResources[0..100000]
         resources = newResources.dup
-        puts "With #{i} minutes remaining, #{resources.size} resources to check"
     end
 
     max = resources.max_by{|resource| resource[3]}[3]
-    puts "Blueprint #{blueprint[0]}: #{max}"
-    answer += blueprint[0] * resources.max_by{|resource| resource[3]}[3]
+    answer += blueprint[0] * max
 end
 
 puts answer
