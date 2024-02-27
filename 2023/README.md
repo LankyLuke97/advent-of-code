@@ -598,4 +598,206 @@ Looking back with more understanding of a) cycle detection and b) how AoC tends 
 **Part 1:** *32 ms*
 **Part 2:** *7 ms*
 
+## Day 9
+### Part 1
 
+#### Solution
+
+### Part 2
+
+#### Solution
+
+**Part 1:** *20 ms*
+**Part 2:** *3 ms*
+
+## Day 10
+### Part 1
+
+#### Solution
+
+### Part 2
+
+#### Solution
+
+**Part 1:** *24 ms*
+**Part 2:** *7 ms*
+
+## Day 11
+### Part 1
+
+#### Solution
+
+### Part 2
+
+#### Solution
+
+**Part 1:** *25 ms*
+**Part 2:** *6 ms*
+
+## Day 12
+### Part 1
+
+#### Solution
+
+### Part 2
+
+#### Solution
+
+**Part 1:** *120 ms*
+**Part 2:** *2354 ms*
+
+## Day 13
+### Part 1
+
+#### Solution
+
+### Part 2
+
+#### Solution
+
+**Part 1:** *54 ms*
+**Part 2:** *2 ms*
+
+## Day 14
+### Part 1
+
+#### Solution
+
+### Part 2
+
+#### Solution
+
+**Part 1:** *19 ms*
+**Part 2:** *53 ms*
+
+## Day 15
+### Part 1
+
+#### Solution
+
+### Part 2
+
+#### Solution
+
+**Part 1:** *15 ms*
+**Part 2:** *2 ms*
+
+## Day 16
+### Part 1
+
+#### Solution
+
+### Part 2
+
+#### Solution
+
+**Part 1:** *64 ms*
+**Part 2:** *16531 ms*
+
+## Day 17
+### Part 1
+
+#### Solution
+
+### Part 2
+
+#### Solution
+
+**Part 1:** *368 ms*
+**Part 2:** *1134 ms*
+
+## Day 18
+### Part 1
+
+#### Solution
+
+### Part 2
+
+#### Solution
+
+**Part 1:** *71 ms*
+**Part 2:** *23 ms*
+
+## Day 19
+### Part 1
+
+#### Solution
+
+### Part 2
+
+#### Solution
+
+**Part 1:** *25 ms*
+**Part 2:** *12 ms*
+
+## Day 20
+### Part 1
+
+#### Solution
+
+### Part 2
+
+#### Solution
+
+**Part 1:** *49 ms*
+**Part 2:** *130 ms*
+
+## Day 21
+### Part 1
+
+#### Solution
+
+### Part 2
+
+#### Solution
+
+**Part 1:** *47 ms*
+**Part 2:** *77806 ms*
+
+## Day 22
+### Part 1
+
+#### Solution
+
+### Part 2
+
+#### Solution
+
+**Part 1:** *45 ms*
+**Part 2:** *1 ms*
+
+## Day 23
+### Part 1
+
+#### Solution
+
+### Part 2
+
+#### Solution
+
+**Part 1:** *25 ms*
+**Part 2:** *1 ms*
+
+## Day 24
+### Part 1
+
+#### Solution
+
+### Part 2
+
+#### Solution
+
+**Part 1:** *18 ms*
+**Part 2:** *3 ms*
+
+## Day 25
+### Part 1
+
+#### Solution
+
+### Part 2
+
+#### Solution
+
+**Part 1:** *75217 ms*
+**Part 2:** *0 ms*
