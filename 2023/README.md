@@ -550,3 +550,52 @@ How frustrating...
 
 **Part 1:** *83 ms*
 **Part 2:** *14 ms*
+
+## Day 8
+### Part 1
+Having lost our guide and camel companion because she turned out to be, say it with me now, a ghost, we find a set of maps and try to puzzle our way out of the desert. We have a list of directions and a list of nodes:
+```
+RL
+
+AAA = (BBB, CCC)
+BBB = (DDD, EEE)
+CCC = (ZZZ, GGG)
+DDD = (DDD, DDD)
+EEE = (EEE, EEE)
+GGG = (GGG, GGG)
+ZZZ = (ZZZ, ZZZ)
+```
+Starting at ```AAA```, we navigate our way through the nodes until we reach ```ZZZ```. At each step, we choose either the left or right node in the pair of choices based on our current instruction from the first line, which loops if we run out of instructions before reaching ZZZ (i.e. the first line is really RLRLRLRLRLRLRL..... ad infinitum).  
+How many steps does it take us to go from ```AAA``` to ```ZZZ```?
+#### Solution
+There's very little to say about this part. I constructed a map of the nodes, where each value is the pair of nodes connected to the key node. I then set the current node to the start and follow the instructions until I reached the end, counting the number of steps. Nothing interesting here.
+### Part 2
+The previous attempt was apparently not good enough and now we think the map is actually for ghosts! Additionally, these ghosts would apparently start simultaneously at all nodes ending in A and would, for each instance of themselves, follow the instructions from the respective nodes until all instances of the ghosts were simultaneously at nodes ending in Z. Confusing, so let's look at the example again.  
+> - Step 0: You are at 11A and 22A.
+> - Step 1: You choose all of the left paths, leading you to 11B and 22B.
+> - Step 2: You choose all of the right paths, leading you to 11Z and 22C.
+> - Step 3: You choose all of the left paths, leading you to 11B and 22Z.
+> - Step 4: You choose all of the right paths, leading you to 11Z and 22B.
+> - Step 5: You choose all of the left paths, leading you to 11B and 22C.
+> - Step 6: You choose all of the right paths, leading you to 11Z and 22Z.
+#### Solution
+Ah, to be young and unaware of AoC's propensity for cycle detection problems (I think that's the quote). Initially this seemed straightforward to me. Convert the code to keep track of a vector of current positions, for each of which we took the appropriate step, and only stop once all the isntances were at nodes ending in Z. Simple, clean, worked beautifully for the example. What could go wrong?  
+
+Once I'd acknowledged that it was almost definitely too slow to just leave running (though the halting problem was haunting me a little), it was back to the drawing board. I tried out various optimisation ideas, but they were fundamentally piddly time improvements if they weren't already being done by compiler optimisation in the background. Eventually I realised I must be going about this the wrong way; I believe it was at this point that I took my first peek at the Reddit solutions page for a pointer.  
+It was here that I saw the term cycle detection; of course, I knew of the concept of cycles in a graph, but it had never occurred to me that this might well be the solution here. I had promised myself before starting AoC that I would keep outside help to a minimum, so as soon as I had this idea I went to close the tab; as I did so, my eyes glanced over one final term - LCM...  
+So, I altered my code. Now, instead of iterating through all 'ghosts' at every step, I stuck with one ghost at a time and figured out how many steps it would take to reach a node ending in Z. Once I had that value for all ghosts, I calculated the lowest common mmultiple for them all, plugging each into an LCM function with the value of the previous LCM:
+```
+answer = 1;
+
+for(int dist : cycleDistances) {
+	answer = lcm(answer, dist);
+}
+```
+Bada-bing bada-boom, the answer appeared before me even faster than part 1.
+
+Looking back with more understanding of a) cycle detection and b) how AoC tends to structure problems, I think I was quite lucky with how the inputs were constructed. There was actually no guarantee that there wasn't an extra section of steps before the system settled in a steady cycle for each ghost - unless that was in fact the case and fortunately enough the factorisation was such that the lowest common multiple was still the same? Perhaps we'll never know...
+
+**Part 1:** *32 ms*
+**Part 2:** *7 ms*
+
+
