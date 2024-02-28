@@ -600,12 +600,70 @@ Looking back with more understanding of a) cycle detection and b) how AoC tends 
 
 ## Day 9
 ### Part 1
-
+As the sandstorm subsides, we find ourselves standing at a miraculous oasis beneath another floating island, from which (we leap to the not unreasonable conclusion) the missing parts should be coming. While we wait for the sun to heat up the desert sand so we can use the thermals to glide up to the island on a convenient hang glider, we decide to perform an ecological survey of sorts on the oasis; evidently, we've not got enough to be getting on with in terms of sorting global snow production.  
+Our handy **O**asis **a**nd **S**and **I**nstability **S**ensor, or **OASIS** for short (is this an instance of GNU or CINC?), produces a report of many values and how they're changing over time, each contained within a single line.
+```
+0 3 6 9 12 15
+1 3 6 10 15 21
+10 13 16 21 30 45
+```
+We need to predict the next value for each sequence. Taking the second line as an example, we would need to produce something like this:
+```
+1   3   6  10  15  21
+  2   3   4   5   6
+    1   1   1   1
+      0   0   0
+```
+Once we've reached a sequence where all the numbers are 0, we can extrapolate our way back up to predict the next number in the original sequence. To do this, we add the last number of the bottom sequence to the last number of the sequence above, to get a new number, repeating this iteratively:
+```
+1   3   6  10  15  21  28 [21+7]
+  2   3   4   5   6   7 [6+1]
+    1   1   1   1   1 [1+0]
+      0   0   0   0 [0+0]
+```
+We then need to sum the new numbers for all the sequences for our final answer. Seems straightforward enough - let's go!
 #### Solution
+Quite a straightforward one today, very much a case of transcribing exactly what's written into code, without any tricky edge cases that I noticed. I started by creating a vector for each line, containing all the integers as written.  
+Next, I repeatedly created a new sequence from the differences between each value in the sequence. I checked if any of the values in the new sequence were non-zero; if so, I flagged that the process needed to be run again.
+```
+bool allZero = false;
 
+while (!allZero) {
+	allZero = true;
+	sequences.push_back(sequence);
+	sequence.clear();
+	prevSeq = sequences.back();
+
+	for (int i = 1; i < prevSeq.size(); i++) {
+		int diff = prevSeq[i] - prevSeq[i - 1];
+		sequence.push_back(diff);
+		allZero = allZero && (diff == 0);
+	}
+}
+```
+Once all the values in a sequence were 0 and I could break out of the above loop, all that was left was to propagate that information back up through the sequences. Starting with a cumulative 'add' of zero and beginning at the last sequence created, I summed all the final values of each sequence.
+```
+int add = 0;
+for(int i = sequences.size() - 1; i > -1; i--) {
+	add += sequences[i].back();
+}
+
+answer += add;
+```
+Something to note was that I tracked all the sequences created for each line in a vector of vectors and reiterated over each of those. Perhaps I could have improved performance by starting the cumulative add on the way down the sequences - then I could have just kept track of one at any given time and skipped out the second loop entirely.
 ### Part 2
-
+Apparently I'm *still* underworked, as now I decide to extrapolate backwards. What a surprise...
 #### Solution
+I don't know whether it was just down to the manner in which I implemented the first part or whether this was just a particularly easy second part, but this was just as straightforward as the first part, with an almost identical approach. The sequence creation was identical - the only difference was in the extrapolation.
+```
+int add = 0;
+for (int i = sequences.size() - 1; i > -1; i--) {
+	add = sequences[i].front() - add;
+}
+
+answer += add;
+```
+Day 9 in the books - onto double digits and a real struggle over the next three weeks...
 
 **Part 1:** *20 ms*
 **Part 2:** *3 ms*
