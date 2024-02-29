@@ -670,12 +670,227 @@ Day 9 in the books - onto double digits and a real struggle over the next three 
 
 ## Day 10
 ### Part 1
-
+On the floating island above the desert, we find nothing except an entirely metal world: floor, plants, even an animal scurrying away! We're immediately drawn away from the signs we had been following labelled "Hot Springs" to try catch this random, potentially dangerous animal.  
+Scanning the ground, we realise a large proportion is actually densely packed pipes in amongst the rest of the ground, represented like this:
+> - | is a vertical pipe connecting north and south.
+> - - is a horizontal pipe connecting east and west.
+> - L is a 90-degree bend connecting north and east.
+> - J is a 90-degree bend connecting north and west.
+> - 7 is a 90-degree bend connecting south and west.
+> - F is a 90-degree bend connecting south and east.
+> - . is ground; there is no pipe in this tile.
+> - S is the starting position of the animal; there is a pipe on this tile, but your sketch doesn't show what shape the pipe has.
+We assess from the acoustings of the scurrying below is that there is one large continuous loop containing the animal - something like this:
+```
+.....
+.F-7.
+.|.|.
+.L-J.
+.....
+```
+Or this:
+```
+..F7.
+.FJ|.
+SJ.L7
+|F--J
+LJ...
+```
+But there are lots of pipes not connected to the main loop and we're also not certain of the shape of the pipe the animal leapt down, ```S```:
+```
+7-F7-
+.FJ|7
+SJLL7
+|F--J
+LJ.LJ
+```
+We want to get ahead of the animal. To do this, we need to find the tile around the loop that is furthest in terms of steps around the loop regardless of direction from the starting tile. For the example above, the tile marked 8 is furthest away.
+```
+..45.
+.236.
+01.78
+14567
+23...
+```
+Now let's find it on the real input.
 #### Solution
+Let's crack our knuckles and get to work. First off, let's figure out where the starting tile is:
+```
+for(std::string line : input) {
+	if(line.empty()) break;
 
+	for(char c : line) {
+		if(c == 'S') {
+			lineNum = currentLine;
+			col = currentCol;
+
+			break;
+		}
+		currentCol++;
+	}
+	if (lineNum > -1 && col > -1) break;
+	currentLine++;
+}
+```
+Easy enough, what's next? I needed to know what direction to start off in, as we don't know the shape of the pipe under 'S'. I figured that, for at least part 1, they would make it obvious and I wouldn't have to track multiple directions until they hit dead ends - this presumption turned out to be correct.  
+So, I was able to check if the tile about was a tile you could logically 'enter' from below (i.e a '7', '|', or 'F'), the one to left was one you could enter from the right, etc, and start there:
+```
+if(lineNum > 0) {
+	if(input[lineNum - 1][col] == '7' || input[lineNum - 1][col] == '|' || input[lineNum - 1][col] == 'F') direction = 0;
+}
+if(lineNum < input.size() - 2 && direction == -1) {
+	if (input[lineNum + 1][col] == 'J' || input[lineNum + 1][col] == '|' || input[lineNum + 1][col] == 'L') direction = 2;
+}
+if(col < input[lineNum].size() - 2 && direction == -1) {
+	if(input[lineNum][col + 1] == 'J' || input[lineNum][col + 1] == '-' || input[lineNum][col + 1] == '7') direction = 1;
+}
+if(col > 0 && direction == -1) {
+	if(input[lineNum][col - 1] == 'L' || input[lineNum][col - 1] == '-' || input[lineNum][col - 1] == 'F') direction = 3;
+}
+```
+Now I setup the main loop. Each iteration, I increment the step count and move to the tile in the current 'direction'. I then alter the direction based on the tile. Let's say I currently have direction '0' for 'up' and I enter a '|' tile - well, my direction doesn't change, I continue to go up. But if I enter a 'F', I now have direction '1' for 'right' and will adjust my next step accordingly. In code, that breaks down to a big ol' switch statement with accompanying ifs. (I have ommitted all the checks that the step I was taking made sense in terms of the problem - not moving sideways into a '|' pipe for exmaple - for legibility.)
+```
+while(!end) {
+	steps++;
+
+	switch(direction) {
+	case 0:
+		lineNum--;
+		break;
+	case 1:
+		col++;
+		break;
+	case 2:
+		lineNum++;
+		break;
+	case 3:
+		col--;
+		break;
+	}
+
+	char current = input[lineNum][col];
+	switch (current) {
+	case '.':
+		std::cout << "Shouldn't encounter ground" << std::endl;
+		assert(false);
+		break;
+	case '|':
+		break;
+	case '-':
+		break;
+	case 'L':
+		if(direction == 2) direction = 1;
+		else direction = 0;
+		break;
+	case 'J':
+		if(direction == 2) direction = 3;
+		else direction = 0;
+		break;
+	case '7':
+		if(direction == 0) direction = 3;
+		else direction = 2;
+		break;
+	case 'F':
+		if(direction == 0) direction = 1;
+		else direction = 2;
+		break;
+	case 'S':
+		end = true;
+		break;
+	}
+}
+```
+Once I reach 'S' again, we have traversed the full loop and counted the number of steps it took - the answer is just halfway along - ```return (steps / 2) + steps % 2;```
+Excellent, onto par - oh, it doesn't work? It's trying to access outside the vectors? What??
+Some debugging later, and one solitary change in the next commit:
+```
+for(std::string line : input) {
+	if(line.empty()) break;
+
+	for(char c : line) {
+		...
+	}
+	if (lineNum > -1 && col > -1) break;
+	currentLine++;
+	currentCol = 0; <------------------------------
+}
+```
+With a bit of extreme face-palming, I had my solution. I just needed to actually start from the starting location.
 ### Part 2
-
+Having been unable to catch the creature thus far, we are struck by another brainwave (or perhaps a cartoon mallet?) - perhaps the animal has a nest enclosed by the loop we have identified? But is it even worth searching all those pipes...  
+Well, lets figure out how many possible tiles that could be and then decide!  
+Taking this example pipe layout:
+```
+...........
+.S-------7.
+.|F-----7|.
+.||.....||.
+.||.....||.
+.|L-7.F-J|.
+.|..|.|..|.
+.L--J.L--J.
+...........
+```
+There are only four tiles enclosed in the loop, marked I below. The segment in the very middle, marked with O, is actually outside the loop:
+```
+...........
+.S-------7.
+.|F-----7|.
+.||OOOOO||.
+.||OOOOO||.
+.|L-7OF-J|.
+.|II|O|II|.
+.L--JOL--J.
+.....O.....
+```
+But the same is actually true of the below layout:
+```
+..........
+.S------7.
+.|F----7|.
+.||OOOO||.
+.||OOOO||.
+.|L-7F-J|.
+.|II||II|.
+.L--JL--J.
+..........
+```
+So, we're talking about inside from a topographical perspective. Should be breezy, right?
 #### Solution
+Wrong. I found this a conceptually challenging puzzle. If the layout was of the first type above, with at least one tile of gap between any loop pieces, then this would be a case of a simple flood-fill algorithm. Obviously, however, they wouldn't have given the second example were that the case - or at least, it would have been cruel to do so.  
+I toyed around with the idea of implementing a [point in polygon algorithm](https://en.wikipedia.org/wiki/Point_in_polygon), but from memory decided that it would be my backup approach, as it felt quite complex to do and I wasn't certain if there were prequisites about the polygons that perhaps my loop wouldn't fulfil.  
+I eventually took the approach that I think many people did, looking on the solutions thread afterwards - I took the singular pipe characters and blew them up to 3x3 represntations:
+```
+	...
+F = .##
+	.#.
+	
+	.#.
+| = .#.
+	.#.
+```
+Then, two '|' symbols next to each other (||) became:
+```
+.#..#.
+.#..#.
+.#..#.
+```
+I also replaced any symbols not part of the main loop with the ground representation, a 3x3 grid of '.' - I repurposed the approach from the first part to figure out which tiles those were - as well as surrounding the whole thing with an extra ring of empty tiles. Once all of that was in place, then I could implement a simple flood fill algorithm, replacing '.' with 'O'.  
+Finally, I counted the number of grid-aligned 3x3 blocks of periods - these were the original tiles inside the loop.  
+```
+This would be one tile inside a basic loop:
+
+OOOOOOOOO
+O#######O
+O#.....#O
+O#.III.#O
+O#.III.#O
+O#.III.#O
+O#.....#O
+O#######O
+OOOOOOOOO
+```
+I'm not going to show any code for this one, as it's several hundred lines, but it's all available on the repository. I was pleased to be done with this part two without implementing the polygon approach.
 
 **Part 1:** *24 ms*
 **Part 2:** *7 ms*
