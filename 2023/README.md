@@ -897,12 +897,122 @@ I'm not going to show any code for this one, as it's several hundred lines, but 
 
 ## Day 11
 ### Part 1
-
+Despite having thus far had no issues going along our merry way, following sign posts to the Hot Springs, we allow ourselves to be waylaid once again by an elf in need of assistance, for the tenuous reward of...taking us to the place we're not having trouble finding. Right...  
+He's collected some observations of galaxies and needs to calculate the shortest (Manhattan) distance between every pair of galaxies - it's well known that, in space, one can only travel orthoganally to one's previous direction. He has an input that looks like so and we need to calculate those distances:
+```
+   v  v  v
+ ...#......
+ .......#..
+ #.........
+>..........<
+ ......#...
+ .#........
+ .........#
+>..........<
+ .......#..
+ #...#.....
+   ^  ^  ^
+```
+The catch lies in the rows and columns marked by arrows. These are rows or columns without any galaxies - and which will have therefore doubled in size since the readings were taken (but none of the others will have changed at all, because physics). The example, with galaxies numbered, would look like this:
+```
+....1........
+.........2...
+3............
+.............
+.............
+........4....
+.5...........
+............6
+.............
+.............
+.........7...
+8....9.......
+```
+With 9 galaxies there would be 36 unique pairs (8 + 7 + ... + 2 + 1) as we don't care about the order of galaxies. We need to sum all the shortest paths for him. Hop to it!
 #### Solution
+Let's break this problem down. 
+> 1. We need to know where the galaxies are
+> 2. We need to know where none of the galaxies are
+> 3. We need to somehow inflate the size of where the galaxies aren't
+> 4. We need to calculate all the distances between the galaxies, accounting for inflation (story of our lives)
+I combined points 1 and 2 into the same loop over the input:
+```
+int col = 0, row = 0;
+for (std::string line : input) {
+	if (line.empty()) break;
 
+	for(char c : line) {
+		if (c == '#') {
+			galaxies.push_back(std::make_pair(col, row));
+
+			auto erase = std::find(columnsWithout.begin(), columnsWithout.end(), col);
+			if (erase != columnsWithout.end()) columnsWithout.erase(erase);
+
+			erase = std::find(rowsWithout.begin(), rowsWithout.end(), row);
+			if (erase != rowsWithout.end()) rowsWithout.erase(erase);
+		}
+		col++;
+	}
+
+	col = 0, row++;
+}
+```
+```colsWithout``` and ```rowsWithout``` both start full of every column and row. Every time we find a **#** representing a galaxy, we add the coordinates to a pair and make sure to remove the current column and row from those vectors, if they're still there.  
+With that done, I addressed points 3 and 4 together. I looped over all the galaxies, with an inner loop over all of the galaxies from after the one currently in the outer loop; this found all the necessary pairings. Calculating the Manhattan distance on its own would be trivial - simply the sum of the differences between each pair of x and y coordinates - but how to account for expansion?  
+My solution was to loop over all the columns without a galaxy and all the rows without a galaxy, both of which we tracked in the first part: if they were to the left or above the galaxies, I continued; if they were to the right or below, I stopped searching; all the others were between the two galaxies and I incremented a counter to add to the distance. I then added these as separate values to the distance, though in hindsight this could have been one variable.
+```
+for (int i = 0; i < galaxies.size() - 1; i++) {
+	for (int j = i + 1; j < galaxies.size(); j++) {
+		int leftX = min(galaxies[i].first, galaxies[j].first);
+		int rightX = max(galaxies[i].first, galaxies[j].first);
+		int topY = min(galaxies[i].second, galaxies[j].second);
+		int bottomY = max(galaxies[i].second, galaxies[j].second);
+		int xExpansion = 0;
+		int yExpansion = 0;
+
+		for (int k : columnsWithout) {
+			if (k < leftX) continue;
+			if (k > rightX) break;
+			xExpansion++;
+		}
+
+		for (int k : rowsWithout) {
+			if (k < topY) continue;
+			if (k > bottomY) break;
+			yExpansion++;
+		}
+
+		answer += (rightX - leftX + xExpansion) + (bottomY - topY + yExpansion);
+	}
+}
+```
+Quick and painless - very nice.
 ### Part 2
-
+Oh dear - the researcher was mistaken and the galaxies are much older and therefore further apart than expected. Now each empty row or column expands to 1,000,000 times the size! If only we had some easily extensible code to manage this new requirement...  
 #### Solution
+Ok, so I lucked out with how I wrote this. All I needed to do was switch everything to int64_t to account for the huge numbers involved and then, when accounting for the expansion of empty space, add 999,999 instead of 1 (not 1,000,000, because we would then be double counting the original row or column.
+```
+int expansion = 1000000;
+for (int64_t i = 0; i < galaxies.size() - 1; i++) {
+	for (int64_t j = i + 1; j < galaxies.size(); j++) {
+		...
+		
+		for (int64_t k : columnsWithout) {
+			if (k < leftX) continue;
+			if (k > rightX) break;
+			xExpansion += (expansion - 1);
+		}
+
+		for (int64_t k : rowsWithout) {
+			if (k < topY) continue;
+			if (k > bottomY) break;
+			yExpansion += (expansion - 1);
+		}
+		answer += (rightX - leftX + xExpansion) + (bottomY - topY + yExpansion);
+	}
+}
+```
+I was flying high off the back of my success with this part - too high. And much like Icarus when faced with the heat of the sun/part 12 of AoC 2023, I was about to come crashing down to earth.
 
 **Part 1:** *25 ms*
 **Part 2:** *6 ms*
