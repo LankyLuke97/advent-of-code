@@ -1019,12 +1019,252 @@ I was flying high off the back of my success with this part - too high. And much
 
 ## Day 12
 ### Part 1
-
+Skating quickly past the bait-and-switch of onsen/literal springs that are hot, we find out that said springs are not currently hot - in fact, they, like the rest of Gear Island (this explains the very metallic theme) are suffering from a lava shortage. The elf asks if you mind being launched up to the island where lava comes from (Lava Island?) to see what's going on.  
+Except many of the springs are damaged.  
+But they have a record of which springs are damaged!  
+Except the record of which springs are damaged is itself damaged...
+We are given this record as our input - here's an example:
+```
+???.### 1,1,3
+.??..??...?##. 1,1,3
+?#?#?#?#?#?#?#? 1,3,1,6
+????.#...#... 4,1,1
+????.######..#####. 1,6,5
+?###???????? 3,2,1
+```
+'.' indicates a working spring, '#' a broken spring, and '?' a spring in unknown condition. The numbers at the end correspond to contiguous groups of broken springs, each of which will be separated by at least one working spring. We need to figure out how many different arrangements are possible for each line given the information and sum it all up. For our example input, there are:
+> * ```???.### 1,1,3``` - 1 arrangement
+> * ```.??..??...?##. 1,1,3``` - 4 arrangements
+> * ```?#?#?#?#?#?#?#? 1,3,1,6 ```- 1 arrangement
+> * ```????.#...#... 4,1,1``` - 1 arrangement
+> * ```????.######..#####. 1,6,5``` - 4 arrangements
+> * ```?###???????? 3,2,1``` - 10 arrangements
 #### Solution
+Ok, let's look at the approach I took here. if we ignore the parsing of the input, my solution can be broken down into two broad sections - generating potential 'arrangements' based on the springs in the input, and then validating those arrangements against the sets of contiguous broken springs. Looking at the generation section, I first start by looking at the first character - if it's either '.' or '#' there's no ambiguity and I add a single element vector to a another vector. If it's a '?', then I add one of each. This operation will underpin a lot fo the rest of the problem.  
+```
+if (data[0] == '.') prevArrangements.push_back({ '.' });
+else if (data[0] == '#') prevArrangements.push_back({ '#' });
+else {
+	prevArrangements.push_back({ '.' });
+	prevArrangements.push_back({ '#' });
+}
+```
+With that done, I looped over the remaining characters. For each character, I looped over the existing potential arrangements. For each existing potential arrangement, I looped over the characters within it, tracking which contiguous blocks we had encountered, which block we were in (if any), and how many of that block we'd already seen (if any). Thus far we have this:
+```
+for (int i = 1; i < data.size(); i++) {
+	char c = data[i];
+	arrangements.clear();
 
+	for (std::vector<char> prev : prevArrangements) {
+		int currentContiguous = 0;
+		int contiguousIndex = -1;
+		bool brokenBlock = false;
+
+		for (char prevC : prev) {
+			if (prevC == '.') {
+				if (!brokenBlock) continue;
+				currentContiguous = 0;
+				brokenBlock = false;
+			}
+			else {
+				if (!brokenBlock) {
+					contiguousIndex++;
+					brokenBlock = true;
+				}
+				currentContiguous++;
+			}
+		}
+		
+		...
+```
+What do you notice about this? That's right - I said the word **looped** far too many times and Mr. Bachmann is probably spinning in his grave indignantly. Alas, this was the best I could come up with on my own.  
+With that done, it's the turn of the current input character. The code arbitrates on whether it potentially matches the contiguous blocks of broken springs. If it does, I added a new arrangement with this character appended. In the case of an unknown spring, I checked if it makes sense either as a '.' or a '#' or both, adding 0, 1, or 2 new arrangements as necessary.  
+```
+for (int i = 1; i < data.size(); i++) {
+	char c = data[i];
+	arrangements.clear();
+
+	for (std::vector<char> prev : prevArrangements) {
+		...
+	
+		if (c == '.' || c == '?') {
+			std::vector<char> newArrangement = prev;
+			newArrangement.push_back('.');
+			if (!brokenBlock) arrangements.push_back(newArrangement);
+			else if (currentContiguous == contiguous[contiguousIndex]) arrangements.push_back(newArrangement);
+		}
+
+		if (c == '#' || c == '?') {
+			std::vector<char> newArrangement = prev;
+			newArrangement.push_back('#');
+			if (!brokenBlock) {
+				if (++contiguousIndex < contiguous.size()) arrangements.push_back(newArrangement);
+			}
+			else if (++currentContiguous <= contiguous[contiguousIndex]) arrangements.push_back(newArrangement);
+		}
+	}
+
+	prevArrangements = arrangements;
+}
+```
+At this point, I've looped through all the characters for a single input, only adding arrangements at any stage that fit the criteria given by the contiguous broken blocks (this was already an optimisation from when I tried to generate all of the possibilities and then check them all at the end, at which point my laptop suffered amnesia). All that's left is one final check of the arrangements - we need to make sure that all the contiguous blocks of broken springs given at the end of the input are present - no more, no less. We have to do this because otherwise instances of all working springs will be still in, as the previous checks will have found no fault - there still *could* be broken springs coming, after all. 
+```
+for (std::vector<char> arrangement : arrangements) {
+	int currentContiguous = 0;
+	int contiguousIndex = -1;
+	int lastContiguous = 0;
+	bool brokenBlock = false;
+
+	for (char c : arrangement) {
+		if (c == '.') {
+			if (!brokenBlock) continue;
+			currentContiguous = 0;
+			brokenBlock = false;
+		}
+		else {
+			if (!brokenBlock) {
+				contiguousIndex++;
+				brokenBlock = true;
+			}
+			currentContiguous++;
+			lastContiguous = currentContiguous;
+		}
+	}
+
+	if (contiguousIndex == contiguous.size() - 1 && lastContiguous == *(contiguous.end() - 1)) answer++;
+}
+```
+Whoops, another nested loop. But at least it worked and that was all I cared about right now.
 ### Part 2
-
+We note a discrepancy in the number of springs we can see vs what's on our record and quickly realise that the record is folded. To unfold it, we need to pentuple (is that a word? Multiply by 5) each input. The multiple instances of springs need to be separated by '?', and the contiguous blocks information separated by ','.  
+So, an input of ```.# 1``` would become ```.#?.#?.#?.#?.# 1,1,1,1,1```.  
+For our example before, these would be the numbers of arrangements:
+```
+> * ```???.### 1,1,3``` - 1 arrangement
+> * ```.??..??...?##. 1,1,3``` - 16384 arrangements
+> * ```?#?#?#?#?#?#?#? 1,3,1,6 ```- 1 arrangement
+> * ```????.#...#... 4,1,1``` - 16 arrangement
+> * ```????.######..#####. 1,6,5``` - 2500 arrangements
+> * ```?###???????? 3,2,1``` - 506250 arrangements
+```
+Oh dearie me. Those are some much bigger numbers.
 #### Solution
+Here comes that violent grounding I mentioned.  
+I decided, without any real hope of success but with a determination not to miss the simple answer through lack of just trying, to replicate my first solution as I knew it did work. All I had to do to implement this for the second part was to take the input and alter it according to the constraints before passing it to the main loop; fairly basic string manipulation.  
+It failed. I can't remember now whether it was a memory hog as well as a time sink, but it was definitely sinking my time. I was a bit demoralised, as I'd struggled with the first part already, and had done day already today, so I decided to call it quits for the day and come back refreshed the following morning.
+
+Coming back to the problem the next day, I spun my wheels for a bit trying to optimise the solution I already had - but I couldn't think differently enough about the problem to remove any of those loops and seriously reduce the runtime complexity. Maybe there was a way, but it didn't present itself to me.  
+Eventually, I turned to the solutions thread for the second time for some pointers and saw that which I'd hoped to avoid - dynamic porgramming.  
+Now, I know what dynamic programming is, at a surface level. I've even implemented a (very basic) recursive memoisation function...once. But I also know what Greek is, and I even know a few words - that doesn't mean I could have a full blown conversation with an ancient Hellenist about the Torah. What I'm trying to say is this - this did not go well.  
+As I say, I'd implemented recursive memoisation once or twice before and the concept behind that DP approach do make perfect sense, so I decided to take this route. I moved the main meat of the code into its own function that called itself recursively. I created a string representation of what I thought was imoprtant about a given situation - in this case, a string consisting of a 'springs' input concatenated with information on contiguous blocks of failed springs. That 'hash' was used to store the number of arrangements found for that particular input in a dictionary (the cache for the memoisation part of the DP).  
+Next, instead of validating whether the new character made sense in the context of previous arrangements each time, I instead set up base cases to terminate the recursive function. Firstly I checked the cache - if we calculated this input before, no sense in doing it again. If there were actually no springs in the input, that was fine provided there were no contiguous blocks of failed springs (I'm going to call those 'groups' from hereon, because that's a PITA to write over and over) - this is only 1 arrangement. If there were no groups left, that was also fine provided there were no '#' left in the input - also only 1 arrangement, as they all need to be working.  
+Here's how it was looking so far with the base cases:
+```
+int64_t Day12::part2Recursion(std::string& data, std::queue<int> groups) {
+	std::string groupKey;
+	std::queue<int> copy = groups;
+	while (!copy.empty()) {
+		groupKey += ',';
+		groupKey += std::to_string(copy.front());
+		copy.pop();
+	}
+	auto search = Day12::cache.find(data + groupKey);
+	if (search != Day12::cache.end()) return search->second;
+	
+	if (data.size() == 0) return groups.size() == 0;
+	if (groups.size() == 0) {
+		for (char c : data) {
+			if (c == '#') return 0;
+		}
+		return 1;
+	}
+```
+Next up we get the recursion. I separated the first spring and rest of the input. If the first spring in the input was definitely working, then I recursively called the function with the remaining input and the full groups. I then cached the return value of that function for both the original and remaining input.
+```
+char c = data[0];
+std::string remainingData(data.begin() + 1, data.end());
+if (c == '.') {
+	int64_t val = part2Recursion(remainingData, groups);
+	Day12::cache.try_emplace(remainingData + groupKey, val);
+	Day12::cache.try_emplace(data + groupKey, val);
+	return val;
+}
+```
+If the first spring was definitely broken, then I took the first group, *g*. If the remaining data was smaller than *g*, then this was definitely wrong and there were no arrangements to meet the criteria, so the cache could read 0 for this scenario. Otherwise, I checked that none of of the next *g* - 1 springs were definitely working and that the *g*th was either working or unknown. If either of those conditions weren't met then we could also stored this in the cache as 0 arrangements and return.
+```
+if (c == '#') {
+	int group = groups.front();
+	if (data.size() < group) {
+		Day12::cache.try_emplace(data + groupKey, 0);
+		return 0;
+	}
+	for (int i = 0; i < group; i++) {
+		if (data[i] == '.') {
+			Day12::cache.try_emplace(data + groupKey, 0);
+			return 0;
+		}
+	}
+	if (data.size() > group && data[group] == '#') {
+		Day12::cache.try_emplace(data + groupKey, 0);
+		return 0;
+	}	
+	...
+```
+If the input passes both those conditions, then we can safely say that it's a valid input *and that the next __g__ inputs must be broken*. This is an insight that I got from the reddit thread and it was a lifesaver in the implementation - it makes perfect sense when you think about it. So we can remove the first *g* inputs of the remaining string, remove the first group, and pass those as inputs to the next round of the recursive function, before storing the results in the cache.
+```
+	...
+	std::string dataWithoutGroup(data.begin() + group, data.end());
+	std::queue<int> popped(groups);
+	popped.pop();
+	int64_t val = part2Recursion(dataWithoutGroup, popped);
+
+	std::string poppedKey;
+	std::queue<int> copy = popped;
+	while (!copy.empty()) {
+		poppedKey += ',';
+		poppedKey += std::to_string(copy.front());
+		copy.pop();
+	}
+	
+	Day12::cache.try_emplace(dataWithoutGroup + poppedKey, val);
+	Day12::cache.try_emplace(data + groupKey, val);
+	
+	return val;
+}
+```
+That took care of the situations where the state of the spring was known - what about when we have a '?' as the next character? Well, that's pretty straightforward. Call the recursive function twice: once with the spring working and once with it broken. The sum of the arrangements returned in each instance gives us the value for this input, and can also be used independently for the cache.
+```
+std::string replacePeriod(data.begin(), data.end());
+std::string replaceHash(data.begin(), data.end());
+replacePeriod[0] = '.';
+replaceHash[0] = '#';
+
+int64_t valPeriod = part2Recursion(replacePeriod, groups), valHash = part2Recursion(replaceHash, groups);
+Day12::cache.try_emplace(replacePeriod + groupKey, valPeriod);
+Day12::cache.try_emplace(replaceHash + groupKey, valHash);
+Day12::cache.try_emplace(data + groupKey, valPeriod + valHash);
+return valPeriod + valHash;
+```
+Dynamic programming conquered, right? 
+
+No. As my commit message puts it:
+> First attempt to use dynamic programming, specifically recursion and
+> caching. Not yet working, but is very fast now and barely using memory.
+> Right lines, just need to figure out the incorrect conditions.
+The next day was New Year's Eve and I remember having limited time to work on the problem. My commit from that day shows some small changes that did actually get the code working - sort of. The main change was in selecting the next data to pass to the recursive function in the case of a broken spring:
+```
+ - std::string dataWithoutGroup(data.begin() + group, data.end());
+ + auto afterGroup = group == data.size() ? data.end() : data.begin() + group + 1;
+ + std::string dataWithoutGroup(afterGroup, data.end());
+```
+If the group is the same size as the data, need to make sure to pass an empty string, rather than from 1 after the group to the end. Even as I write it, that sounds like something that will only make sense if you wrote the code yourself, but I'm going to stick with it.  
+It was now passing the tests and the code was giving the same answer for a double folded input as the code from the first part did (if I was willing to wait long enough to test. My commit message from this day has a small aside:
+> Throws some random memory errors on the 5 fold when running 
+> Debug though completes on Release. The answer on Release is 
+> incorrect - perhaps related?
+A memory error? Unexpectedly incorrect answers when summing lots of big numbers? What could it mean??  
+If you instantly said "integer overflow" the congratulations - where were you when I needed you?! My commit for this part on New Year's Day consists almost entirely of switching from int64_t to uint64_t, at which point I finally had the puzzle solved.  
+Ego bruised, I limped on into the depths of AoC.
 
 **Part 1:** *120 ms*
 **Part 2:** *2354 ms*
