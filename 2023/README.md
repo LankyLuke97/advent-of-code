@@ -1271,12 +1271,160 @@ Ego bruised, I limped on into the depths of AoC.
 
 ## Day 13
 ### Part 1
-
+Having made our way up to Lava Island via a spring our work identified as functional, we find ourselves faced with a lack of that eponymous material. Instead, we find a landscape of mirrors, some of which have fallen out of their mounting frames. Due to the monochromatic nature of the terrain, it's hard to tell where is safe to walk. We start noting down the patterns of ash (.) and rocks (#) as we walk. The example looks like this:  
+```
+    ><   
+#.##..##.
+..#.##.#.
+##......#
+##......#
+..#.##.#.
+..##..##.
+#.#.##.#.
+    ><   
+	
+ #...##..# 
+ #....#..# 
+ ..##..### 
+v#####.##.v
+^#####.##.^
+ ..##..### 
+ #....#..#
+```
+The arrows mark horizontal and vertical lines of reflection in the pattern. To solve the puzzle, add up the number of columns to the left of each vertical line of reflection and add 100 multiplied by the number of rows above horizontal lines of reflection.  
+The above examples have 5 columns to the left in the first pattern and 4 rows above for the send pattern - 405 in total.
 #### Solution
+An interesting problem. It seemed to me that we would have to do a lot of looping, at least naively, so I wanted to at least optimise the comparison of each column or row. To that end, I decided to 'hash' each column and row based on the locations of ash or rocks.  
+The hash was very basic - for each character in a line, I bit shifted the previous hash in that column and row - then added either 1 or 2 for '.' or '#'. This was not doing what I thought it was doing, but it worked for part 1 (and bit me in part 2, but we'll come to that.
+```
+for (int i = 0; i < line.size(); i++) {
+	if (i >= columnHashes.size()) columnHashes.push_back(0);
+	if (row >= rowHashes.size()) rowHashes.push_back(0);
+	int hash = line[i] == '#' ? 2 : 1;
+	columnHashes[i] = (columnHashes[i] << 1) + hash;
+	rowHashes[row] = (rowHashes[row] << 1) + hash;
+}
+```
+I repeated this for each line in the input until I reached an empty line - this signified the end of a pattern.  
+At this point I started analsing the hashes, beginning with the columns. I compared the hash for column 1 to the hash for column 2 - if they matched, then this was the point of reflection (as all the other columns had no possible matching line to compare to. if not, I moved the invisible line of potential reflection to between comparing 2 and 3, comparing hashes 1 with 4 and 2 with 3. If there were any discrepancies in those pairs, I moved the reflection line to between 3 and 4, and so on.  
+```
+bool reflected = true;
+for (int i = 1; i < columnHashes.size() - 1; i++) {
+	reflected = true;
+	for (int j = 0; j <= i; j++) {
+		int r = (i * 2) - j - 1;
+		if(r >= columnHashes.size()) continue;
+		if (columnHashes[j] != columnHashes[r]) {
+			reflected = false;
+			break;
+		}
+	}
 
+	if (reflected) {
+		answer += i;
+		break;
+	}
+}
+```
+If I found a line of reflection, great - I added the current "line of reflection" index to the answer. If not, then the reflection must be between two rows: we repeat the same process there, but rowwise and adding the index * 100 once we find that reflecting line.
+```
+if (!reflected) {
+	for (int i = 1; i < rowHashes.size() - 1; i++) {
+		reflected = true;
+		for (int j = 0; j <= i; j++) {
+			...
+		}
+
+		if (reflected) {
+			answer += (i * 100);
+			break;
+		}
+	}
+}
+```
+At this point, in classic style, I was passing the tests but not the full puzzle. By flagging up instances where no reflection had been found, I realised it was a simple off by 1 error in the loop indexes - I needed to go to ```colHashes.size()``` and ```rowHashes.size()``` without subtracting 1. With that small change done and the puzzle complete, I opened part 2.
 ### Part 2
-
+**_Smack_**. We walk head first into a mirror we weren't expecting? Did I forget another off-by-one error?  
+No - turns out there is exactly one smudge on each of the mirrors (convenient) - a smudge flips the actual value; '.' becomes '#' and vice versa. Looking at our first example pattern, the smudge is in the top left corner. If that '#' became a '.', then we would instead have a horizontal line of reflection:  
+```
+1 ..##..##. 1
+2 ..#.##.#. 2
+3v##......#v3
+4^##......#^4
+5 ..#.##.#. 5
+6 ..##..##. 6
+7 #.#.##.#. 7
+```
+A similar process of flipping the fifth symbol on row 2 in the second pattern changes the line of reflection to between rows 1 and 2:
+```
+1v#...##..#v1
+2^#...##..#^2
+3 ..##..### 3
+4 #####.##. 4
+5 #####.##. 5
+6 ..##..### 6
+7 #....#..# 7
+```
+The summarisation of our notes would now give a result of 400 as there are three rows above the reflection in the first pattern and one row above in the second. Make sense? Then off we go.
 #### Solution
+My intuition told me that the process of using hashes would likely serve me well here. If I could figure out the 'hash' difference of any single flipped character, I could easily find lines of reflection that were off by just one character. Full of unjustified optimism, I set off.  
+My initial attempt saw me constructing the hashes identically as the first part. I then iterated through the columns and rows in exactly the same manner. The difference here was what I did on finding the first two lines that didn't reflect each other. I started with 's' (hash difference, helpfully) equal to 1. If this was the diference, great - there's our smudge. If not, then I bit shifted s and checked again. I did this until I found a smudge or s had shifted enough times to be sure that there were no more possible characters, then broke out and carried on. If I found another set of mismatching lines, then there was no reflection. If I didn't find *any* mismatching lines, then this must be the old reflection and wasn't correct.
+```
+bool smudgeCorrected = true;
+for (int i = 1; i < columnHashes.size(); i++) {
+	reflected = true;
+	smudgeCorrected = false;
+	for (int j = 0; j <= i; j++) {
+		int r = (i * 2) - j - 1;
+		if (r >= columnHashes.size()) continue;
+		if (columnHashes[j] != columnHashes[r]) {
+			if (smudgeCorrected) {
+				reflected = false;
+				break;
+			}
+
+			int s = 0;
+			for (int smudgeShift = 0; smudgeShift < columnHashes.size(); smudgeShift++) {
+				s = 1 << smudgeShift;
+				if (columnHashes[j] - s == columnHashes[r] || columnHashes[j] + s == columnHashes[r]) {
+					smudgeCorrected = true;
+				}
+			}
+		}
+	}
+
+	if (reflected && smudgeCorrected) {
+		answer += i;
+		break;
+	}
+}
+```
+The code for the rows was near identical and so is omitted. 
+Upon writiing this in this post-mortem, I had to remove a number of debug cosole print statements, because this didn't work.  
+My gut instinct, partially correctly as it turns out, was that my hashing was incorrect. Some of the changes made included switching to int64_t as this has often hamstrung me in other seemingly working algorithms; lots of variables to debug all sorts of values in an attempt to find the culprit values; and another hashing algorithm that looked like this:
+```
+for (int i = 0; i < line.size(); i++) {
+	if (i >= columnHashes.size()) columnHashes.push_back(1);
+	if (row >= rowHashes.size()) rowHashes.push_back(1);
+	int64_t hash = line[i] == '#' ? 1 : 0;
+	columnHashes[i] = (columnHashes[i] * 2) + hash;
+	rowHashes[row] = (rowHashes[row] * 2) + hash;
+}
+```
+This switched to using 1s and 0s instead of 1s and 2s, with a leading 1 (which more neatly solved the issue of positional information that the 1s and 2s had tried to solve) along with a multipication by two rather than a bitshift (although these are equivalent operations). Given the somewhat random nature of these changes, I was clearly up the creek without a paddle and thrashing instead of thinking.  
+The next day finally saw me reaching a working solution with a sensible hash:
+```
+for (int i = 0; i < line.size(); i++) {
+	if (i >= columnHashes.size()) columnHashes.push_back(0);
+	if (row >= rowHashes.size()) rowHashes.push_back(0);
+	int64_t hash = line[i] == '#' ? 1 : 0;
+	columnHashes[i] += hash << row;
+	rowHashes[row] += hash << i;
+}
+```
+That's all that was needed - a bit of calm thought.
+
+I've not taken the time to look at the solution thread post completion, as I have only so much time to dedicate to AoC, but I would be very interested to see if there were approached with better or sounder fundamentals, or whether this was the right idea poorly executed.
 
 **Part 1:** *54 ms*
 **Part 2:** *2 ms*
