@@ -1431,12 +1431,143 @@ I've not taken the time to look at the solution thread post completion, as I hav
 
 ## Day 14
 ### Part 1
-
+Reaching the focal point of all the mirrors, we find ourselves at a massive parabolic reflector dish attached to the side of a mountain - very Archimedes vibes. Unfortunately, the many small mirrors of which the dish is composed are all pointing in misaligned directions; this must be why the lava isn't flowing.  
+After further investigation, you we discover the means by which all the mirrors are focused; it's up to us to get all the dishes aligned by shifting around a load of rocks on the backing of the megastructure. There are round rocks, 'O', which will roll when the dish is tilted; square rocks,'#', which will not; and empty spaces, '.', through which rocks can roll. We start with an input like this:  
+```
+O....#....
+O.OO#....#
+.....##...
+OO.#O....O
+.O.....O#.
+O.#..O.#.#
+..O..#O..O
+.......O..
+#....###..
+#OO..#....
+```
+We then tilt the platform so that the rocks roll north (up), ending up like so:
+```
+OOOO.#.O.. 10
+OO..#....#  9
+OO..O##..O  8
+O..#.OO...  7
+........#.  6
+..#....#.#  5
+..O..#.O.O  4
+..O.......  3
+#....###..  2
+#....#....  1
+```
+We need to calculate the load on the north support beams, which look a little suspect to our experienced engineering eyes. The load from a single rock is calculated as the number of rows from the rock to the south edge of the platform, including the row the rock is on. For the example above, this comes to a total of 136.
 #### Solution
+I was quite pleased with how neat my solution was for this problem, requiring only one pass over the data and manipulating a single vector of integers instead of shifting characters in a two dimensional matrix. To start with, I initialised a vector called ```currentEmpty```. Each value in this vector corresponded to a column, and the value corresponded to the lowest solid point in that column after viewing the latest line.  
+Iterating over each character in a line, I updated the corresponding value in the vector based on the character. A '.' did mothing. A '#' set the value to the current row + 1. An 'O' incremented the value by 1 and cumulatively summed the row that indicated the rock landed on.
+```
+std::vector<int> currentEmpty(input[0].size(), 0);
+int size = input.size() - 1;
 
+for (int i = 0; i < input.size(); i++) {
+	if (input[i].empty()) break;
+
+	std::string line = input[i];
+
+	for(int cInd = 0; cInd < line.size(); cInd++) {
+		char c = line[cInd];
+		if (c == '.') continue;
+		if (c == '#') {
+			currentEmpty[cInd] = i + 1;
+			continue;
+		}
+		answer += size - currentEmpty[cInd]++;
+	}
+}
+```
+So, starting with the first line of the example, the vector would end as ```1,0,0,0,0,1,0,0,0,0```. After the second row, this would end as ```2,0,1,1,2,1,0,0,0,2````. The third, ```2,0,1,1,2,3,3,0,0,2```, and so on. Once all the lines in the input had been checked, the cumulative sum gave the solution.
 ### Part 2
-
+So much for the easy bit - we now need to be sure of the load on the weakened north beams after 1000000000 cycles; one full cycle is a tilt to the north, then west, then south, then esat. Off we go...
 #### Solution
+I was a little wiser by this point of the experience and so realised I was looking at a cycle related question as soon as I saw the rather large number involved in the problem rubric; the fact that it also literally contained the word 'cycles' also helped.  
+The first step was the extension of my tilting code to manage the cycles. The first step was to maintain the 2D char information. I took the same approach as before, tracking the lowest empty row, but now I swapped 'O' for '.' and vice versa, using that index.
+```
+std::vector<int> currentEmpty(input[0].size(), 0);
+for (int i = 0; i < input.size(); i++) {
+	if (input[i].empty()) break;
+	std::string line = input[i];
+	for (int cInd = 0; cInd < line.size(); cInd++) {
+		char c = line[cInd];
+		if (c == '.') continue;
+		if (c == '#') {
+			currentEmpty[cInd] = i + 1;
+			continue;
+		}
+		input[i][cInd] = '.';
+		input[currentEmpty[cInd]][cInd] = 'O';
+		currentEmpty[cInd]++;
+	}
+}
+```
+Once I'd done that, I needed to rotate the 2D matrix before repeating the tilting - it was the older brother equivalent of when you first learn to switch the values in two variables using a third temp variable.
+```
+std::vector<std::vector<char>> tempInput(input[0].size(), std::vector<char>(input.size() - 1, '.'));
+for (int i = 0; i < input.size(); i++) {
+	if (input[i].empty()) break;
+	for (int j = 0; j < input[0].size(); j++) {
+		tempInput[j][input.size() - i - 2] = input[i][j];
+	}
+}
+
+for (int i = 0; i < tempInput.size(); i++) input[i] = std::string(tempInput[i].begin(), tempInput[i].end());
+```
+Repeating this 4 times forms one full cycle.  
+Now to the meat of the problem. I needed to detect when a pattern of rocks arose for a second time. I stored a map of strings and integers - the strings were flattened representations of the rock array and the integer was the step on which I'd encountered it. I did this for every cycle until the hash was found in the map. I chose to use an unordered map with the step as the value rather than a vector due to the O(1) lookup time this gave.
+```
+for (int i = 0; i < cycles; i++) {
+	cycle(input);
+	std::string hash = "";
+	for (std::string chars : input) hash += chars;
+	std::unordered_map<std::string, int>::const_iterator search = hashes.find(hash);
+
+	if (search == hashes.end()) {
+		hashes.try_emplace(hash, i);
+		continue;
+	}
+```
+Once the cycle was found, I then figured out how many steps further would be needed to hit the magic 1000000000 cycles. 
+```
+int cycleLength = i - search->second;
+cycles -= i + 1;
+finishIndex = cycles % cycleLength;
+for (auto kv : hashes) {
+	if (kv.second != (search->second + finishIndex)) continue;
+	std::string hash = kv.first;
+	std::vector<std::string> check;
+	for (int k = 0; k < input.size()-1; k++) {
+		int startInd = (k * input[0].size());
+		int endInd = ((k + 1) * input[0].size());
+		check.push_back(std::string(hash.begin() + (k * input[0].size()), hash.begin() + ((k + 1) * input[0].size())));
+	}
+	input = check;
+	break;
+}
+break;
+```
+The final step was to calculate the load on the north beams as before, copying my function from the first part:
+```
+for (int i = 0; i < input.size(); i++) {
+	std::vector<int> currentEmpty(input[0].size(), 0);
+	std::string line = input[i];
+	for (int cInd = 0; cInd < line.size(); cInd++) {
+		char c = line[cInd];
+		if (c == '.') continue;
+		if (c == '#') {
+			currentEmpty[cInd] = i + 1;
+			continue;
+		}
+		answer += size - currentEmpty[cInd]++;
+	}
+}
+```
+Except - no it's not. This screwed me over a bit. I eventually realised that this calculation method was also doing one extra "northward" tilt and throwing off the calculations. I switched out the method and it suddenly started working. What a relief.
 
 **Part 1:** *19 ms*
 **Part 2:** *53 ms*
