@@ -1574,12 +1574,136 @@ Except - no it's not. This screwed me over a bit. I eventually realised that thi
 
 ## Day 15
 ### Part 1
-
+Making our way inside yet another mountain, to which the new-focused parabola is pointed, we find ourselves in a large facility staffed by a panicked reindeer wearing goggles and a loose-fitting hard hat (I thoroughly enjoyed this imagery). He seems to be the fellow that got us loaded so rapidly into the trebuchet, judging by the snout marks on the "PUSH FOR HELP" button...  
+Looking through the manual, we need to start by running a hashing algorithm on a bunch of random comma separated characters - for example:
+```
+rn=1,cm-,qp=3,cm=2,qp-,pc=4,ot=9,ab=5,pc-,pc=6,ot=7
+```
+For each character, we take the ASCII value of that character and add it to a cumulative sum, multiply by 17, and then return the remainder when divided by 256. When we reach a comma, that cumulative sum is added to the answer and reset to 0, before we continue to the next charcter.
 #### Solution
-
+My commit message for this problem says, "Blessedly simple in comparison to day 14", if you want a rough summary of my mental state at this point. Let's look at the solution that had me so relieved.  
+More akin to the earlier problems, this was as straightforward as iterating through every single character in the input and performing some basic arithmetic. If I encountered a comma, I ignored it. Otherwise, I took the integer value of the character, multiplied it by 17, then modulo'd it by 256. The resulting integer I added to the running total. I don't think it's even worth showing the code for this one, so let's look at part two.
 ### Part 2
+Having coaxed the reindeer into giving us the page containing the expected result, we confirm the algorithm is working correctly.  
+The mainstay of bringing the lava facility online is to correctly arrange a series of lenses in a series of boxes. The lenses are numbered 0 through 255 (I think I see where that modulo 256 operation is going to be used) and the lenses each have a focal length of 1 through 9. Each step in our input is an operation we need to perform with those lenses and boxes.  
+* The letters are the label, the hash result of this string is the box to operate on. 
+* A '-' means remove the lens with that label if it exists in that box and do nothing if it doesn't. If you remove it, move all other lenses in the box forward. 
+* The number after the equals tells you what focus length to add.
+* If the label already exists in that box, replace it with another lens of the new focal length.
+* If it doesn't exist, insert a new lens of the correct focal length at the back of the box (the front if there are no lenses.
+The example input would look something like this:
+```
+After "rn=1":
+Box 0: [rn 1]
 
+After "cm-":
+Box 0: [rn 1]
+
+After "qp=3":
+Box 0: [rn 1]
+Box 1: [qp 3]
+
+After "cm=2":
+Box 0: [rn 1] [cm 2]
+Box 1: [qp 3]
+
+After "qp-":
+Box 0: [rn 1] [cm 2]
+
+After "pc=4":
+Box 0: [rn 1] [cm 2]
+Box 3: [pc 4]
+
+After "ot=9":
+Box 0: [rn 1] [cm 2]
+Box 3: [pc 4] [ot 9]
+
+After "ab=5":
+Box 0: [rn 1] [cm 2]
+Box 3: [pc 4] [ot 9] [ab 5]
+
+After "pc-":
+Box 0: [rn 1] [cm 2]
+Box 3: [ot 9] [ab 5]
+
+After "pc=6":
+Box 0: [rn 1] [cm 2]
+Box 3: [ot 9] [ab 5] [pc 6]
+
+After "ot=7":
+Box 0: [rn 1] [cm 2]
+Box 3: [ot 7] [ab 5] [pc 6]
+```
+The focusing power of a box is then ```(box number + 1) * slot number of the lens (1 for first, 2 for second, etc) * focal length of that lens``` for all lenses in a box. For the example input:
+```
+rn: 1 (box 0) * 1 (first slot) * 1 (focal length) = 1
+cm: 1 (box 0) * 2 (second slot) * 2 (focal length) = 4
+ot: 4 (box 3) * 1 (first slot) * 7 (focal length) = 28
+ab: 4 (box 3) * 2 (second slot) * 5 (focal length) = 40
+pc: 4 (box 3) * 3 (third slot) * 6 (focal length) = 72
+```
+We need to sum all of those for our result. On we blunder!
 #### Solution
+This was again a straightforward string processing problem so far as I was concerned. For my data structure, I chose a vector of vectors of Lens structs. The Lens struct just wrapped some functionality for me, storing a label and focal length and implementing an equivalency check using the label:
+```
+struct Lens {
+	std::string label;
+	int focalLength;
+
+	Lens(std::string _label, int _focalLength) : label(_label), focalLength(_focalLength) {
+
+	}
+
+	std::string toString() {
+		return "[" + label + " " + std::to_string(focalLength) + "]";
+	}
+
+	friend bool operator == (Lens const& l, Lens const& r) {
+		return (l.label == r.label);
+	}
+};
+```
+I then iterated through all the characters in the string, constructing a label and the hash for the current label to figure out with box we were looking at. If I encountered a '-', I searched for the current label in the correct box (vector) and erased it, which also moved all the other lenses forward, so to speak. If I encountered a '=', I got the focal length from the next character and either replaced the existing pair in the vector or added a new pair to the end:
+```
+for (int i = 0; i < input[0].size(); i++) {
+	char c = input[0][i];
+
+	if (c == '=') {
+		int focalLength = input[0][++i] - '0';
+		Lens newLens(label, focalLength);
+		std::vector<Lens>::iterator existing = std::find(boxes[current].begin(), boxes[current].end(), newLens);
+
+		if (existing == boxes[current].end())boxes[current].push_back(newLens);
+		else *existing = newLens;
+
+		current = 0;
+		label = "";
+		i++;
+		continue;
+	}
+
+	if (c == '-') {
+		int l = 0;
+		for (l = 0; l < boxes[current].size(); l++) if (boxes[current][l].label == label) break;
+		if (l < boxes[current].size()) boxes[current].erase(boxes[current].begin() + l);
+
+		current = 0;
+		label = "";
+		i++;
+		continue;
+	}
+
+	label += c;
+	current += int(c);
+	current *= 17;
+	current = current % 256;
+}
+```
+A final calculation over all the boxes provided the answer in double quick time:
+```
+for (int i = 0; i < 256; i++) for (int j = 0; j < boxes[i].size(); j++) answer += (i + 1) * (j + 1) * boxes[i][j].focalLength;
+```
+A welcome break after day 14.
 
 **Part 1:** *15 ms*
 **Part 2:** *2 ms*
