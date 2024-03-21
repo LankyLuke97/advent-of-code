@@ -21,11 +21,7 @@ lines.each do |line|
     elsif line[0].include?("Operation")
         op = line[1].split
         opEnum = -1
-<<<<<<< HEAD
         if op[4] == "old"
-=======
-        if op[4] != "old"
->>>>>>> backup-master
             opEnum = 2
         elsif op[3] == '+'
             opEnum = 0
@@ -42,15 +38,9 @@ lines.each do |line|
     end
 end
 
-<<<<<<< HEAD
 # items.each_with_index do |item, index|
     # puts "Monkey #{index}: #{item.join(",")}"
 # end
-=======
-items.each_with_index do |item, index|
-    puts "Monkey #{index}: #{item.join(",")}"
-end
->>>>>>> backup-master
 
 inspected = Array.new(items.size, 0)
 
@@ -59,7 +49,6 @@ inspected = Array.new(items.size, 0)
     items.each_with_index do |item, monkeyIndex|
         operation = operations[monkeyIndex]
         t = tests[monkeyIndex]
-<<<<<<< HEAD
         # puts "Monkey #{monkeyIndex}:"
         while(!item.empty?)
             newItem = item.pop
@@ -95,38 +84,6 @@ inspected = Array.new(items.size, 0)
     # end
 end
 
-=======
-        while(!item.empty?)
-            newItem = item.pop
-            inspected[monkeyIndex] += 1
-            #puts "Here: #{newItem}"
-            if operation[0] == 0
-                newItem += operation[1]
-            elsif operation[0] == 1
-                newItem *= operation[1]
-            else
-                newItem = newItem * newItem
-            end
-            #puts "There: #{newItem}"
-            newItem = (newItem / 3).floor
-            #puts "Finally: #{newItem}"
-
-            if newItem % t[0] == 0
-                items[t[1]].unshift(newItem)
-            else
-                items[t[2]].unshift(newItem)
-            end
-        end
-    end
-    #puts "After round #{r}"
-    #items.each_with_index do |item, index|
-    #    puts "Monkey #{index}: #{item.join(",")}"
-    #end
-end
-
-puts inspected.join(", ")
-
->>>>>>> backup-master
 inspected.sort! {|x, y| y <=> x}
 monkeyBusiness = inspected[0] * inspected[1] #lol
 puts monkeyBusiness
