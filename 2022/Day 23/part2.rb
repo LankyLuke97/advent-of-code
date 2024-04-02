@@ -5,7 +5,10 @@ lines = File.readlines(filename)
 
 directionInd = 0
 directions = [[0,-1],[0,1],[-1,0],[1,0]]
-checks = [[[-1,-1],[0,-1],[1,-1]],[[-1,1],[0,1],[1,1]],[[-1,-1],[-1,0],[-1,1]],[[1,-1],[1,0],[1,1]]]
+checks = [[[-1,-1],[+0,-1],[+1,-1]],
+          [[-1,+1],[+0,+1],[+1,+1]],
+          [[-1,-1],[-1,+0],[-1,+1]],
+          [[+1,-1],[+1,+0],[+1,+1]]]
 
 elfPositions = Array.new
 
@@ -58,73 +61,45 @@ while needToMove do
             elfInWay = false
             adjacent.each do |adjacentElf|
                 diff = [elfPositions[adjacentElf][0] - elfPositions[elf][0],elfPositions[adjacentElf][1] - elfPositions[elf][1]]
-                check = checks[(directionInd + indOffset) % 4]
+                check = checks[indOffset]
                 if check.include? diff
                     elfInWay = true
-                    #puts "Elf in way of elf #{elf} in direction #{(directionInd + indOffset) % 4}: #{check} includes #{diff}"
                     break
                 end
             end
 
             unless elfInWay
                 position = elfPositions[elf]
-                step = directions[(directionInd + indOffset) % 4]
+                step = directions[indOffset]
                 suggestion = [position[0] + step[0], position[1] + step[1]]
-                #puts "Suggested move for elf #{elf} at #{position}: #{suggestion}"
                 break
             end
         end
 
         unless suggestion.nil?
-            moveSuggestions[elf] = suggestion
+            unless moveSuggestions.include? suggestion
+                moveSuggestions[suggestion] = Array.new
+            end
+            moveSuggestions[suggestion].append(elf)
             next
         end
     end
-
-    clashing = Set.new
     moved = false
 
-    moveSuggestions.each do |e1, suggestion|
-        moveSuggestions.each do |e2, otherSuggestion|
-            if e2 <= e1
-                next
-            end
-            if suggestion == otherSuggestion
-                clashing.add(suggestion)
-            end
+    moveSuggestions.each do |suggestion, elves|
+        if elves.size > 1
+            next
         end
-
-        unless clashing.include? suggestion
-            elfPositions[e1] = suggestion
-            moved = true
-        end
+        elfPositions[elves[0]] = suggestion
+        moved = true
     end
 
     unless moved
-        puts "HERE"
         break
     end
-    
-=begin
-    minX = elfPositions.min_by {|x, y| x }[0]
-    maxX = elfPositions.max_by {|x, y| x }[0]
-    minY = elfPositions.min_by {|x, y| y }[1]
-    maxY = elfPositions.max_by {|x, y| y }[1]
 
-    (minY..maxY).each do |y|
-        str = ""
-        (minX..maxX).each do |x|
-            if elfPositions.include?([x,y])
-                str += "#"
-            else
-                str += "."
-            end
-        end
-        puts str
-    end
-    puts elfPositions.inspect
-=end
-    directionInd = (directionInd + 1) % 4
+    directions = directions[1..-1].append directions[0]
+    checks = checks[1..-1].append checks[0]
 end
 
 puts rounds
