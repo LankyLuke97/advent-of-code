@@ -56,9 +56,6 @@ while toCheck.size > 0
     end
     checked.add([elfPos, steps % mod])
 
-    if steps >= $shortestPath
-        next
-    end
     steps += 1
 
     (0..4).each do |dir|
