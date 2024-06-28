@@ -3,185 +3,107 @@ require 'Set'
 filename = ARGV.length() == 0 ? "input.txt" : ARGV[0].to_s
 lines = File.readlines(filename)
 
-$horizontalSize = lines[0].strip.size
-$verticalSize = lines.size
-
-$start = [lines[0].index('.'), 0]
-$finish = [lines[-1].index('.'), $verticalSize - 1]
-
-blizzards = Hash.new
-$directions = [[0, 1], [1, 0], [0, -1], [-1, 0]]
-$cache = Hash.new {}
-$shortestPath = 1000000
-
-def createHashKey(current, blizzards)
-    hash = ""
-    blizzards.each do |b|
-        hash += b.inspect
-    end
-    hash += current.inspect
-
-    return hash
-end
-
-def nextSteps(path, blizzards)
-    if path[0] >= ($shortestPath - 1)
-        #puts "WE'VE REACHED THE END IN THIS MANY MINUTES ALREADY"
-        return
-    end
-    #puts "STILL CHECKING: #{path.inspect}"
-    if path[-1] == $finish
-        #puts "FINISHED"
-        if path[0] < $shortestPath
-            $shortestPath = path[0]
-            #puts "SHORTEST PATH #{$shortestPath}"
-            return
-        end
-    end
-
-    hash = createHashKey(path[-1], blizzards)
-    if $cache.include? hash
-        if path[0] >= $cache[hash]
-            #puts "BEEN HERE BEFORE, AND QUICKER"
-            return
-        end
-        #puts "BEEN HERE BEFORE, THIS IS A NEW, SHORTER TIME"
-        $cache[hash] = path[0]
-    end
-
-    if blizzards.include? path[-1]
-        puts "SITTING IN BLIZZARD"
-        return
-    end
-
-    unless path[-1] == $start
-        if path[-1][0] == 0 or path[-1][0] == ($horizontalSize - 1) or path[-1][1] == 0 or path[-1][1] == ($verticalSize - 1)
-            return
-        end
-    end
-
-    newBlizzards = Hash.new
-
-    blizzards.each do |pos, directions|
-        ##puts "Sorting blizzards moving #{directions.inspect} at #{pos.inspect}"
-        directions.each do |direction|
-            newPos = [pos[0] + direction[0], pos[1] + direction[1]]
-            if newPos[0] == 0
-                newPos[0] = $horizontalSize-2
-            elsif newPos[0] == $horizontalSize - 1
-                newPos[0] == 1
-            elsif newPos[1] == 0
-                newPos[1] = $verticalSize - 2
-            elsif newPos[1] == $verticalSize - 1
-                newPos[1] = 1
-            end
-
-            unless newBlizzards.include? newPos
-                newBlizzards[newPos] = []
-            end
-            newBlizzards[newPos].append direction
-        end
-    end
-    
-    path[0] += 1
-
-    $directions.each do |dir|
-        newPath = path.dup
-        newPath[-1] = [path[-1][0] + dir[0], path[-1][1] + dir[1]]
-        nextSteps(newPath, newBlizzards)
-    end
-
-    newPath = path.dup
-    nextSteps(newPath, newBlizzards)
-end
-
-lines.each_with_index do |line, y|
-    line.strip.each_char.with_index do |c, x|
-        if c == '#' or c == '.'
-            next
-        end
-        pos = [x, y]
-        movement = []
-
-        if c == '^'
-            movement = $directions[0]
-        elsif c == '>'
-            movement = $directions[1]
-        elsif c == 'v'
-            movement = $directions[2]
-        elsif c == '<'
-            movement = $directions[3]
-        end
-
-        unless blizzards.include? pos
-            blizzards[pos] = []
-        end
-        blizzards[pos].append movement
-    end
-end
-
-nextSteps([0,$start], blizzards)
-puts $shortestPath
+$startPos = [0, lines[0].index('.')]
+$endPos = [lines.count - 1, lines[-1].index('.')]
 
 =begin
-while !foundEnd
-    newPaths = []
-    #puts "NEW LOOP:\n#{paths.size} different paths, with size #{paths[0][0]}"
-    paths.each do |path|
-        ##puts "Checking #{path[-1].inspect}"
+Blizzard values
+right - 1
+down  - 2
+left  - 4
+up    - 8
+Elves - 16
+If a position is greater than 16, there are elves and at least one blizzard - dead path
+=end
+$axes = [[0, 1], [1, 0], [0, -1], [-1, 0], [0, 0]]
+$reverseAxes = [[0, -1], [-1, 0], [0, 1], [1, 0], [0, 0]]
+$shortestPath = 10000000000000000000
+$shortestPathStr = ""
+$blizzardsRight = lines[1..-2].map { |line| line[1..-3].each_char.map { |c| { '>' => 1 }[c] || 0 } }
+$blizzardsDown = lines[1..-2].map { |line| line[1..-3].each_char.map { |c| { 'v' => 1 }[c] || 0 } }
+$blizzardsLeft = lines[1..-2].map { |line| line[1..-3].each_char.map { |c| { '<' => 1 }[c] || 0 } }
+$blizzardsUp = lines[1..-2].map { |line| line[1..-3].each_char.map { |c| { '^' => 1 }[c] || 0 } }
+$rowLength = lines[0].size - 3
+$colLength = lines.size - 2
 
-        if path[-1] == finish
-            #puts "Shortest path is #{path[0]}\n"
-            foundEnd = true
+def display(map, timeStep)
+    map.each do |line|
+        str = ""
+        line.each_with_index do |c, i|
+            if line[(i - timeStep) % $rowLength] == 1
+                str += '#'
+            else 
+                str += '.'
+            end
+        end
+        puts str
+    end
+    puts "#{'X' * map[0].size}"
+end
+
+toCheck = [[$startPos, 0, ""]]
+checked = Set.new
+mod = $rowLength.lcm($colLength)
+
+while toCheck.size > 0
+    elfPos = toCheck[0][0]
+    steps = toCheck[0][1]
+    path = toCheck[0][2]
+    toCheck = toCheck[1..-1]
+
+    if checked.include?([elfPos, steps % mod])
+        next
+    end
+    checked.add([elfPos, steps % mod])
+
+    if steps >= $shortestPath
+        next
+    end
+    steps += 1
+
+    (0..4).each do |dir|
+        newElfPos = [elfPos[0] + $axes[dir][0], elfPos[1] + $axes[dir][1]]
+        newPath = path.dup
+        newPath += dir.to_s
+
+        if newElfPos == $endPos
+            if steps < $shortestPath
+                $shortestPath = steps
+                $shortestPathStr = newPath
+            end
             break
         end
 
-        if blizzards.include? path[-1]
+        if newElfPos == $startPos
+            toCheck.append([newElfPos, steps, newPath])
             next
         end
-        unless path[-1] == start
-            if path[-1][0] == 0 or path[-1][0] == ($horizontalSize - 1) or path[-1][1] == 0 or path[-1][1] == ($verticalSize - 1)
-                next
-            end
+
+        if newElfPos[0] <= 0 or newElfPos[0] >= $colLength + 1 or newElfPos[1] <= 0 or newElfPos[1] >= $rowLength + 1
+            next
         end
         
-        newPath = path.dup
-        newPath[0] += 1
-        newPaths.append newPath
-        directions.each do |dir|
-            newPath = path.dup
-            newPath[0] += 1
-            newPath[-1] = [path[-1][0] + dir[0], path[-1][1] + dir[1]]
-            newPaths.append newPath
+        checkPos = [newElfPos[0] - 1, newElfPos[1] - 1]
+        if $blizzardsRight[checkPos[0]][(checkPos[1] - steps) % $rowLength] == 1
+            next
         end
-    end
-
-    paths = newPaths.dup
-    ##puts "After: #{paths.inspect}"
-
-    newBlizzards = Hash.new
-
-    blizzards.each do |pos, directions|
-        ##puts "Sorting blizzards moving #{directions.inspect} at #{pos.inspect}"
-        directions.each do |direction|
-            newPos = [pos[0] + direction[0], pos[1] + direction[1]]
-            if newPos[0] == 0
-                newPos[0] = $horizontalSize-2
-            elsif newPos[0] == $horizontalSize - 1
-                newPos[0] == 1
-            elsif newPos[1] == 0
-                newPos[1] = $verticalSize - 2
-            elsif newPos[1] == $verticalSize - 1
-                newPos[1] = 1
-            end
-
-            unless newBlizzards.include? newPos
-                newBlizzards[newPos] = []
-            end
-            newBlizzards[newPos].append direction
+        if $blizzardsDown[(checkPos[0] - steps) % $colLength][checkPos[1]] == 1
+            next
         end
+        if $blizzardsLeft[checkPos[0]][(checkPos[1] + steps) % $rowLength] == 1
+            next
+        end
+        if $blizzardsUp[(checkPos[0] + steps) % $colLength][checkPos[1]] == 1
+            next
+        end
+        
+        toCheck.append([newElfPos, steps, newPath])
     end
-
-    blizzards = newBlizzards.dup
 end
-=end
+
+puts $shortestPath
+
+$shortestPathStr.each_char.with_index do |c, i|
+    str = { '4' => 'wait', '0' => 'move right', '1' => 'move down', '2' => 'move left', '3' => 'move up' }[c]
+    puts "Minute #{i + 1}, #{str}"
+end
