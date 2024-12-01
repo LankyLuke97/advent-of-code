@@ -1,0 +1,23 @@
+from pathlib import Path
+
+def load_input(test=False):
+    file_path = Path(f'day{{ day_number }}', 'data', f'day{{ day_number }}{"_test" if test else ""}.txt')
+    with open(file_path, 'r') as f:
+        return f.readlines()
+
+def part1(test=False):
+    # inp = load_input(test)
+    return 0
+
+def part2(test=False):
+    # inp = load_input(test)
+    return 0
+
+test1_correct = 0
+test2_correct = 0
+test = part1(test=True)
+assert test == test1_correct, f'Part 1 test failed; it returned {test} instead of {test1_correct}'
+print(f'Part 1 answer is: {part1()}')
+test = part2(test=True)
+assert test == test2_correct, f'Part 2 test failed; it returned {test} instead of {test2_correct}'
+print(f'Part 2 answer is: {part2()}')
