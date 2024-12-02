@@ -1,5 +1,6 @@
 from collections import Counter
 from pathlib import Path
+from time import perf_counter
 
 def load_input(test=False):
     file_path = Path('day1', 'data', f'day1{"_test" if test else ""}.txt')
@@ -8,19 +9,23 @@ def load_input(test=False):
 
 def part1(test=False):
     inp = load_input(test)
+    start_time = perf_counter()
     left, right = sorted([int(line.split()[0]) for line in inp]), sorted([int(line.split()[1]) for line in inp])
-    return sum([abs(l - r) for l, r in zip(left, right)])
+    return sum([abs(l - r) for l, r in zip(left, right)]), perf_counter() - start_time
 
 def part2(test=False):
     inp = load_input(test)
+    start_time = perf_counter()
     left, right = [int(line.split()[0]) for line in inp], Counter([int(line.split()[1]) for line in inp])
-    return sum([l*right[l] for l in left])
+    return sum([l*right[l] for l in left]), perf_counter() - start_time
 
 test1_correct = 11
 test2_correct = 31
-test = part1(test=True)
+test, _ = part1(test=True)
 assert test == test1_correct, f'Part 1 test failed; it returned {test} instead of {test1_correct}'
-print(f'Part 1 answer is: {part1()}')
-test = part2(test=True)
+part1_ans, part1_time = part1()
+print(f'Part 1 answer is: {part1_ans}, returned in {part1_time * 1000} ms')
+test, _ = part2(test=True)
 assert test == test2_correct, f'Part 2 test failed; it returned {test} instead of {test2_correct}'
-print(f'Part 2 answer is: {part2()}')
+part2_ans, part2_time = part2()
+print(f'Part 2 answer is: {part2_ans}, returned in {part2_time * 1000} ms')
