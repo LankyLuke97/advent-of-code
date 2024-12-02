@@ -32,14 +32,16 @@ end
 
 test1_correct = 11
 test2_correct = 31
-test = Day1.part1("day1/data/day1_test.txt")
+test = Day1.part1("day1/data/test.txt")
 if test != test1_correct do
     raise "Part 1 test failed; it returned #{test} instead of #{test1_correct}"
 end
-IO.puts "Part 1 answer from elixir is: #{Day1.part1("day1/data/day1.txt")}"
+{u_secs, ans} = :timer.tc(fn -> Day1.part1("day1/data/input.txt") end)
+IO.puts "Part 1 answer from elixir is: #{ans}, returned in #{u_secs/1000} ms"
 
-test = Day1.part2("day1/data/day1_test.txt")
+test = Day1.part2("day1/data/test.txt")
 if test != test2_correct do
     raise "Part 2 test failed; it returned #{test} instead of #{test2_correct}"
 end
-IO.puts "Part 2 answer from elixir is: #{Day1.part2("day1/data/day1.txt")}"
+{u_secs, ans} = :timer.tc(fn -> Day1.part2("day1/data/input.txt") end)
+IO.puts "Part 2 answer from elixir is: #{ans}, returned in #{u_secs/1000} ms"

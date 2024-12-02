@@ -10,14 +10,16 @@ end
 
 test1_correct = 0
 test2_correct = 0
-test = Day{{ day_number }}.part1("day{{ day_number }}/data/day{{ day_number }}_test.txt")
+test = Day{{ day_number}}.part1("day{{ day_number}}/data/test.txt")
 if test != test1_correct do
     raise "Part 1 test failed; it returned #{test} instead of #{test1_correct}"
 end
-IO.puts "Part 1 answer from elixir is: #{Day{{ day_number }}.part1("day{{ day_number }}/data/day{{ day_number }}.txt")}"
+{u_secs, ans} = :timer.tc(fn -> Day{{ day_number}}.part1("day{{ day_number}}/data/input.txt") end)
+IO.puts "Part 1 answer from elixir is: #{ans}, returned in #{u_secs/1000} ms"
 
-test = Day{{ day_number }}.part2("day{{ day_number }}/data/day{{ day_number }}_test.txt")
+test = Day{{ day_number}}.part2("day{{ day_number}}/data/test.txt")
 if test != test2_correct do
     raise "Part 2 test failed; it returned #{test} instead of #{test2_correct}"
 end
-IO.puts "Part 2 answer from elixir is: #{Day{{ day_number }}.part2("day{{ day_number }}/data/day{{ day_number }}.txt")}"
+{u_secs, ans} = :timer.tc(fn -> Day{{ day_number}}.part2("day{{ day_number}}/data/input.txt") end)
+IO.puts "Part 2 answer from elixir is: #{ans}, returned in #{u_secs/1000} ms"

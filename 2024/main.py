@@ -42,7 +42,7 @@ if __name__=="__main__":
                 script.write(python_script_template.render(
                     day_number=day,
                 ))
-        data_files = [f'day{day}_test.txt', f'day{day}.txt']
+        data_files = [f'input.txt', 'test.txt']
         for f in data_files:
             full_path = Path(data_folder, f)
             if full_path.exists():
