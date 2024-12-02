@@ -1,6 +1,14 @@
 defmodule Day2 do
-  def part1(_path) do
-    0
+  def part1(path) do
+    File.stream!(path, :line)
+    |> Stream.map(&String.trim/1)
+    |> Stream.map(&String.split/1)
+    |> Stream.map(&Stream.zip(&1, tl(&1)))
+    |> Stream.reject(fn inner ->
+      !(Enum.all?(inner, fn {l, r} -> String.to_integer(l) - String.to_integer(r) in 1..3 end) or
+      Enum.all?(inner, fn {l, r} -> String.to_integer(l) - String.to_integer(r) in -3..-1 end))
+    end)
+    |> Enum.count()
   end
 
   def part2(_path) do
