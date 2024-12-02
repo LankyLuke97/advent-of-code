@@ -15,6 +15,7 @@ if __name__=="__main__":
                                lstrip_blocks=True,
                                )
     elixir_script_template = template_env.get_template('elixir_template.exs.jinja')
+    post_mortem_template = template_env.get_template('post_mortem.md.jinja')
     python_script_template = template_env.get_template('python_template.py.jinja')
     load_dotenv()
     session = os.getenv('AoC_SESSION')
@@ -24,10 +25,16 @@ if __name__=="__main__":
         data_folder = Path(day_folder, 'data')
         data_folder.mkdir(parents=True,exist_ok=True)
         elixir_script = Path(day_folder, f'day{day}.exs')
+        post_mortem = Path(day_folder, f'README.md')
         python_script = Path(day_folder, f'day{day}.py')
         if not elixir_script.exists():
             with open(elixir_script,'w') as script:
                 script.write(elixir_script_template.render(
+                    day_number=day,
+                ))
+        if not post_mortem.exists():
+            with open(post_mortem,'w') as script:
+                script.write(post_mortem_template.render(
                     day_number=day,
                 ))
         if not python_script.exists():
