@@ -2,19 +2,19 @@ from collections import Counter
 from pathlib import Path
 from time import perf_counter
 
-def load_input(test=False):
-    file_path = Path('day1', 'data', f'{"test" if test else "input"}.txt')
+def load_input(test=False, file_path=None):
+    file_path = Path(f'day3', 'data', f'{"test" if test else "input"}.txt') if not file_path else file_path
     with open(file_path, 'r') as f:
         return f.readlines()
 
-def part1(test=False):
-    inp = load_input(test)
+def part1(test=False, file_path=None):
+    inp = load_input(test, file_path)
     start_time = perf_counter()
     left, right = sorted([int(line.split()[0]) for line in inp]), sorted([int(line.split()[1]) for line in inp])
     return sum([abs(l - r) for l, r in zip(left, right)]), perf_counter() - start_time
 
-def part2(test=False):
-    inp = load_input(test)
+def part2(test=False, file_path=None):
+    inp = load_input(test, file_path)
     start_time = perf_counter()
     left, right = [int(line.split()[0]) for line in inp], Counter([int(line.split()[1]) for line in inp])
     return sum([l*right[l] for l in left]), perf_counter() - start_time
