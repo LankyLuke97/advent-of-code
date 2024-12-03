@@ -1,13 +1,13 @@
 from pathlib import Path
 from time import perf_counter
 
-def load_input(test=False): 
-    file_path = Path(f'day2', 'data', f'{"test" if test else "input"}.txt')
+def load_input(test=False, file_path=None):
+    file_path = Path(f'day3', 'data', f'{"test" if test else "input"}.txt') if not file_path else file_path
     with open(file_path, 'r') as f:
         return f.readlines()
 
-def part1(test=False):
-    inp = load_input(test)
+def part1(test=False, file_path=None):
+    inp = load_input(test, file_path)
     start_time = perf_counter()
     reports = [list(map(int, line.strip().split())) for line in inp if line.strip() != ""]
     reports = [list(zip(report[:-1], report[1:])) for report in reports]
@@ -17,13 +17,13 @@ def part1(test=False):
         all([diff[1] < diff[0] for diff in report]))
     else 0 for report in reports]), perf_counter() - start_time
 
-def part2(test=False):
+def part2(test=False, file_path=None):
     def is_safe(report):
         return (all([1 <= abs(diff[0] - diff[1]) <= 3 for diff in report]) and
         (all([diff[0] < diff[1] for diff in report]) or
         all([diff[1] < diff[0] for diff in report])))
     
-    inp = load_input(test)
+    inp = load_input(test, file_path)
     start_time = perf_counter()
     safe = 0
     reports = [list(map(int, line.strip().split())) for line in inp if line.strip() != ""]
