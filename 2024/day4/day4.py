@@ -64,14 +64,62 @@ def part1(test=False, file_path=None):
     return ans, end_time - start_time
 
 def part2(test=False, file_path=None):
-    # inp = load_input(test, file_path)
+    inp = load_input(test, file_path)
     start_time = perf_counter()
 
+    inp = [l.strip() for l in inp]
+    X = 'MAS'
+    _X = 'SAM'
+
+    left_right_diag = []
+    for i in range(len(inp) - 2):
+        str_top = ""
+        j = i
+        while j < len(inp) and j < len(inp[0]):
+            str_top += inp[j-i][j]
+            j += 1
+        left_right_diag.append((str_top, (0, i)))
+        if not i:
+            continue
+        str_side = ""
+        j = i
+        while j < len(inp) and j < len(inp[0]):
+            str_side += inp[j][j-i]
+            j += 1
+        left_right_diag.append((str_side, (i, 0)))
+
+    right_left_diag = []
+    for i in range(2, len(inp)):
+        str_top = ""
+        x = i
+        y = 0
+        while x >= 0 and y < len(inp):
+            str_top += inp[y][x]
+            x -= 1
+            y += 1
+        right_left_diag.append((str_top, (0, i)))
+        if i == len(inp) - 1:
+            continue
+        str_side = ""
+        x = len(inp[0]) - 1
+        y = len(inp) - i - 1
+        while x >= 0 and y < len(inp):
+            str_side += inp[y][x]
+            x -= 1
+            y += 1
+        right_left_diag.append((str_side, (len(inp) - i - 1, len(inp[0]) - 1)))
+
+    ans = len(set([(coord[0] + i.start() + 1, coord[1] + i.start() + 1) for test_str, coord in left_right_diag for i in re.finditer(X, test_str)] +
+                  [(coord[0] + i.start() + 1, coord[1] + i.start() + 1) for test_str, coord in left_right_diag for i in re.finditer(_X, test_str)]).intersection(
+              set([(coord[0] + i.start() + 1, coord[1] - i.start() - 1) for test_str, coord in right_left_diag for i in re.finditer(X, test_str)] +
+                  [(coord[0] + i.start() + 1, coord[1] - i.start() - 1) for test_str, coord in right_left_diag for i in re.finditer(_X, test_str)]))
+             )
+
     end_time = perf_counter()
-    return 0, end_time - start_time
+    return ans, end_time - start_time
 
 test1_correct = 18
-test2_correct = 0
+test2_correct = 9
 test, _ = part1(test=True)
 assert test == test1_correct, f'Part 1 test failed; it returned {test} instead of {test1_correct}'
 part1_ans, part1_time = part1()

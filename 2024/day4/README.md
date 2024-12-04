@@ -10,6 +10,6 @@
 
 
 **Part 1:** *8.862 ms*
-**Part 2:** *x ms*  
+**Part 2:** *10.571 ms*  
 
 [Back to all days](/2024)
