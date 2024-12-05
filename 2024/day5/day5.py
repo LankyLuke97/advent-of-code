@@ -38,14 +38,41 @@ def part1(test=False, file_path=None):
     return correct_pages, end_time - start_time
 
 def part2(test=False, file_path=None):
-    # inp = load_input(test, file_path)
+    def compare_pages(l, r, rules):
+        if l in rules[r]:
+            return -1
+        if r in rules[l]:
+            return 1
+        return 0
+
+    inp = load_input(test, file_path)
     start_time = perf_counter()
 
+    rules = defaultdict(list)
+    correct_pages = 0
+
+    for X, Y in [l.strip().split('|') for l in inp if '|' in l]:
+        rules[Y].append(X)
+
+    for update in [l.strip().split(',') for l in inp if ',' in l]:
+        seen = []
+        must_not_see = []
+        for page in update:
+            seen.append(page)
+            if page in must_not_see:
+                correct_pages += int(sorted(update, key=cmp_to_key(lambda l, r: compare_pages(l, r, rules)))[len(update) // 2])
+                break
+            if page in rules:
+                for must_see in rules[page]:
+                    if must_see in seen:
+                        continue
+                    must_not_see.append(must_see)
+
     end_time = perf_counter()
-    return 0, end_time - start_time
+    return correct_pages, end_time - start_time
 
 test1_correct = 143
-test2_correct = 0
+test2_correct = 123
 test, _ = part1(test=True)
 assert test == test1_correct, f'Part 1 test failed; it returned {test} instead of {test1_correct}'
 part1_ans, part1_time = part1()
