@@ -2,7 +2,7 @@ from pathlib import Path
 from time import perf_counter
 
 def load_input(test=False, file_path=None):
-    file_path = Path(f'day3', 'data', f'{"test" if test else "input"}.txt') if not file_path else file_path
+    file_path = Path(f'day2', 'data', f'{"test" if test else "input"}.txt') if not file_path else file_path
     with open(file_path, 'r') as f:
         return f.readlines()
 
