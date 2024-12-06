@@ -27,7 +27,7 @@ def part1(test=False, file_path=None):
         potential = [index[i] + steps[direction][i] for i in range(2)]
         if not 0 <= potential[0] < len(inp) or not 0 <= potential[1] < len(inp[0]):
             break
-        if inp[potential[0]][potential[1]] == '#':
+        while inp[potential[0]][potential[1]] == '#':
             direction = (direction + 1) % 4
             potential = [index[i] + steps[direction][i] for i in range(2)]
         index = potential
@@ -36,14 +36,64 @@ def part1(test=False, file_path=None):
     return len(visited), end_time - start_time
 
 def part2(test=False, file_path=None):
-    # inp = load_input(test, file_path)
+    def check_cycle(inp, index):
+        steps = [[-1, 0],[0, 1],[1, 0],[0, -1]]
+        index = index + [0]
+        visited = set()
+        while True:
+            if tuple(index) in visited:
+                return 1
+            visited.add(tuple(index))
+            potential = [index[0] + steps[index[2]][0], index[1] + steps[index[2]][1], index[2]]
+            if not 0 <= potential[0] < len(inp) or not 0 <= potential[1] < len(inp[0]):
+                return 0
+            next_dir = index[2]
+            while inp[potential[0]][potential[1]] == '#':
+                next_dir = (next_dir + 1) % 4
+                potential = [index[0] + steps[next_dir][0], index[1] + steps[next_dir][1], next_dir]
+            index = potential
+
+    inp = load_input(test, file_path)
+    inp = [line.strip() for line in inp if line.strip()]
     start_time = perf_counter()
 
+    direction = 0
+    start = [-1, -1]
+    index = [-1, -1]
+    steps = [[-1, 0],[0, 1],[1, 0],[0, -1]]
+    visited = set()
+
+    for y, line in enumerate(inp):
+        x = line.find('^')
+        if x != -1:
+            index = [y, x]
+            start = [y, x]
+            break
+
+    while True:
+        visited.add(tuple(index))
+        potential = [index[i] + steps[direction][i] for i in range(2)]
+        if not 0 <= potential[0] < len(inp) or not 0 <= potential[1] < len(inp[0]):
+            break
+        while inp[potential[0]][potential[1]] == '#':
+            direction = (direction + 1) % 4
+            potential = [index[i] + steps[direction][i] for i in range(2)]
+        index = potential
+
+    visited.remove(tuple(start))
+    cycle_points = 0
+
+    for y, x in visited:
+        original_inp = inp[y]
+        inp[y] = original_inp[:x] + '#' + original_inp[x+1:]
+        cycle_points += check_cycle(inp, start)
+        inp[y] = original_inp
+
     end_time = perf_counter()
-    return 0, end_time - start_time
+    return cycle_points, end_time - start_time
 
 test1_correct = 41
-test2_correct = 0
+test2_correct = 6
 test, _ = part1(test=True)
 assert test == test1_correct, f'Part 1 test failed; it returned {test} instead of {test1_correct}'
 part1_ans, part1_time = part1()
