@@ -1,3 +1,4 @@
+import math
 from pathlib import Path
 from time import perf_counter
 
@@ -26,14 +27,27 @@ def part1(test=False, file_path=None):
     return ans, end_time - start_time
 
 def part2(test=False, file_path=None):
-    # inp = load_input(test, file_path)
+    inp = load_input(test, file_path)
     start_time = perf_counter()
 
+    inp = [map(int, line.replace(':','').strip().split()) for line in inp]
+    ans = 0
+    for [total, *options] in inp:
+        potentials = [options.pop(0)]
+        while options:
+            option = options.pop(0)
+            num = len(potentials)
+            for i in range(num):
+                potentials.append(potentials[i] * option)
+                potentials.append(potentials[i] * (10 ** math.ceil(math.log10(option))) + option)
+                potentials[i] += option
+        if any([potential == total for potential in potentials]): ans += total
+
     end_time = perf_counter()
-    return 0, end_time - start_time
+    return ans, end_time - start_time
 
 test1_correct = 3749
-test2_correct = 0
+test2_correct = 11387
 test, _ = part1(test=True)
 assert test == test1_correct, f'Part 1 test failed; it returned {test} instead of {test1_correct}'
 part1_ans, part1_time = part1()
