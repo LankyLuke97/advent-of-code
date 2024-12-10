@@ -35,14 +35,35 @@ def part1(test=False, file_path=None):
     return ans, end_time - start_time
 
 def part2(test=False, file_path=None):
-    # inp = load_input(test, file_path)
+    inp = [[int(l) for l in line.strip()] for line in load_input(test, file_path) if line.strip()]
     start_time = perf_counter()
+    ans = 0
+    directions = [(-1,0),(0,1),(1,0),(0,-1)]
+
+    for y in range(len(inp)):
+        for x in range(len(inp[0])):
+            if inp[y][x]: continue
+            trailheads = []
+
+            bfs = [(y, x, 0)]
+            while bfs:
+                _y, _x, height = bfs.pop(0)
+                if height == 9:
+                    trailheads.append((_y, _x))
+                    continue
+                for y_off, x_off in directions:
+                    if (0 <= _y+y_off < len(inp) and
+                       0 <= _x+x_off < len(inp[0]) and
+                       inp[_y+y_off][_x+x_off] == (height+1)):
+                        bfs.append((_y+y_off, _x+x_off, height+1))
+
+            ans += len(trailheads)
 
     end_time = perf_counter()
-    return 0, end_time - start_time
+    return ans, end_time - start_time
 
 test1_correct = 36
-test2_correct = 0
+test2_correct = 81
 test, _ = part1(test=True)
 assert test == test1_correct, f'Part 1 test failed; it returned {test} instead of {test1_correct}'
 part1_ans, part1_time = part1()
