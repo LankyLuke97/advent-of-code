@@ -37,8 +37,26 @@ defmodule Day4 do
     |> Enum.sum()
   end
 
-  def part2(_path) do
-    0
+  def part2(path) do
+    File.stream!(path)
+    |> Enum.map(&String.trim/1)
+    |> Enum.map(&String.graphemes/1)
+    |> then(fn lines ->
+      left_right_diag = extract_diagonals(lines)
+      |> Enum.map(&Enum.join(&1))
+      |> IO.inspect()
+      right_left_diag = extract_diagonals(Enum.map(lines, &Enum.reverse/1))
+      |> Enum.map(&Enum.join(&1))
+      |> IO.inspect()
+      [left_right_diag, right_left_diag]
+    end)
+    |> Enum.map(fn direction ->
+      Enum.map(direction, fn line ->
+        search_pattern = ~r/(?<=M)A(?=S)|(?<=S)A(?=M)/
+        Enum.count(Regex.scan(search_pattern, line))
+      end)
+      |> Enum.sum()
+    end)
   end
 end
 
