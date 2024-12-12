@@ -1,3 +1,4 @@
+from functools import cache
 from pathlib import Path
 from time import perf_counter
 
@@ -7,33 +8,49 @@ def load_input(test=False, file_path=None):
         return [line.strip() for line in f.readlines() if line.strip()]
 
 def part1(test=False, file_path=None):
-    inp = [(int(i),i) for line in load_input(test, file_path)for i in line.split()]
+    @cache
+    def apply_rule(n):
+        if n == 0: return [1]
+        str_n = str(n)
+        if len(str_n) % 2 == 0: return [int(str_n[:len(str_n) // 2]), int(str_n[len(str_n) // 2:])]
+        return [n * 2024]
+
+    @cache
+    def transform(stone, depth):
+        if not depth: return 1
+        transformed = apply_rule(stone)
+        return sum(transform(s, depth - 1) for s in transformed)
+
+    inp = [int(i) for line in load_input(test, file_path) for i in line.split()]
     start_time = perf_counter()
-
-    for _ in range(25):
-        new_inp = []
-        for i, str_rep in inp:
-            if i == 0: new_inp.append((1, '1'))
-            elif len(str(str_rep)) % 2 == 0:
-                first_half = int(str_rep[:int(len(str_rep)/2)])
-                second_half = int(str_rep[int(len(str_rep)/2):])
-                new_inp.append((first_half,str(first_half)))
-                new_inp.append((second_half,str(second_half)))
-            else: new_inp.append((i * 2024, str(i*2024)))
-        inp = new_inp
-
+    stones = sum(transform(stone, 25) for stone in inp)
+    
     end_time = perf_counter()
-    return len(inp), end_time - start_time
+    return stones, end_time - start_time
 
 def part2(test=False, file_path=None):
-    # inp = load_input(test, file_path)
-    start_time = perf_counter()
+    @cache
+    def apply_rule(n):
+        if n == 0: return [1]
+        str_n = str(n)
+        if len(str_n) % 2 == 0: return [int(str_n[:len(str_n) // 2]), int(str_n[len(str_n) // 2:])]
+        return [n * 2024]
 
+    @cache
+    def transform(stone, depth):
+        if not depth: return 1
+        transformed = apply_rule(stone)
+        return sum(transform(s, depth - 1) for s in transformed)
+
+    inp = [int(i) for line in load_input(test, file_path) for i in line.split()]
+    start_time = perf_counter()
+    stones = sum(transform(stone, 75) for stone in inp)
+    
     end_time = perf_counter()
-    return 0, end_time - start_time
+    return stones, end_time - start_time
 
 test1_correct = 55312
-test2_correct = 0
+test2_correct = 65601038650482
 test, _ = part1(test=True)
 assert test == test1_correct, f'Part 1 test failed; it returned {test} instead of {test1_correct}'
 part1_ans, part1_time = part1()
