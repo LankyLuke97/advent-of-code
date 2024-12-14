@@ -1,1 +1,4 @@
 .env
+
+# Ignore this - unnecessary data for the most part
+2024/day14/data/pngs
