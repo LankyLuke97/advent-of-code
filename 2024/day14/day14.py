@@ -1,5 +1,5 @@
 from pathlib import Path
-import png
+# import png
 from time import perf_counter
 
 def load_input(test=False, file_path=None):
@@ -44,7 +44,7 @@ def part2(test=False, file_path=None):
 
     image = [[0] * width for _ in range(height)]
     
-    w = png.Writer(width=width, height=height, greyscale=True)
+    # w = png.Writer(width=width, height=height, greyscale=True)
     for step in range(1, 10000):
         positions = set()
         for robot in robots:
@@ -56,9 +56,9 @@ def part2(test=False, file_path=None):
         
         # with open(Path('day14','data','pngs',f'{step:04}.png'), 'wb') as frame:
         #    w.write(frame, image)
-        if step == 7492:
-            with open(Path('day14','data','easter_egg_7492.png'), 'wb') as frame:
-                w.write(frame, image)
+        # if step == 7492:
+        #    with open(Path('day14','data','easter_egg_7492.png'), 'wb') as frame:
+        #        w.write(frame, image)
 
         for (x, y) in positions:
             image[y][x] = 0
