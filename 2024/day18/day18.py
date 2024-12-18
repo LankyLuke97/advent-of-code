@@ -32,21 +32,44 @@ def part1(test=False, file_path=None):
             _y, _x = y+y_off, x+x_off
             if not(0 <= _y < max_coord and 0 <= _x < max_coord): continue
             if grid[_y][_x]: continue
-            
             search.append((_y, _x, steps + 1))
 
     end_time = perf_counter()
     return min_dist, end_time - start_time
 
 def part2(test=False, file_path=None):
-    # inp = load_input(test, file_path)
+    inp = load_input(test, file_path)
     start_time = perf_counter()
 
+    max_coord = 7 if test else 71
+    b = 12 if test else 1024
+    grid = [[0] * max_coord for _ in range(max_coord)]
+    directions = [(-1,0),(0,1),(1,0),(0,-1)]
+
+    for l in inp:
+        b_x, b_y = l.split(',')
+        grid[int(b_y)][int(b_x)] = -1
+        search=[(0,0,0)]
+        visited={}
+        path = False
+        while search:
+            y, x, steps = search.pop(0)
+            if (y, x) == (max_coord-1, max_coord-1): path = True; break
+            if (y, x) in visited and visited[(y, x)] <= steps: continue
+            visited[y, x] = steps
+            for y_off, x_off in directions:
+                _y, _x = y+y_off, x+x_off
+
+                if not(0 <= _y < max_coord and 0 <= _x < max_coord): continue
+                if grid[_y][_x]: continue
+                search.append((_y, _x, steps + 1))
+        if not path: break
+
     end_time = perf_counter()
-    return 0, end_time - start_time
+    return (b_x, b_y), end_time - start_time
 
 test1_correct = 22
-test2_correct = 0
+test2_correct = ('6','1')
 test, _ = part1(test=True)
 assert test == test1_correct, f'Part 1 test failed; it returned {test} instead of {test1_correct}'
 part1_ans, part1_time = part1()
