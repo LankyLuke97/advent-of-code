@@ -9,12 +9,26 @@ def load_input(test=False, file_path=None):
 
 @cache
 def find_pattern(towels, pattern):
+    patterns = 0
     for towel in towels:
-        if pattern == towel: return 1
-        if pattern.startswith(towel) and find_pattern(towels, pattern[len(towel):]): return 1
-    return 0
+        if pattern == towel: patterns += 1
+        elif pattern.startswith(towel):
+            patterns += find_pattern(towels, pattern[len(towel):])
+    return patterns
 
 def part1(test=False, file_path=None):
+    inp = load_input(test, file_path)
+    start_time = perf_counter()
+
+    possible = 0
+    towels = tuple([t.strip() for t in inp[0].split(',')])
+    for design in inp[1:]:
+        possible += 1 if find_pattern(towels, design) else 0
+
+    end_time = perf_counter()
+    return possible, end_time - start_time
+
+def part2(test=False, file_path=None):
     inp = load_input(test, file_path)
     start_time = perf_counter()
 
@@ -26,15 +40,8 @@ def part1(test=False, file_path=None):
     end_time = perf_counter()
     return possible, end_time - start_time
 
-def part2(test=False, file_path=None):
-    # inp = load_input(test, file_path)
-    start_time = perf_counter()
-
-    end_time = perf_counter()
-    return 0, end_time - start_time
-
 test1_correct = 6
-test2_correct = 0
+test2_correct = 16
 test, _ = part1(test=True)
 assert test == test1_correct, f'Part 1 test failed; it returned {test} instead of {test1_correct}'
 part1_ans, part1_time = part1()
