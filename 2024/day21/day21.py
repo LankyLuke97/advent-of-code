@@ -57,14 +57,16 @@ def part1(test=False, file_path=None):
     return complexity, end_time - start_time
 
 def part2(test=False, file_path=None):
-    # inp = load_input(test, file_path)
+    inp = load_input(test, file_path)
     start_time = perf_counter()
 
+    complexity = sum([steps(start,end,26,26) * int(line[:-1]) for line in inp for start, end in zip('A'+line[:-1],line)])
+
     end_time = perf_counter()
-    return 0, end_time - start_time
+    return complexity, end_time - start_time
 
 test1_correct = 126384
-test2_correct = 0
+test2_correct = 154115708116294
 test, _ = part1(test=True)
 assert test == test1_correct, f'Part 1 test failed; it returned {test} instead of {test1_correct}'
 part1_ans, part1_time = part1()
