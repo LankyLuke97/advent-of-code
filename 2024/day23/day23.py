@@ -35,14 +35,33 @@ def part1(test=False, file_path=None):
     return len(parties), end_time - start_time
 
 def part2(test=False, file_path=None):
-    # inp = load_input(test, file_path)
+    def bron_kerbosch(R, P, X, N, cliques):
+        if not (P or X):
+            cliques.append(R)
+            return
+        for v in list(P):
+            bron_kerbosch(R | {v}, P & N[v], X & N[v], N, cliques)
+            P.remove(v)
+            X.add(v)   
+
+    inp = load_input(test, file_path)
     start_time = perf_counter()
 
+    pc_group = defaultdict(set)
+    for line in inp:
+        pc_1, pc_2 = line.split('-')
+        pc_group[pc_1].add(pc_2)
+        pc_group[pc_2].add(pc_1)
+
+    cliques = []
+    bron_kerbosch(set(), set(pc_group.keys()), set(), pc_group, cliques)
+    largest = sorted(list(cliques), key=lambda x: len(x))[-1]
+
     end_time = perf_counter()
-    return 0, end_time - start_time
+    return ','.join(sorted(largest)), end_time - start_time
 
 test1_correct = 7
-test2_correct = 0
+test2_correct = 'co,de,ka,ta'
 test, _ = part1(test=True)
 assert test == test1_correct, f'Part 1 test failed; it returned {test} instead of {test1_correct}'
 part1_ans, part1_time = part1()
