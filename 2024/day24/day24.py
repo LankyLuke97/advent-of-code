@@ -1,3 +1,4 @@
+from collections import defaultdict
 from pathlib import Path
 from time import perf_counter
 
@@ -41,8 +42,62 @@ def part1(test=False, file_path=None):
     return ans, end_time - start_time
 
 def part2(test=False, file_path=None):
-    # inp = load_input(test, file_path)
+    if test: return 0, 0
+    inp = load_input(test, file_path)
     start_time = perf_counter()
+
+    inputs = [l.split(':')[0] for l in inp if ':' in l]
+    gates = defaultdict(dict)
+
+    adders = [[None]*5 for _ in range(len(inputs)+1)]
+
+    for g1, op, g2, _, g3 in [line.split() for line in inp if ':' not in line]:
+        gates[g1][op] = [g1, g2, g3]
+        gates[g2][op] = [g1, g2, g3]
+
+    for g1, op, g2, _, g3 in [line.split() for line in inp if ':' not in line and (line.startswith('x') or line.startswith('y'))]:
+        index = int(g1[1:])
+        if index == 0:
+            if op == 'AND': adders[0][4] = g3
+            continue
+        g_index = 0 if op == 'XOR' else 1
+        adders[index][g_index] = g3
+
+    for item in gates.items():
+        print(item)
+
+    potentials = []
+
+    for i, adder in enumerate(adders[1:]):
+        try:
+            c_in = adders[i][4]
+            xor_c = gates[c_in]['XOR']
+            xor_a_b = gates[adder[0]]['XOR']
+            if xor_c != xor_a_b:
+                potentials.extend(xor_a_b[0:2])
+                potentials.extend(xor_c[0:2])
+        except:
+            print(f'Cannot access one of the XORs: c_in is {c_in} and xor is {adder[0]})')
+        try:
+            and_c = gates[c_in]['AND']
+            and_a_b = gates[adder[0]]['AND']
+            if and_c != and_a_b:
+                potentials.extend(and_a_b[0:2])
+                potentials.extend(and_c[0:2])
+        except:
+            print(f'Cannot access one of the ANDs: c_in is {c_in} and xor is {adder[0]})')
+        try:
+            or_c = gates[gates[c_in]['AND'][2]]['OR']
+            or_a_b = gates[adder[1]]['OR']
+            if and_c != and_a_b:
+                potentials.extend(or_a_b[0:2])
+                potentials.extend(or_c[0:2])
+        except:
+            print(f'In the ORs, c_in is: {c_in}')
+            print(f'Cannot access one of the ORs: and_c is {gates[c_in]['AND']} and and is {adder[1]})')
+
+    print(potentials)
+
 
     end_time = perf_counter()
     return 0, end_time - start_time
