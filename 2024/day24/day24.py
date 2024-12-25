@@ -46,61 +46,24 @@ def part2(test=False, file_path=None):
     inp = load_input(test, file_path)
     start_time = perf_counter()
 
-    inputs = [l.split(':')[0] for l in inp if ':' in l]
-    gates = defaultdict(dict)
+    num_outputs = len([l.split(':')[0] for l in inp if ':' in l])//2
+    operations = [line.split() for line in inp if ':' not in line]
 
-    adders = [[None]*5 for _ in range(len(inputs)+1)]
-
-    for g1, op, g2, _, g3 in [line.split() for line in inp if ':' not in line]:
-        gates[g1][op] = [g1, g2, g3]
-        gates[g2][op] = [g1, g2, g3]
-
-    for g1, op, g2, _, g3 in [line.split() for line in inp if ':' not in line and (line.startswith('x') or line.startswith('y'))]:
-        index = int(g1[1:])
-        if index == 0:
-            if op == 'AND': adders[0][4] = g3
-            continue
-        g_index = 0 if op == 'XOR' else 1
-        adders[index][g_index] = g3
-
-    for item in gates.items():
-        print(item)
-
-    potentials = []
-
-    for i, adder in enumerate(adders[1:]):
-        try:
-            c_in = adders[i][4]
-            xor_c = gates[c_in]['XOR']
-            xor_a_b = gates[adder[0]]['XOR']
-            if xor_c != xor_a_b:
-                potentials.extend(xor_a_b[0:2])
-                potentials.extend(xor_c[0:2])
-        except:
-            print(f'Cannot access one of the XORs: c_in is {c_in} and xor is {adder[0]})')
-        try:
-            and_c = gates[c_in]['AND']
-            and_a_b = gates[adder[0]]['AND']
-            if and_c != and_a_b:
-                potentials.extend(and_a_b[0:2])
-                potentials.extend(and_c[0:2])
-        except:
-            print(f'Cannot access one of the ANDs: c_in is {c_in} and xor is {adder[0]})')
-        try:
-            or_c = gates[gates[c_in]['AND'][2]]['OR']
-            or_a_b = gates[adder[1]]['OR']
-            if and_c != and_a_b:
-                potentials.extend(or_a_b[0:2])
-                potentials.extend(or_c[0:2])
-        except:
-            print(f'In the ORs, c_in is: {c_in}')
-            print(f'Cannot access one of the ORs: and_c is {gates[c_in]['AND']} and and is {adder[1]})')
-
-    print(potentials)
-
+    wrong = set()
+    for g1, op, g2, _, g3 in operations:
+        if g3[0] == 'z' and op != 'XOR' and g3 != f'z{num_outputs}': wrong.add(g3)
+        if op == 'XOR' and (g1[0] not in ['x', 'y', 'z'] and
+                            g2[0] not in ['x', 'y', 'z'] and
+                            g3[0] not in ['x',' y', 'z']): wrong.add(g3)
+        if op == "AND" and "x00" not in [g1, g2]:
+            for subg1, subop, subg2, _, _ in operations:
+                if (g3 == subg1 or g3 == subg2) and subop != "OR": wrong.add(g3)
+        if op == "XOR":
+            for subg1, subop, subg2, _, _ in operations:
+                if (g3 == subg1 or g3 == subg2) and subop == "OR": wrong.add(g3)
 
     end_time = perf_counter()
-    return 0, end_time - start_time
+    return ','.join(sorted(list(wrong))), end_time - start_time
 
 test1_correct = 2024
 test2_correct = 0
