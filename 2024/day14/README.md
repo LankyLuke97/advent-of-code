@@ -17,7 +17,7 @@ My final solution, as was the case for so many people, was to simulate the robot
 
 I scrolled the Reddit solutions to see if anyone had come up with more programmatic solutions than this; the best that I saw, which I did think was an interesting approach, was to calculate the dispersion of the robots at each step; during the timestep where the robots were forming a Christmas tree image, the dispersion was likely to be the lowest, since they would all be clumped together. In the end, I decided it wasn't worth more than the pleasure of spotting a Christmas tree amongst a bunch of random noise. Go figure that one out.  
 
-**Part 1:** *0.89 ms*
+**Part 1:** *0.89 ms*  
 **Part 2:** *N/A*  
 
 [Back to all days](/2024)

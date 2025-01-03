@@ -21,7 +21,7 @@ The solution I came to was based on a breadth-first search (what a useful tool).
 
 With this list of affected boxes, I now work in reverse order, updating the grid to reflect the movement of each box. I work in reverse order to ensure that no information is lost; if I worked forwards, then I would overwrite information that's going to be needed later in the process. Finally, I return the same GPS sum as for part 1.
 
-**Part 1:** *8.23 ms*
+**Part 1:** *8.23 ms*  
 **Part 2:** *24.59 ms*  
 
 [Back to all days](/2024)
