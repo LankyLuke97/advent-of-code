@@ -7,7 +7,7 @@ A **User** has misunderstood what a pushdown automaton is (I don't blame them) a
 
 First, though, we need to know what locations are safe and what to avoid. Given a list of where the bytes are going to fall on a grid, we need to simulate where all the bytes will be after a kilobyte has fallen, and what our shortest path will be.
 ### Solution
-Thank goodness, a respite after my disastrous day 17. This first part just combines a 'simulation', which is really just parsing the text file and turning then provided coordinates into a grid of walkable and non-walkable locations, and a breadth-first search.  
+Thank goodness, a respite after my disastrous day 17 (which, I should note, I didn't finish until after finishing day 19). This first part just combines a 'simulation', which is really just parsing the text file and turning then provided coordinates into a grid of walkable and non-walkable locations, and a breadth-first search.  
 
 I don't think there's much more to say here, since this is a well-worn path now, so let's see what's going on in part 2.
 ### Part 2
