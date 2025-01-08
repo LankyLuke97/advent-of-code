@@ -1,15 +1,63 @@
 # Advent of Code 2024
 ## Day 6
 ### Part 1
+We've now been teleported to a lab in 1518, patrolled by a single guard. The guard keeps walking forward until she hits one of many eclectic obstacles scattered throughout the lab, at which point she turns 90 degrees to the right and continues walking forward. This repeats over and over again until she leaves the area under inspection.  
 
+The historians want to know how many unique positions she will visit so they know where to search. 
 ### Solution
-
+This puzzle sees the welcome return of the classic map-based AoC puzzle, with full-stops and hashes littering the screen. What a pleasure. The actual soluiton is pretty simple. I started by finding the position of the guard in the input. From there, it's a simple case of simulation; moving the position of the guard each step until there's an obstacle in front of her, at which point I rotate her and continue. Each position gets added to a set (we're looking for unique locations) and the size of the set after she steps out of bounds is our answer. Nice and straightforward.  
 ### Part 2
+With a slight detour to spy on the guard for the preceding few months, we catch up with the historians, who explain that the area the guard is searching is too large. They want to know where they can put an object in the lab to cause the guard to get stuck in a loop, as this will apparently make the place easier to search.  
 
+Oh. They want to know how many different places they could put something to cause a cycle?  
+
+Right. This feels tricky.
 ### Solution
+In the end, I mostly brute-forced this answer, with a single vague optimisation. The process was, roughly, to loop once through and record all the positions that the guard visits, and then check whether a cycle occurs if and of those 'path' spots is replaced with an obstacle. There's no point replacing any square that she doesn't visit, because it will have no effect.  
 
+This seemed to work fine, and I believe the test instance passed without issue, but my answer was incorrect when I submitted it; too low apparently.  
 
-**Part 1:** *x ms*
-**Part 2:** *x ms*  
+After a good long while trying to figure out where this sudden error had come from, I realised what was going on. I was doing something like this (in pseudocode):
+```
+if (next_spot is '#'):
+    turn rght
+    ....
+```
+This worked without issue in the first part, where all the objects were isolated, but now I'm adding them everywhere, and very occasionally was coming up with this issue:
+```
+......
+......
+..#... Marching forward
+.#.<..
+......
+
+......
+......
+..#... Encounters obstacle
+.#<...
+......
+
+......
+......
+..#... Turns right, encounters another obstacle
+.#^...
+......
+
+......
+......
+..^... Phases through obstacle like the Twins in the Matrix Reloaded
+.#....
+......
+
+......
+..^...
+..#... Phases out of obstacle and continues on merry way
+.#....
+......
+```
+A trivially easy fix, switching that if statement to a while loop.
+
+**Part 1:** *5.54 ms*  
+**Part 2:** *11,817.33 ms*  
 
 [Back to all days](/2024)

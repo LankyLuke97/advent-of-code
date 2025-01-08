@@ -26,7 +26,7 @@ def part1(test=False, file_path=None):
 
 def part2(test=False, file_path=None):
     def all_changes(num, iterations=2000):
-        prev = num & 9
+        prev = num % 10
         sequence = deque([],4)
         sequences_to_amount = {}
         for _ in range(3):

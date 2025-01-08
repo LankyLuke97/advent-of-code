@@ -53,8 +53,8 @@ def part2(test=False, file_path=None):
                     continue
                 for y_off, x_off in directions:
                     if (0 <= _y+y_off < len(inp) and
-                       0 <= _x+x_off < len(inp[0]) and
-                       inp[_y+y_off][_x+x_off] == (height+1)):
+                        0 <= _x+x_off < len(inp[0]) and
+                        inp[_y+y_off][_x+x_off] == (height+1)):
                         bfs.append((_y+y_off, _x+x_off, height+1))
 
             ans += len(trailheads)
