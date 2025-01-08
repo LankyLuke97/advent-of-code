@@ -13,7 +13,7 @@ If the robot attempts to move into a wall, don't. If it attempts to move into an
 
 Finally, sum the various GPS values for each box.
 ### Part 2
-Just as we save the day here, another robot goes rogue. This time, its in a warehouse where the layout is the same, except everything is twice as wide. 
+Just as we save the day here, another robot goes rogue. This time, it's in a warehouse where the layout is the same, except everything is twice as wide. 
 ### Solution
 The double width has no practical difference when the robot is moving left or right, but when moving up or down, one box has the ability to push two boxes. This means that I need to check a potentially widening 'front' of boxes for any walls. If there is a wall blocking any of the boxes that would potentially move, then the whole movement fails. If there is an area of empty space into which the robot could push the boxes, then I need to move them all one space - there's no easy chain trick here.  
 
