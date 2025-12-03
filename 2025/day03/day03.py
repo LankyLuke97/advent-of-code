@@ -30,30 +30,16 @@ def part_two(file):
         for line in data.readlines():
             line = line.strip()
             l = len(line)
-            dp = [[('0',0)] * l for _ in range(12)]
-            for i in range(len(dp)):
-                for j in range(i-12, 0):
-                    dp[i][i-j] = (line[i-12], l+i-12)
-
-            for row in dp: print(row)
-            input()
-            for idx in range(l-2,-1,-1):
-                for row in dp:
-                    if row[idx+1][0] <= line[idx] and row[idx][1] <= idx: row[idx] = (line[idx], idx)
-                    else: row[idx] = row[idx+1]
-                print(f'-----{idx:02}-----')
-                for row in dp: print(row)
-                input()
-
             string = ""
             idx = 0
-            for row in dp:
-                c, idx = row[idx]
-                string += c
+            for i in range(12):
+                cur = '0'
+                for c in range(idx, l-11+i):
+                    if line[c] > cur:
+                        idx = c
+                        cur = line[c]
+                string += cur
                 idx += 1
-            print(string)
-            for row in dp: print(row)
-            input()
             ans += int(string)
     return ans
 
