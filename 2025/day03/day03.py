@@ -1,6 +1,4 @@
-from math import ceil
 from pathlib import Path
-import re
 
 def part_one(file):
     ans = 0
